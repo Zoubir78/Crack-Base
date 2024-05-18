@@ -27,18 +27,18 @@ Les principaux frameworks/bibliothèques utilisés pour démarrer le projet :
 
 ## Prérequis
 Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment l'installer:
-`Python : 3.12`
-`conda`
+- `Python : 3.12`
+- `conda`
 
 ### Installation
 Voici la façon dont vous pouvez instruire l'installation et la configuration de votre application.
 
 ### Clonez le dépôt
- `git clone https://github.com/Zoubir78/Crack-Base.git`
+- `git clone https://github.com/Zoubir78/Crack-Base.git`
 
 ### Installez les dépendances Python
- `cd Crack-Base`
- `pip install -r requirements.txt`
+- `cd Crack-Base`
+- `pip install -r requirements.txt`
 
 ## Utilisation
 En cours de rédaction...
