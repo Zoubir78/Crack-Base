@@ -32,10 +32,10 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 Voici un exemple de la façon dont vous pouvez instruire votre audience sur l'installation et la configuration de votre application. Ce modèle ne repose sur aucune dépendance ou service externe.
 
 ### Clonez le dépôt
- git clone https://github.com/Zoubir78/Crack-Base.git
+ `git clone https://github.com/Zoubir78/Crack-Base.git`
 
 ### Installez les dépendances Python
- pip install -r requirements.txt
+ `pip install -r requirements.txt`
 
 ## Utilisation
 Utilisez cet espace pour montrer des exemples utiles de la manière dont un projet peut être utilisé. Des captures d'écran supplémentaires, des exemples de code et des démonstrations fonctionnent bien dans cet espace. Vous pouvez également créer des liens vers plus de ressources.
