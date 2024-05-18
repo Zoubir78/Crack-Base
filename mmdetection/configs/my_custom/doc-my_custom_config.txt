@@ -1,0 +1,37 @@
+Ce code est une configuration de modèle utilisée dans le cadre du framework de détection d'objets mmdetection. 
+mmdetection est une bibliothèque open-source basée sur PyTorch, conçue pour faciliter la mise en œuvre et l'entraînement de modèles de détection d'objets.
+
+La configuration du modèle détermine l'architecture du modèle, les paramètres d'apprentissage, les configurations d'entraînement et de test, 
+et d'autres aspects liés à la formation et à l'évaluation du modèle de détection d'objets.
+
+Le modèle configuré ici semble être basé sur le framework Faster R-CNN, qui est un modèle populaire pour la détection d'objets. 
+Le modèle est divisé en deux parties principales : la tête RPN (Region Proposal Network) pour la génération de propositions de régions 
+et la tête ROI (Region of Interest) pour la prédiction des classes d'objets, des boîtes englobantes et des masques.
+
+Voici une brève explication des principales parties de la configuration :
+
+>>>>RPN Head (Region Proposal Network) : Cette partie génère des propositions de régions (ancres) pour les objets potentiels dans l'image.
+
+>>>>ROI Head (Region of Interest) : Cette partie prend les propositions de régions générées par la tête RPN et effectue la prédiction des classes d'objets, 
+des boîtes englobantes et des masques pour chaque région.
+
+>>>>Anchor Generator : Génère des ancres pour la tête RPN avec différentes échelles et ratios.
+
+>>>>BBox Coder (BoundingBox Coder) : Codeur de boîte englobante pour convertir les prédictions de boîtes englobantes en boîtes englobantes réelles.
+
+>>>>Loss Functions : Spécification des fonctions de perte utilisées pour l'apprentissage, comme la perte de classification croisée 
+et la perte de boîte équilibrée.
+
+>>>>Train Configuration (train_cfg) : Configuration spécifique pour l'entraînement, y compris des paramètres pour l'assignation d'ancres, 
+l'échantillonnage, etc.
+
+>>>>Test Configuration (test_cfg) : Configuration spécifique pour les tests, y compris des paramètres pour le post-traitement 
+comme le non-maximum suppression (NMS) et des seuils de score.
+
+Il est important de noter que cette configuration est spécifique à mmdetection et est utilisée pour définir l'architecture 
+et les paramètres d'un modèle de détection d'objets particulier. Pour comprendre pleinement le modèle, il serait utile de consulter 
+la documentation de mmdetection et d'examiner la documentation spécifique du modèle utilisé.
+
+
+
+
