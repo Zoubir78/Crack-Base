@@ -1,7 +1,7 @@
 # Crack-Base
- ENDSUM - Strasbourg
+*ENDSUM - Strasbourg*
 
-## À Propos du Projet
+## À Propos du projet
 
 ![Crack-Base](https://github.com/Zoubir78/Crack-Base/blob/main/carck-base.png)
 
@@ -10,23 +10,25 @@ Bien sûr, aucun modèle ne conviendra à tous les projets puisque vos besoins p
 ## Construit Avec
 Les principaux frameworks/bibliothèques utilisés pour démarrer le projet :
 
-- os
-- sys
-- io
-- cv2
-- subprocess
-- json
-- tkinter
-- Image
-- ImageTk
-- BytesIO
-- Thread
-- open_new
-- datetime
-- nbformat
+- `os`
+- `sys`
+- `io`
+- `cv2`
+- `subprocess`
+- `json`
+- `tkinter`
+- `Image`
+- `ImageTk`
+- `BytesIO`
+- `Thread`
+- `open_new`
+- `datetime`
+- `nbformat`
 
 ## Prérequis
-Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment les installer.
+Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment l'installer:
+`Python : 3.12`
+`conda`
 
 ### Installation
 Voici un exemple de la façon dont vous pouvez instruire votre audience sur l'installation et la configuration de votre application. Ce modèle ne repose sur aucune dépendance ou service externe.
@@ -35,12 +37,14 @@ Voici un exemple de la façon dont vous pouvez instruire votre audience sur l'in
  `git clone https://github.com/Zoubir78/Crack-Base.git`
 
 ### Installez les dépendances Python
+ `cd Crack-Base`
  `pip install -r requirements.txt`
 
 ## Utilisation
 Utilisez cet espace pour montrer des exemples utiles de la manière dont un projet peut être utilisé. Des captures d'écran supplémentaires, des exemples de code et des démonstrations fonctionnent bien dans cet espace. Vous pouvez également créer des liens vers plus de ressources.
 
-Pour plus d'exemples, veuillez vous référer à la Documentation.
+Pour plus d'infos sur les modèles d'entrainement et le fichier de configuration, veuillez vous référer à la Documentation de MMDetection.
+[MMDetection] (https://mmdetection.readthedocs.io/en/latest/get_started.html)
 
 ### Licence
 Distribué sans licence.
