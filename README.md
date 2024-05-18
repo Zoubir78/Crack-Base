@@ -1,5 +1,4 @@
 # Crack-Base
-*ENDSUM - Strasbourg*
 
 ## À Propos du projet
 
