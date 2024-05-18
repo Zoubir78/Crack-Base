@@ -118,26 +118,31 @@ class CrackBase(Tk):
 
     # Fonction pour exécuter npz_img
     def run_npz_img(self):
-        chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "npz-img.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "npz-img.py")
         subprocess.run(["python", "npz-img.py"])
 
-        #messagebox.showinfo("Script exécuté!", "Le script a été exécuté avec succès.")
+    # Fonction pour exécuter fusion_img
+    def run_fusion_img(self):
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fusion-img.py")
+        subprocess.run(["python", "fusion-img.py"])
+
+        messagebox.showinfo("Script exécuté", "La fusion des images a été exécutée avec succès.")
 
     # Fonctions pour exécuter les fichiers "coco-format"
     def execute_program2(self):
-        chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\mask2coco.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\mask2coco.py")
         subprocess.run(["python", "mask2coco-converter\\mask2coco.py"])
 
     def execute_program3(self):
-        chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\visualize_mask2points.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\visualize_mask2points.py")
         subprocess.run(["python", "mask2coco-converter\\visualize_mask2points.py"])
 
     def execute_program4(self):
-        chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\analysis.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\analysis.py")
         subprocess.run(["python", "mask2coco-converter\\analysis.py"])
 
     def execute_program5(self):
-        chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\dir_masks.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\dir_masks.py")
         subprocess.run(["python", "mask2coco-converter\\dir_masks.py"])
 
     # Fonction pour afficher le fichier généré   
@@ -188,10 +193,15 @@ class CrackBase(Tk):
         file.add_command(label="Exit", command=self.destroy)
         menu.add_cascade(label="File", menu=file)
 
-        npz = Menu(menu, tearoff=0) 
+        npz_img = Menu(menu, tearoff=0) 
         npz_img = tk.Menu(menu, tearoff=0)
         npz_img.add_command(label="Exécuter", command=self.run_npz_img)
         menu.add_cascade(label="npz-png", menu=npz_img)
+
+        fusion_img = Menu(menu, tearoff=0) 
+        fusion_img = tk.Menu(menu, tearoff=0)
+        fusion_img.add_command(label="Exécuter", command=self.run_fusion_img)
+        menu.add_cascade(label="Fusion-img", menu=fusion_img)
 
         view = Menu(self)
         view.add_command(label="Voir le dossier des BDD", command=self.explorer)
