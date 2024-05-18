@@ -40,7 +40,8 @@ Voici la façon dont vous pouvez instruire l'installation et la configuration de
 - `pip install -r requirements.txt`
 
 ## Utilisation
-En cours de rédaction...
+Pour lancer l'application via votre LCI :
+- `python app.py`
 
 Pour plus d'infos sur les modèles d'entrainement et le fichier de configuration, veuillez vous référer à la Documentation de MMDetection.
 [MMDetection] (https://mmdetection.readthedocs.io/en/latest/get_started.html)
