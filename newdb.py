@@ -33,15 +33,11 @@ def add_site_to_existing_database():
         create_new_database()
 
 def get_existing_databases():
-    # Insérez ici le code pour récupérer la liste des bases de données existantes
-    # Par exemple, vous pourriez rechercher tous les fichiers de type .db dans un répertoire spécifique
-    # et retourner une liste contenant les noms de ces fichiers
+
     pass
 
 def add_site_to_existing(chosen_database):
-    # Insérez ici le code pour ajouter le site à la base de données existante choisie
-    # Cela impliquera d'ouvrir une connexion à la base de données, d'exécuter une requête d'insertion appropriée
-    # pour ajouter les informations du site et de gérer toute erreur éventuelle
+
     pass
 
 def create_new_database():

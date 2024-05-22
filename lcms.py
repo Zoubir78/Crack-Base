@@ -64,7 +64,6 @@ def connect():
     # Sauvegarder les modifications
     connection.commit()
 
-    # Retourner la connexion sans fermer le curseur ici
     return connection
 
 def insert(conn, category, site, tube, sens, nom_image, image_json, created_at=None, table="images"):

@@ -11,11 +11,11 @@ from datetime import datetime
 
 
 def connect():
-    # Create a connection to the database
+    # Créer une connexion à la base de données
     connection = sqlite3.connect("DB\\rdg.db")
     print(f"Connecté à la base de données {'rdg.db'}")
 
-    # Create a cursor
+    # Créer un curseur
     cursor = connection.cursor()
 
     # Create the 'images' table
@@ -48,7 +48,6 @@ def connect():
     # Save the changes
     connection.commit()
 
-    # Return the connection without closing the cursor here
     return connection
 
 def insert(conn, category, site, camera, sens, nom_image, image_json, created_at=None, table="images"):
