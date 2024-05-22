@@ -11,11 +11,11 @@ from datetime import datetime
 
 
 def connect():
-    # Create a connection to the database
+    # Créer une connexion à la base de données
     connection = sqlite3.connect("DB\\grandMare.db")
     print(f"Connected to the database {'grandMare.db'}")
 
-    # Create a cursor
+    # Créer un curseur
     cursor = connection.cursor()
 
     cursor.execute('''
@@ -29,7 +29,7 @@ def connect():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
-    print("Table 'images_grand' created successfully.")
+    print("La table 'images_grand' créée avec succès.")
 
     # Create the 'json_data' table
     cursor.execute('''
