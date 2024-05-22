@@ -131,19 +131,19 @@ class CrackBase(Tk):
 
     # Fonctions pour exécuter les fichiers "coco-format"
     def execute_program2(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\mask2coco.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\mask2coco.py")
         subprocess.run(["python", "mask2coco-converter\\mask2coco.py"])
 
     def execute_program3(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\visualize_mask2points.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\visualize_mask2points.py")
         subprocess.run(["python", "mask2coco-converter\\visualize_mask2points.py"])
 
     def execute_program4(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\analysis.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\analysis.py")
         subprocess.run(["python", "mask2coco-converter\\analysis.py"])
 
     def execute_program5(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco-converter\\dir_masks.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\dir_masks.py")
         subprocess.run(["python", "mask2coco-converter\\dir_masks.py"])
 
     # Fonction pour afficher le fichier généré   
