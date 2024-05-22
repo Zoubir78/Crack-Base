@@ -11,11 +11,11 @@ from datetime import datetime
 
 
 def connect():
-    # Create a connection to the database
+    # Créer une connexion à la base de données
     connection = sqlite3.connect("DB\\deepCrack.db")
     print(f"Connected to the database {'deepCrack.db'}")
 
-    # Create a cursor
+    # Créer un curseur
     cursor = connection.cursor()
 
     cursor.execute('''
@@ -29,9 +29,9 @@ def connect():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
-    print("Table 'images_deep' created successfully.")
+    print("La table 'images_deep' a été créée avec succès.")
 
-    # Create the 'json_data' table
+    # Créer une table 'json_data'
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS masques_deep (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +44,6 @@ def connect():
     # Save the changes
     connection.commit()
 
-    # Return the connection without closing the cursor here
     return connection
 
 def insert(conn, category, site, type, nom_image, image_json, created_at=None, table="images_deep"):

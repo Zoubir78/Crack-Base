@@ -31,7 +31,7 @@ def connect():
     ''')
     print("La table 'images_grand' créée avec succès.")
 
-    # Create the 'json_data' table
+    # Créer une table 'json_data'
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS masques_grand (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +44,6 @@ def connect():
     # Save the changes
     connection.commit()
 
-    # Return the connection without closing the cursor here
     return connection
 
 def insert(conn, category, site, tube, nom_image, image_json, created_at=None, table="images_grand"):
