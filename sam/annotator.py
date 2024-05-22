@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
         self.shape_dock.setObjectName("Labels")
         self.shape_dock.setWidget(self.labelList)
 
-        self.category_list = [i.strip() for i in open(r'C:\Users\z.marouf-araibi\Desktop\crack-base-project\classes.csv', 'r', encoding='utf-8').readlines()]
+        self.category_list = [i.strip() for i in open(r'C:\Users\z.marouf-araibi\Desktop\Crack-Base\classes.csv', 'r', encoding='utf-8').readlines()]
         self.labelDialog = LabelDialog(
             parent=self,
             labels=self.category_list,
@@ -212,7 +212,7 @@ class MainWindow(QMainWindow):
             enabled=True,
         )
         imageDirectory = action(
-            self.tr("Répertoire d'images"),
+            self.tr("Dossier d'images"),
             lambda: self.clickFileChoose(),
             'None',
             "objects",
@@ -254,7 +254,7 @@ class MainWindow(QMainWindow):
         )
 
         createMode = action(
-            self.tr("Polygones manuels"),
+            self.tr("Polygones"),
             lambda: self.toggleDrawMode(False, createMode="polygon"),
             'Ctrl+W',
             "objects",
@@ -262,7 +262,7 @@ class MainWindow(QMainWindow):
             enabled=True,
         )
         createPointMode = action(
-            self.tr("Invite de points"),
+            self.tr("Points"),
             lambda: self.toggleDrawMode(False, createMode="point"),
             'None',
             "objects",
@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
             enabled=True,
         )
         createRectangleMode = action(
-            self.tr("Invite de boîte"),
+            self.tr("Boîte"),
             lambda: self.toggleDrawMode(False, createMode="rectangle"),
             'None',
             "objects",
@@ -337,7 +337,7 @@ class MainWindow(QMainWindow):
         )
 
         undo = action(
-            self.tr("annuler"),
+            self.tr("Annuler"),
             self.undoShapeEdit,
             'Ctrl+U',
             "undo",
@@ -1409,7 +1409,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description="pixel annotator by GroundedSAM")
     parser.add_argument(
         "--app_resolution",
-        default='1000,1600',
+        default='1100,1900',
     )
     parser.add_argument(
         "--model_type",
