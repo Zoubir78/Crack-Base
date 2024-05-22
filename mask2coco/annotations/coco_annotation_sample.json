@@ -1,0 +1,78 @@
+{
+	"info": {
+		"description": "COCO 2017 Dataset",
+		"url": "http://cocodataset.org",
+		"version": "1.0",
+		"year": 2017,
+		"contributor": "COCO Consortium",
+		"date_created": "2017/09/01"
+	},
+
+    "licenses": [
+		{
+			"url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+			"id": 1,
+			"name": "Attribution-NonCommercial-ShareAlike License"
+		}
+    ],
+    "images": [
+		{
+			"license": 3,
+			"file_name": "000000554625.jpg",
+			"coco_url": "http://images.cocodataset.org/train2017/000000554625.jpg",
+			"height": 640,
+			"width": 426,
+			"date_captured": "2013-11-14 16:03:19",
+			"flickr_url": "http://farm5.staticflickr.com/4086/5094162993_8f59d8a473_z.jpg",
+			"id": 554625
+		}
+    ],
+    "annotations": [
+		{   
+			"segmentation": [
+				[
+					239.97,
+					260.24,
+					222.04,
+					270.49,
+					199.84,
+					253.41,
+					213.5,
+					227.79,
+					259.62,
+					200.46,
+					274.13,
+					202.17,
+					277.55,
+					210.71,
+					249.37,
+					253.41,
+					237.41,
+					264.51,
+					242.54,
+					261.95,
+					228.87,
+					271.34
+				]
+			],
+			"area": 2765.1486500000005,
+			"iscrowd": 0,
+			"image_id": 558840,
+			"bbox": [
+				199.84,
+				200.46,
+				77.71,
+				70.88
+			],
+			"category_id": 58,
+			"id": 156
+		}
+    ], 
+    "categories": [
+		{
+			"supercategory": "outdoor",
+			"id": 10,
+			"name": "traffic light"
+		}
+    ]
+}
