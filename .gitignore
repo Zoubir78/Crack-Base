@@ -1,0 +1,32 @@
+
+# Fichiers et répertoires spécifiques aux IDE
+.vscode/
+.idea/
+
+# Ignorer les fichiers log
+*.log
+
+# Fichiers export
+/export/
+
+# Fichiers temporaires
+*.tmp
+*.swp
+
+# Répertoires de build
+/build/
+/dist/
+
+# Fichiers de cache de Python
+__pycache__/
+*.pyc
+
+# Environnements virtuels Python
+venv/
+.env/
+
+# Fichiers de database
+/DB/
+
+# Fichiers de SAM
+vit_b.pth
