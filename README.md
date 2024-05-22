@@ -26,7 +26,7 @@ Les principaux frameworks/bibliothèques utilisés pour démarrer le projet :
 
 ## Prérequis
 Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment l'installer:
-- `Python : 3.12`
+- `Python 3.12`
 - `conda`
 
 ### Installation
@@ -43,7 +43,8 @@ Voici la façon dont vous pouvez instruire l'installation et la configuration de
 Pour lancer l'application via votre LCI :
 - `python app.py`
 
-Pour plus d'infos sur les modèles d'entrainement et le fichier de configuration, veuillez vous référer à la Documentation de MMDetection.
+- N'oubliez pas de créer deux dossiers, un pour les bases de données 'DB' et un autre pour les exports 'export'.
+- Pour plus d'infos sur les modèles d'entrainement et le fichier de configuration, veuillez vous référer à la documentation de MMDetection.
 [MMDetection] (https://mmdetection.readthedocs.io/en/latest/get_started.html)
 
 ### Licence
