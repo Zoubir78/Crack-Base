@@ -1232,17 +1232,19 @@ class View(Frame):
         frame = ttk.Frame(self)
         frame.pack(side=tk.TOP, padx=5, pady=5)
 
-        # Étiquette et champ de saisie pour le nom de la base de données
-        self.database_label = ttk.Label(frame, text="Nom de la base de données (database.db):")
+        # Sélection de la base de données
+        self.database_label = ttk.Label(frame, text="Base de données:")
         self.database_label.grid(row=0, column=0, padx=5, pady=5)
-        self.database_entry = ttk.Entry(frame, width=40)
-        self.database_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.database_combobox = ttk.Combobox(frame, width=40)
+        self.database_combobox.grid(row=0, column=1, padx=5, pady=5)
+        self.database_combobox.bind("<<ComboboxSelected>>", self.load_tables)
 
-        # Étiquette et champ de saisie pour le nom de la table
-        self.table_label = ttk.Label(frame, text="Nom de la table:")
+        # Sélection de la table
+        self.table_label = ttk.Label(frame, text="Table:")
         self.table_label.grid(row=0, column=2, padx=5, pady=5)
-        self.table_entry = ttk.Entry(frame, width=40)
-        self.table_entry.grid(row=0, column=3, padx=5, pady=5)
+        self.table_combobox = ttk.Combobox(frame, width=40)
+        self.table_combobox.grid(row=0, column=3, padx=5, pady=5)
+        self.table_combobox.bind("<<ComboboxSelected>>", self.display_selected_table)
 
         # Bouton pour afficher les données de la table spécifiée
         self.show_table_button = ttk.Button(frame, text="Afficher la table", command=self.display_selected_table)
@@ -1257,12 +1259,35 @@ class View(Frame):
         scrollbar.config(command=self.tree.yview)
 
         self.db_directory = "DB"  # Dossier contenant les bases de données
+        self.load_databases()  # Charger les bases de données au démarrage
 
-    # Méthodes de fonctionnement des commandes
+    def load_databases(self):
+        db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
+        self.database_combobox['values'] = db_files
+
+    def load_tables(self, event):
+        database_name = self.database_combobox.get()
+        if not database_name:
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = [table[0] for table in cursor.fetchall()]
+            connection.close()
+            self.table_combobox['values'] = tables
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors du chargement des tables : {e}")
+
     def explorer(self):
-        dossier_db = r'C:\Users\z.marouf-araibi\Desktop\crack-base-project\DB'
-        os.name == 'nt'  # Windows
-        subprocess.run(["explorer", dossier_db], shell=True)
+        dossier_db = os.path.abspath(self.db_directory)
+        if os.name == 'nt':  # Windows
+            subprocess.run(["explorer", dossier_db], shell=True)
+        else:  # macOS ou Linux
+            subprocess.run(["open", dossier_db], shell=True)
 
     def search_box(self, event):
         query = self.entryvar.get().strip()
@@ -1283,15 +1308,17 @@ class View(Frame):
         except IndexError:
             pass
 
-    def display_data(self, db_file, table_name, columns, data):
-        # Ajouter les colonnes au Treeview si elles n'existent pas
-        if not self.tree["columns"]:
-            self.tree["columns"] = columns
-            for col in columns:
-                self.tree.heading(col, text=col)
-                self.tree.column(col, width=100)
+    def display_data(self, table_name, columns, data):
+        # Ajouter les colonnes au Treeview
+        self.tree["columns"] = columns
+        for col in columns:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=100)
         
-        # Ajouter les données au Treeview
+        # Effacer les anciennes données
+        self.tree.delete(*self.tree.get_children())
+
+        # Ajouter les nouvelles données
         for row in data:
             self.tree.insert("", "end", values=row)
 
@@ -1308,7 +1335,7 @@ class View(Frame):
                     table_name = table[0]
                     cursor.execute(f"SELECT * FROM {table_name}")
                     data = cursor.fetchall()
-                    self.display_data(db_file, table_name, [d[0] for d in cursor.description], data)
+                    self.display_data(table_name, [d[0] for d in cursor.description], data)
                 connection.close()
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
@@ -1316,7 +1343,8 @@ class View(Frame):
 
     def view_other_table_data(self, table_name):
         try:
-            connection = sqlite3.connect("DB\\{database_name}")
+            database_name = self.database_combobox.get()
+            connection = sqlite3.connect(os.path.join(self.db_directory, database_name))
             cursor = connection.cursor()
             cursor.execute(f"SELECT * FROM {table_name}")
             data = cursor.fetchall()
@@ -1330,7 +1358,8 @@ class View(Frame):
         self.view_other_table_data("images")
 
     def delete_data(self, name):
-        connection = sqlite3.connect("DB\\{database_name}")
+        database_name = self.database_combobox.get()
+        connection = sqlite3.connect(os.path.join(self.db_directory, database_name))
         cursor = connection.cursor()
         cursor.execute("DELETE FROM images WHERE nom_image = ?", (name,))
         connection.commit()
@@ -1338,8 +1367,10 @@ class View(Frame):
     
     def search(self, query):
         results = []
-        for db in self.databases:
-            conn = sqlite3.connect(db)
+        db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
+        for db_file in db_files:
+            db_path = os.path.join(self.db_directory, db_file)
+            conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -1356,47 +1387,32 @@ class View(Frame):
                         cursor.execute(f"SELECT * FROM {table_name} WHERE {column} LIKE ?", ('%' + query + '%',))
                         rows = cursor.fetchall()
                         for row in rows:
-                            results.append((db, table_name) + row)
+                            results.append((db_file, table_name) + row)
                     except sqlite3.OperationalError as e:
                         # Gérer les erreurs, par exemple les colonnes blob qui ne peuvent pas être recherchées avec LIKE
-                        print(f"Erreur lors de la recherche dans {db}.{table_name}.{column}: {e}")
+                        print(f"Erreur lors de la recherche dans {db_file}.{table_name}.{column}: {e}")
             
             conn.close()
         return results
 
-    def display_selected_table(self):
-        # Obtention des noms de la base de données et de la table saisies par l'utilisateur
-        database_name = self.database_entry.get()
-        table_name = self.table_entry.get()
+    def display_selected_table(self, event=None):
+        database_name = self.database_combobox.get()
+        table_name = self.table_combobox.get()
 
         if not database_name or not table_name:
-            messagebox.showerror("Erreur", "Veuillez saisir le nom de la base de données et le nom de la table.")
+            messagebox.showerror("Erreur", "Veuillez sélectionner une base de données et une table.")
             return
 
         try:
-            # Connexion à la base de données spécifiée
-            connection = sqlite3.connect(f"DB\\{database_name}")
+            connection = sqlite3.connect(os.path.join(self.db_directory, database_name))
             cursor = connection.cursor()
 
-            # Vérification si la table spécifiée existe dans la base de données
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
-            table_exists = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table_name}")
+            data = cursor.fetchall()
+            column_names = [description[0] for description in cursor.description]
 
-            if table_exists:
-                # Récupération des données de la table spécifiée
-                cursor.execute(f"SELECT * FROM {table_name}")
-                data = cursor.fetchall()
-
-                # Récupération des noms de colonnes
-                column_names = [description[0] for description in cursor.description]
-
-                # Affichage des données dans le tableau
-                self.display_data(table_name, column_names, data)
-            else:
-                messagebox.showerror("Erreur", f"La table '{table_name}' n'existe pas dans la base de données '{database_name}'.")
-            
+            self.display_data(table_name, column_names, data)
             connection.close()
-
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
