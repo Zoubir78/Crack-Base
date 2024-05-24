@@ -460,19 +460,19 @@ class Frames(Frame):
     def export_data(self, table_name, json_filename):
         conn = sqlite3.connect('DB\\lcms_database.db')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT id, category, site, tube, sens, nom_image, image_json FROM {table_name}")
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
         rows = cursor.fetchall()
         
         data = []
         for row in rows:
             data.append({
                 "id": row[0],
-                "category": row[1],
-                "site": row[2],
-                "tube": row[3],
-                "sens": row[4],
-                "nom_image": row[5],
-                "image_json": row[6]
+                #"category": row[1],
+                #"site": row[2],
+                #"tube": row[3],
+                #"sens": row[4],
+                "nom_image": row[1]
+                #"image_json": row[6]
             })
         
         os.makedirs('export', exist_ok=True)
