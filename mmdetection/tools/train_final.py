@@ -28,7 +28,7 @@ from mmdet.utils import (replace_cfg_vals, setup_multi_processes, update_data_ro
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--config', default='../mmdetection/configs/my_custom/my_custom_config_1.py',help='train config file path')
+    parser.add_argument('--config', default='../mmdetection/configs/my_custom/my_custom_config_final.py',help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument('--resume-from', help='the checkpoint file to resume from')
     parser.add_argument('--auto-resume', action='store_true', help='resume from the latest checkpoint automatically')
