@@ -238,7 +238,7 @@ class CrackBase(Tk):
         coco.add_command(label="Analyser", command=self.execute_program4)
         menu.add_cascade(label="COCO", menu=coco)
 
-        contact.add_command(label="Github", command=lambda: open_new("https://github.com/Zoubir78/"))
+        contact.add_command(label="Github", command=lambda: open_new("https://github.com/Zoubir78/Crack-Base/tree/master"))
         contact.add_separator()
         contact.add_command(label="Questions", command=lambda: open_new("https://stackoverflow.com/questions"))
         help_menu.add_cascade(label="Contact", menu=contact)
