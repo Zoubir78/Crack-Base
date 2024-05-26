@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
-"""COCO Dataset Viewer.
-
-View images with bboxes from the COCO dataset.
-"""
+# -*- coding: utf-8 -*-
+'''
+Created on 2 mai 2024
+@author: Zoubeir Marouf
+'''
 import argparse
 import colorsys
 import json
@@ -29,7 +29,6 @@ parser.add_argument(
     metavar="PATH",
     help="/coco/annotations/annotation_lcms_train.json",
 )
-
 
 class Data:
     """Handles data related stuff."""

@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+'''
+Created on 2 avr. 2024
+@author: Zoubeir Marouf
+'''
 import random
 import cv2
 import matplotlib.pyplot as plt
