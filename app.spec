@@ -1,37 +1,48 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+block_cipher = None
 
 a = Analysis(
     ['app.py'],
-    pathex=[],
+    pathex=['C:/Users/z.marouf-araibi/Desktop/Crack-Base'],
     binaries=[],
-    datas=[],
+    datas=[
+        ('path/to/data/file1', 'data'),
+        ('path/to/image/file2', 'images'),
+    ],
     hiddenimports=[],
     hookspath=[],
-    hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
 )
-pyz = PYZ(a.pure)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
-    name='app',
+    exclude_binaries=True,
+    name='crack-base',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
+    console=False,  # Change to True if you want a console application
+    icon='path/to/icon.ico'  # Path to your icon file
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='crack-base'
 )
