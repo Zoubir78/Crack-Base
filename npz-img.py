@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+'''
+Created on 2 avr. 2024
+@author: Zoubeir Marouf
+'''
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import os

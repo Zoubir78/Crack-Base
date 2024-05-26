@@ -12,4 +12,5 @@ Thread
 open_new
 datetime
 nbformat
+webbrowser
 

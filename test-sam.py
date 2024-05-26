@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+'''
+Created on 20 avr. 2024
+@author: Zoubeir Marouf
+'''
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
