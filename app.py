@@ -30,6 +30,7 @@ from deepCrack import *
 from grandMare import *
 from annotation import *
 from newdb import *
+import webbrowser
 
 buffer = io.StringIO()
 sys.stdout = sys.stderr = buffer 
