@@ -59,13 +59,20 @@ class MainWindow(QMainWindow):
         self.keep_input_size = keep_input_size
         self.max_size = float(max_size)
 
-        self.all_annotations = {
-            "annotations": [],
-            "images": [],
-            "categories": []  # This should be filled with your categories if applicable
-        }
-        self.image_id = 0
-        self.annotation_id = 0
+        self.image_id = 1
+        self.annotation_id = 1
+        self.all_annotations = {"images": [], "annotations": [], "categories": self.get_categories()}
+        self.category_list = [cat["name"] for cat in self.all_annotations["categories"]]
+        self.current_output_dir = None
+        self.current_output_filename = None
+        self.current_img_index = 0
+        self.img_len = 0
+        self.img_list = []
+        self.raw_h = 0
+        self.raw_w = 0
+        self.current_img = None
+        self.dirty = False
+        self.class_on_flag = False
 
         self.setWindowTitle('SAM')
         self.canvas = Canvas(self,
@@ -478,6 +485,33 @@ class MainWindow(QMainWindow):
         self.zoomWidget.valueChanged.connect(self.paintCanvas)
         self.canvas.actions = self.actions
 
+    def get_categories(self):
+        return [
+            {"id": 1, "name": "non_classee", "supercategory": "equipement"},
+            {"id": 2, "name": "cable", "supercategory": "equipement"},
+            {"id": 3, "name": "passe_cable", "supercategory": "equipement"},
+            {"id": 4, "name": "lumiere", "supercategory": "equipement"},
+            {"id": 5, "name": "joint", "supercategory": "equipement"},
+            {"id": 6, "name": "camera", "supercategory": "equipement"},
+            {"id": 7, "name": "prisme_sos_telephone", "supercategory": "equipement"},
+            {"id": 8, "name": "bouche_incendie", "supercategory": "equipement"},
+            {"id": 9, "name": "reflecteur", "supercategory": "equipement"},
+            {"id": 10, "name": "prisme_issue_en_face", "supercategory": "equipement"},
+            {"id": 11, "name": "indication_issue_de_secours", "supercategory": "equipement"},
+            {"id": 12, "name": "plaque_numerotee", "supercategory": "equipement"},
+            {"id": 13, "name": "issue_de_secours", "supercategory": "equipement"},
+            {"id": 14, "name": "plaque_anneau", "supercategory": "equipement"},
+            {"id": 15, "name": "indication_id_sos", "supercategory": "equipement"},
+            {"id": 16, "name": "issue_sos_telephone", "supercategory": "equipement"},
+            {"id": 17, "name": "panneau_signalisation", "supercategory": "equipement"},
+            {"id": 18, "name": "coffrage", "supercategory": "equipement"},
+            {"id": 19, "name": "boitier_elec", "supercategory": "equipement"},
+            {"id": 20, "name": "non_definie_1", "supercategory": "equipement"},
+            {"id": 21, "name": "non_definie_2", "supercategory": "equipement"},
+            {"id": 22, "name": "non_definie_3", "supercategory": "equipement"},
+            {"id": 23, "name": "non_definie_4", "supercategory": "equipement"},
+            {"id": 24, "name": "non_definie_5", "supercategory": "equipement"},
+        ]
 
     def saveFileAs(self, _value=False):
         assert not self.image.isNull(), "cannot save empty image"
@@ -528,7 +562,7 @@ class MainWindow(QMainWindow):
     
     def getCategoryId(self, label):
         try:
-            return self.category_list.index(label)
+            return self.category_list.index(label) + 1  # Add 1 to match category IDs in get_categories
         except ValueError:
             return -1  # Return an invalid category ID if not found
 
@@ -566,7 +600,7 @@ class MainWindow(QMainWindow):
         annotations = data.get("annotations", [])  # Récupérer les annotations du fichier JSON
         for annotation in annotations:
             points = annotation["segmentation"][0]  # Récupérer les points de la segmentation
-            label = self.category_list[annotation["category_id"]]  # Récupérer le label en fonction de l'ID de catégorie
+            label = self.category_list[annotation["category_id"] - 1]  # Récupérer le label en fonction de l'ID de catégorie
             shape = Shape(
                 label=label,
                 shape_type="polygon",
@@ -596,7 +630,6 @@ class MainWindow(QMainWindow):
             self.current_img_index -= 1
             self.current_img = self.img_list[self.current_img_index]
             self.loadImg()
-
 
     def choose_proposal1(self):
         if len(self.sam_mask_proposal) > 0:
@@ -668,7 +701,6 @@ class MainWindow(QMainWindow):
             self.loadImg()
             return directory
 
-
     def clickSwitchClass(self):
         if self.class_on_flag:
             self.class_on_flag = False
@@ -676,7 +708,6 @@ class MainWindow(QMainWindow):
         else:
             self.class_on_flag = True
             self.class_on_text.setText('Class On')
-
 
     def clickCategoryChoose(self):
         filename, _ = QFileDialog.getOpenFileName(self, 'choose target file','.')
