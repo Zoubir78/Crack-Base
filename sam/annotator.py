@@ -59,6 +59,14 @@ class MainWindow(QMainWindow):
         self.keep_input_size = keep_input_size
         self.max_size = float(max_size)
 
+        self.all_annotations = {
+            "annotations": [],
+            "images": [],
+            "categories": []  # This should be filled with your categories if applicable
+        }
+        self.image_id = 0
+        self.annotation_id = 0
+
         self.setWindowTitle('SAM')
         self.canvas = Canvas(self,
             epsilon=10.0,
@@ -476,17 +484,6 @@ class MainWindow(QMainWindow):
         self._saveFile(self.saveFileDialog())
 
     def saveFile(self, _value=False):
-        # assert not self.image.isNull(), "cannot save empty image"
-        # if self.labelFile:
-        #     # DL20180323 - overwrite when in directory
-        #     self._saveFile(self.labelFile.filename)
-        # elif self.output_file:
-        #     self._saveFile(self.output_file)
-        #     self.close()
-        # else:
-        #     self._saveFile(self.saveFileDialog())
-        #self._saveFile(self.saveFileDialog())
-        #print(self.current_output_filename)
         self._saveFile(self.current_output_filename)
 
     def _saveFile(self, filename):
@@ -494,37 +491,46 @@ class MainWindow(QMainWindow):
             self.setClean()
 
     def saveLabels(self, filename):
-        lf = LabelFile()
-
         def format_shape(s):
-            data = s.other_data.copy()
-            data.update(
-                dict(
-                    label=s.label.encode("utf-8") if PY2 else s.label,
-                    points=[[p.x(), p.y()] for p in s.points],
-                    group_id=s.group_id,
-                    description="",
-                    shape_type=s.shape_type,
-                    flags=s.flags,
-                )
-            )
-            return data
+            points = [[p.x(), p.y()] for p in s.points]
+            min_x = min(point[0] for point in points)
+            min_y = min(point[1] for point in points)
+            max_x = max(point[0] for point in points)
+            max_y = max(point[1] for point in points)
+            bbox = [min_x, min_y, max_x - min_x, max_y - min_y]
+            area = (max_x - min_x) * (max_y - min_y)
+            segmentation = [points]
+
+            return {
+                "area": area,
+                "bbox": bbox,
+                "category_id": self.getCategoryId(s.label),
+                "id": self.annotation_id,
+                "image_id": self.image_id,
+                "iscrowd": 0,
+                "segmentation": segmentation
+            }
 
         shapes = [format_shape(item.shape()) for item in self.labelList]
-        imageData = base64.b64encode(self.current_img_data).decode("utf-8")
-        save_data = {
-            "version": "1.0.0",
-            "flags": {},
-            "shapes": shapes,
-            "imagePath": self.current_img,
-            #"imageData": imageData,
-            "imageHeight": self.raw_h,
-            "imageWidth": self.raw_w
-        }
+        self.annotation_id += len(shapes)
 
-        with open(filename, 'w') as f:
-            json.dump(save_data, f)
+        image_entry = {
+            "id": self.image_id,
+            "file_name": self.current_img,
+            "height": self.raw_h,
+            "width": self.raw_w
+        }
+        self.all_annotations["images"].append(image_entry)
+        self.all_annotations["annotations"].extend(shapes)
+
+        self.image_id += 1
         return True
+    
+    def getCategoryId(self, label):
+        try:
+            return self.category_list.index(label)
+        except ValueError:
+            return -1  # Return an invalid category ID if not found
 
     def setClean(self):
         self.dirty = False
@@ -534,69 +540,45 @@ class MainWindow(QMainWindow):
     def saveFileDialog(self):
         caption = self.tr("Choose File")
         filters = self.tr("Label files")
-        if self.output_dir:
-            dlg = QtWidgets.QFileDialog(
-                self, caption, self.output_dir, filters
-            )
-        else:
-            dlg = QtWidgets.QFileDialog(
-                self, caption, self.currentPath(), filters
-            )
+        dlg = QFileDialog(self, caption, self.output_dir if self.output_dir else self.currentPath(), filters)
         dlg.setDefaultSuffix(LabelFile.suffix[1:])
-        dlg.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
-        dlg.setOption(QtWidgets.QFileDialog.DontConfirmOverwrite, False)
-        dlg.setOption(QtWidgets.QFileDialog.DontUseNativeDialog, False)
+        dlg.setAcceptMode(QFileDialog.AcceptSave)
+        dlg.setOption(QFileDialog.DontConfirmOverwrite, False)
+        dlg.setOption(QFileDialog.DontUseNativeDialog, False)
         basename = os.path.basename(self.current_img)[:-4]
-        if self.output_dir:
-            default_labelfile_name = osp.join(
-                self.output_dir, basename + LabelFile.suffix
-            )
-        else:
-            default_labelfile_name = osp.join(
-                self.currentPath(), basename + LabelFile.suffix
-            )
-        filename = dlg.getSaveFileName(
-            self,
-            self.tr("Choose File"),
-            default_labelfile_name,
-            self.tr("Label files (*%s)") % LabelFile.suffix,
-        )
+        default_labelfile_name = osp.join(self.output_dir if self.output_dir else self.currentPath(), basename + LabelFile.suffix)
+        filename = dlg.getSaveFileName(self, self.tr("Choose File"), default_labelfile_name, self.tr("Label files (*%s)") % LabelFile.suffix)
         if isinstance(filename, tuple):
             filename, _ = filename
         return filename
 
     def currentPath(self):
-        #return osp.dirname(str(self.filename)) if self.filename else "."
         return "."
 
-    def loadAnno(self, filename):
-        with open(filename,'r') as f:
-            data = json.load(f)
-        for shape in data['shapes']:
-            label = shape["label"]
-            try:
-                ttt = int(label)
-                label = self.category_list[ttt]
-            except:
-                pass
+    def saveAllAnnotations(self, output_filename):
+        with open(output_filename, 'w') as f:
+            json.dump(self.all_annotations, f, indent=4)
 
-            points = shape["points"]
-            shape_type = shape["shape_type"]
-            flags = shape["flags"]
-            group_id = shape["group_id"]
-            if not points:
-                # skip point-empty shape
-                continue
+    def loadAnno(self, filename):
+        with open(filename, 'r') as f:
+            data = json.load(f)
+
+        annotations = data.get("annotations", [])  # Récupérer les annotations du fichier JSON
+        for annotation in annotations:
+            points = annotation["segmentation"][0]  # Récupérer les points de la segmentation
+            label = self.category_list[annotation["category_id"]]  # Récupérer le label en fonction de l'ID de catégorie
             shape = Shape(
                 label=label,
-                shape_type=shape_type,
-                group_id=group_id,
-                flags=flags
+                shape_type="polygon",
+                group_id=annotation["id"],  # Utiliser l'ID de l'annotation comme ID de groupe
             )
-            for x, y in points:
+            for i in range(0, len(points), 2):
+                x = points[i]
+                y = points[i + 1]
                 shape.addPoint(QtCore.QPointF(x, y))
             shape.close()
             self.addLabel(shape)
+
         self.canvas.loadShapes([item.shape() for item in self.labelList])
 
     def clickButtonNext(self):
@@ -643,7 +625,6 @@ class MainWindow(QMainWindow):
     def loadImg(self):
         self.raw_h, self.raw_w = cv2.imread(self.current_img).shape[:2]
         pixmap = QPixmap(self.current_img)
-        #pixmap = pixmap.scaled(int(0.75 * global_w), int(0.7 * global_h))
         self.canvas.loadPixmap(pixmap)
         self.img_progress_bar.setValue(self.current_img_index)
 
@@ -655,12 +636,17 @@ class MainWindow(QMainWindow):
         self.image_encoded_flag = False
         self.current_img_data = LabelFile.load_image_file(self.current_img)
 
+        # Sauvegarder toutes les annotations dans le fichier annotations.json
+        self.saveAllAnnotationsToFile()
+
+    def saveAllAnnotationsToFile(self):
+        output_filename = os.path.join(self.current_output_dir, 'annotations.json')
+        self.saveAllAnnotations(output_filename)
 
     def clickFileChoose(self):
         directory = QFileDialog.getExistingDirectory(self, 'choose target fold','.')
         if directory == '':
             return
-        #self.img_list = glob.glob(directory + '/*.{jpg,png,JPG,PNG}')
         self.img_list = glob.glob(directory + '/*.jpg') + glob.glob(directory + '/*.png')
         self.img_list.sort()
         self.img_len = len(self.img_list)
