@@ -16,6 +16,7 @@
 # Répertoires de build
 /build/
 /dist/
+.spec
 
 # Fichiers de cache de Python
 __pycache__/
