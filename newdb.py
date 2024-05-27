@@ -14,38 +14,8 @@ from tkinter import ttk, messagebox, simpledialog, filedialog
 from PIL import Image, ImageTk
 from datetime import datetime
 
-def add_new_site():
-    site_name = simpledialog.askstring("Nouveau site", "Entrez le nom du nouveau site:")
-    if site_name:
-        messagebox.showinfo("Site ajouté", f"Le site {site_name} a été ajouté avec succès.")
-        # Ajoutez le code pour ajouter le nouveau site ici
-    
-def add_site_to_existing_database():
-    response = messagebox.askyesno("Base de données existante", "Voulez-vous ajouter ce site à une base de données existante ?")
-    if response:
-        # Ajoutez le code pour obtenir la liste des bases de données existantes
-        existing_databases = get_existing_databases()
-        if existing_databases:
-            # Afficher la liste des bases de données existantes et demander à l'utilisateur de choisir
-            chosen_database = simpledialog.askstring("Choisir une Base de Données", "Choisissez une base de données existante:", initialvalue=existing_databases[0], listvalues=existing_databases)
-            if chosen_database:
-                # Ajoutez le code pour ajouter le site à la base de données existante choisie
-                add_site_to_existing(chosen_database)
-        else:
-            messagebox.showinfo("Aucune Base de Données", "Aucune base de données existante n'a été trouvée.")
-    else:
-        # Ajoutez le code pour créer une nouvelle base de données
-        create_new_database()
 
-def get_existing_databases():
-
-    pass
-
-def add_site_to_existing(chosen_database):
-
-    pass
-
-def create_new_database():
+def create_new_database(self):
    # Fonction pour créer une nouvelle base de données
     new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
     if new_db_name:
@@ -60,7 +30,7 @@ def create_new_database():
             new_connection.commit()
             new_connection.close()
 
-def create_table_in_database():
+def create_table_in_database(self):
     # Fonction pour créer une nouvelle table dans la base de données existante
     db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
 
@@ -90,7 +60,7 @@ def create_table_in_database():
                 connection.commit()
                 connection.close()
 
-def add_data_to_database():
+def add_data_to_database(self):
     # Fonction pour ajouter des données à la base de données
     db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
 

@@ -1074,35 +1074,198 @@ class Frames7(Frame):
         self.image = ImageTk.PhotoImage(image)
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
-        self.canvas_image = self.canvas.create_image(180, 30, image=self.image, anchor=NW)
+        self.canvas_image = self.canvas.create_image(30, 30, image=self.image, anchor=NW)
         self.canvas_text1 = self.canvas.create_text(380, 420, text=f"{category}", font=("Castellar", 20, "italic"), fill="#2C3054")
         self.canvas_text2 = self.canvas.create_text(400, 520,
                                                     text=f"Avec notre application, vous avez la liberté d'ajouter autant de sites que vous le souhaitez. \nEn quelques clics, vous pouvez créer un nouveau site en utilisant le bouton <Nouveau site>. \nDe là, vous avez le choix : \nvous pouvez intégrer ce site à une base de données existante pour une gestion centralisée et organisée, \nou bien créer une toute nouvelle base de données dédiée à ce site spécifique. \nCette flexibilité vous permet de personnaliser votre expérience selon vos besoins \net de structurer vos données de la manière qui vous convient le mieux.", font=("times new roman", 13, "italic"), fill="black")
-      
+        
         self.entry_var = StringVar()
-        #entry = ttk.Entry(self, textvariable=self.entry_var, width=50)
-        button5 = ttk.Button(self, text=f"Nouveau site", width=40, command=add_new_site)
-        button6 = ttk.Button(self, text=f"BDD existante", width=40, command=add_site_to_existing_database)
-        button7 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=create_new_database)
-        button8 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=create_table_in_database)
-        button9 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=add_data_to_database)
+        self.sites = []  # Attribut pour stocker la liste des sites
 
-        self.canvas_button = self.canvas.create_window(920, 440, window=button5)
-        self.canvas_button = self.canvas.create_window(920, 480, window=button6)
-        self.canvas_button = self.canvas.create_window(920, 520, window=button7)
-        self.canvas_button = self.canvas.create_window(920, 560, window=button8)
-        self.canvas_button = self.canvas.create_window(920, 600, window=button9)
-    
-    def add(self, event):
-        entry = self.entry_var.get()  # Obtient le contenu de la zone d'entrée saisie par l'utilisateur.
-        if len(entry.strip()) > 2:
-            messagebox.showinfo("Ajouté avec succès", f"{entry.title().strip()} a été ajouté avec succès")
-            insert(entry.title().strip(), self.category)
-        elif len(entry.strip()) < 1:
-            pass
-        else :
-            messagebox.showinfo("Doit contenir plus de 2 caractères","Les caractères saisis sont trop courts.")
-        self.entry_var.set("")
+        button5 = ttk.Button(self, text=f"Nouveau site", width=40, command=self.add_new_site)
+        button4 = ttk.Button(self, text=f"Choisir une BDD", width=40, command=self.choose_database_for_site)
+        button6 = ttk.Button(self, text=f"BDD existante", width=40, command=self.add_site_to_existing_database)
+        button7 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=self.create_new_database_and_add_site)
+        button8 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=self.create_table_in_database)
+        button9 = ttk.Button(self, text=f"Ajouter des données", width=40, command=self.add_data_to_database)
+        button10 = ttk.Button(self, text=f"Liste des sites", width=40, command=self.show_sites_list)
+        button11 = ttk.Button(self, text=f"Modifier/Supprimer un site", width=40, command=self.modify_or_delete_site)
+
+        self.canvas_button = self.canvas.create_window(920, 40, window=button5)
+        self.canvas_button = self.canvas.create_window(920, 80, window=button4)
+        self.canvas_button = self.canvas.create_window(920, 120, window=button6)
+        self.canvas_button = self.canvas.create_window(920, 160, window=button7)
+        self.canvas_button = self.canvas.create_window(920, 200, window=button8)
+        self.canvas_button = self.canvas.create_window(920, 240, window=button9)
+        self.canvas_button = self.canvas.create_window(920, 280, window=button10)
+        self.canvas_button = self.canvas.create_window(920, 320, window=button11)
+
+    def add_new_site(self):
+        site_name = simpledialog.askstring("Nouveau site", "Entrez le nom du nouveau site:")
+        if site_name:
+            self.sites.append(site_name)  # Ajouter le site à la liste
+            self.choose_database_for_site(site_name)
+            messagebox.showinfo("Site ajouté", f"Le site {site_name} a été ajouté avec succès.")
+
+    def show_sites_list(self):
+        sites_str = "\n".join(self.sites)
+        messagebox.showinfo("Liste des sites", f"Sites existants:\n{sites_str}")
+
+    def add_site_to_existing_database(self):
+        site_name = simpledialog.askstring("Nouveau site", "Entrez le nom du nouveau site:")
+        if site_name:
+            self.sites.append(site_name)
+            self.choose_database_for_site(site_name)
+
+    def choose_database_for_site(self, site_name):
+        existing_databases = self.get_existing_databases()
+        if existing_databases:
+            # Afficher une fenêtre avec les bases de données existantes
+            database_window = Toplevel(self)
+            database_window.title("Bases de données existantes")
+            database_window.geometry("400x200")
+
+            # Créer une liste déroulante pour afficher les bases de données existantes
+            chosen_database = StringVar(database_window)
+            chosen_database.set(existing_databases[0])  # Valeur initiale
+
+            database_label = Label(database_window, text="Choisissez une base de données existante:")
+            database_label.pack(pady=10)
+
+            database_menu = OptionMenu(database_window, chosen_database, *existing_databases)
+            database_menu.pack(pady=10)
+
+            # Bouton pour confirmer le choix de la base de données
+            confirm_button = Button(database_window, text="Confirmer", command=lambda: self.add_site_to_existing(chosen_database.get(), site_name))
+            confirm_button.pack(pady=10)
+        else:
+            messagebox.showinfo("Aucune Base de Données", "Aucune base de données existante n'a été trouvée. Création d'une nouvelle base de données.")
+            self.create_new_database_and_add_site(site_name)
+
+    def get_existing_databases(self):
+        # Cette fonction retourne une liste de bases de données existantes
+        # Pour simplifier, nous allons supposer qu'elles se trouvent dans le répertoire 'DB'
+        db_folder = 'DB'
+        if not os.path.exists(db_folder):
+            os.makedirs(db_folder)
+        databases = [f for f in os.listdir(db_folder) if f.endswith('.db')]
+        return databases
+
+    def add_site_to_existing(self, chosen_database, site_name):
+        # Ajouter le site à la base de données existante choisie
+        try:
+            db_path = os.path.join('DB', chosen_database)
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO sites (name) VALUES (?)", (site_name,))
+            conn.commit()
+            conn.close()
+            messagebox.showinfo("Succès", f"Le site {site_name} a été ajouté à la base de données {chosen_database}.")
+        except Error as e:
+            messagebox.showerror("Erreur", f"Une erreur s'est produite : {e}")
+
+    def create_new_database_and_add_site(self, site_name):
+        new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
+        if new_db_name:
+            db_folder = 'DB'
+            if not os.path.exists(db_folder):
+                os.makedirs(db_folder)
+            new_db_path = os.path.join(db_folder, f"{new_db_name}.db")
+            conn = sqlite3.connect(new_db_path)
+            cursor = conn.cursor()
+            cursor.execute('''CREATE TABLE IF NOT EXISTS sites (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                name TEXT NOT NULL
+                              );''')
+            cursor.execute("INSERT INTO sites (name) VALUES (?)", (site_name,))
+            conn.commit()
+            conn.close()
+            messagebox.showinfo("Succès", f"La nouvelle base de données {new_db_name} a été créée et le site {site_name} y a été ajouté.")
+
+    def create_table_in_database(self):
+        db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+        if db_path:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            table_name = simpledialog.askstring("Nom de la Table", "Entrez le nom de la nouvelle table:")
+            if table_name:
+                fields = simpledialog.askstring("Champs de la Table", "Entrez les champs de la nouvelle table (séparés par des virgules):")
+                if fields:
+                    create_table_query = f'''
+                        CREATE TABLE IF NOT EXISTS {table_name} (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            {fields}
+                        );
+                    '''
+                    cursor.execute(create_table_query)
+                    conn.commit()
+                    conn.close()
+                    messagebox.showinfo("Succès", f"La table {table_name} a été créée dans la base de données {db_path}.")
+
+    def add_data_to_database(self):
+        db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+        if db_path:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            table_name = simpledialog.askstring("Nom de la Table", "Entrez le nom de la table:")
+            if table_name:
+                data_to_add = simpledialog.askstring("Ajouter des Données", "Entrez les données à ajouter (séparées par des virgules):")
+                if data_to_add:
+                    data_list = data_to_add.split(',')
+                    placeholders = ', '.join(['?' for _ in data_list])
+                    insert_query = f'INSERT INTO {table_name} VALUES ({placeholders})'
+                    confirmation = messagebox.askyesno("Confirmation", f"Voulez-vous vraiment ajouter les données suivantes ?\n{data_list}")
+                    if confirmation:
+                        cursor.execute(insert_query, data_list)
+                        conn.commit()
+                        conn.close()
+                        messagebox.showinfo("Succès", "Les données ont été ajoutées avec succès.")
+
+    def modify_or_delete_site(self):
+        site_name = simpledialog.askstring("Modifier/Supprimer un Site", "Entrez le nom du site à modifier ou supprimer:")
+        if site_name in self.sites:
+            action = simpledialog.askstring("Action", "Voulez-vous 'modifier' ou 'supprimer' le site?")
+            if action == 'modifier':
+                new_site_name = simpledialog.askstring("Nouveau nom du site", "Entrez le nouveau nom du site:")
+                if new_site_name:
+                    index = self.sites.index(site_name)
+                    self.sites[index] = new_site_name
+                    self.update_site_in_database(site_name, new_site_name)
+                    messagebox.showinfo("Succès", f"Le site {site_name} a été modifié en {new_site_name}.")
+            elif action == 'supprimer':
+                self.sites.remove(site_name)
+                self.delete_site_from_database(site_name)
+                messagebox.showinfo("Succès", f"Le site {site_name} a été supprimé.")
+        else:
+            messagebox.showinfo("Erreur", f"Le site {site_name} n'existe pas dans la liste.")
+
+    def update_site_in_database(self, old_name, new_name):
+        # Met à jour le nom du site dans toutes les bases de données existantes
+        databases = self.get_existing_databases()
+        for db in databases:
+            db_path = os.path.join('DB', db)
+            try:
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                cursor.execute("UPDATE sites SET name = ? WHERE name = ?", (new_name, old_name))
+                conn.commit()
+                conn.close()
+            except Error as e:
+                messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la mise à jour de {old_name} dans {db}: {e}")
+
+    def delete_site_from_database(self, site_name):
+        # Supprime le site de toutes les bases de données existantes
+        databases = self.get_existing_databases()
+        for db in databases:
+            db_path = os.path.join('DB', db)
+            try:
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM sites WHERE name = ?", (site_name,))
+                conn.commit()
+                conn.close()
+            except Error as e:
+                messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la suppression de {site_name} dans {db}: {e}")
 
 class Frames8(Frame):
     def __init__(self, parent, category, image_path):
