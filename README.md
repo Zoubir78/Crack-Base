@@ -1,10 +1,10 @@
 # Crack-Base
 
-## À Propos du projet
+## À propos du projet
 
 ![carck-base](https://github.com/Zoubir78/Crack-Base/blob/master/carck-base.png)
 
-Bien sûr, aucun modèle ne conviendra à tous les projets puisque vos besoins peuvent être différents. Donc, j'en ajouterai plus dans un avenir proche. 
+Absolument, cette solution a été spécialement élaborée pour répondre aux exigences uniques du laboratoire ENDSUM. Toutefois, il est important de noter qu'aucun modèle ne peut s'adapter parfaitement à tous les projets étant donné la diversité des besoins. C'est pourquoi nous restons ouverts à l'évolution et à l'ajout de fonctionnalités supplémentaires pour mieux répondre à vos besoins spécifiques dans un futur proche.
 
 ## Construit Avec
 Les principaux frameworks/bibliothèques utilisés pour démarrer le projet :
