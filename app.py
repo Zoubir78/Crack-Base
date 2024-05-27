@@ -619,19 +619,19 @@ class Frames2(Frame):
     def export_data1(self, table_name, json_filename):
         conn = sqlite3.connect('DB\\benfeld.db')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT id, category, site, cote, meteo, nom_image, image_json FROM {table_name}")
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
         rows = cursor.fetchall()
         
         data = []
         for row in rows:
             data.append({
                 "id": row[0],
-                "category": row[1],
-                "site": row[2],
-                "cote": row[3],
-                "meteo": row[4],
-                "nom_image": row[5],
-                "image_json": row[6]
+                #"category": row[1],
+                #"site": row[2],
+                #"cote": row[3],
+                #"meteo": row[4],
+                "nom_image": row[1]
+                #"image_json": row[6]
             })
         
         os.makedirs('export', exist_ok=True)
@@ -645,19 +645,19 @@ class Frames2(Frame):
     def export_data2(self, table_name, json_filename):
         conn = sqlite3.connect('DB\\rdg.db')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT id, category, site, camera, sens, nom_image, image_json FROM {table_name}")
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
         rows = cursor.fetchall()
         
         data = []
         for row in rows:
             data.append({
                 "id": row[0],
-                "category": row[1],
-                "site": row[2],
-                "camera": row[3],
-                "sens": row[4],
-                "nom_image": row[5],
-                "image_json": row[6]
+                #"category": row[1],
+                #"site": row[2],
+                #"camera": row[3],
+                #"sens": row[4],
+                "nom_image": row[1]
+                #"image_json": row[6]
             })
         
         os.makedirs('export', exist_ok=True)
@@ -671,18 +671,18 @@ class Frames2(Frame):
     def export_data3(self, table_name, json_filename):
         conn = sqlite3.connect('DB\\codebrim.db')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT id, category, site, type, nom_image, image_json FROM {table_name}")
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
         rows = cursor.fetchall()
         
         data = []
         for row in rows:
             data.append({
                 "id": row[0],
-                "category": row[1],
-                "site": row[2],
-                "type": row[3],
-                "nom_image": row[4],
-                "image_json": row[5]
+                #"category": row[1],
+                #"site": row[2],
+                #"type": row[3],
+                "nom_image": row[1]
+                #"image_json": row[5]
             })
         
         os.makedirs('export', exist_ok=True)
@@ -696,18 +696,18 @@ class Frames2(Frame):
     def export_data4(self, table_name, json_filename):
         conn = sqlite3.connect('DB\\ufr.db')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT id, category, site, capteur, nom_image, image_json FROM {table_name}")
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
         rows = cursor.fetchall()
         
         data = []
         for row in rows:
             data.append({
                 "id": row[0],
-                "category": row[1],
-                "site": row[2],
-                "capteur": row[3],
-                "nom_image": row[4],
-                "image_json": row[5]
+                #"category": row[1],
+                #"site": row[2],
+                #"capteur": row[3],
+                "nom_image": row[1]
+                #"image_json": row[5]
             })
         
         os.makedirs('export', exist_ok=True)
@@ -934,18 +934,18 @@ class Frames4(Frame):
     def export_data0(self, table_name, json_filename):
         conn = sqlite3.connect('DB\\deepCrack.db')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT id, category, site, type, nom_image, image_json FROM {table_name}")
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
         rows = cursor.fetchall()
         
         data = []
         for row in rows:
             data.append({
                 "id": row[0],
-                "category": row[1],
-                "site": row[2],
-                "type": row[3],
-                "nom_image": row[4],
-                "image_json": row[5]
+                #"category": row[1],
+                #"site": row[2],
+                #"type": row[3],
+                "nom_image": row[1]
+                #"image_json": row[5]
             })
         
         os.makedirs('export', exist_ok=True)
@@ -959,18 +959,18 @@ class Frames4(Frame):
     def export_data1(self, table_name, json_filename):
         conn = sqlite3.connect('DB\\grandMare.db')
         cursor = conn.cursor()
-        cursor.execute(f"SELECT id, category, site, tube, nom_image, image_json FROM {table_name}")
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
         rows = cursor.fetchall()
         
         data = []
         for row in rows:
             data.append({
                 "id": row[0],
-                "category": row[1],
-                "site": row[2],
-                "tube": row[3],
-                "nom_image": row[4],
-                "image_json": row[5]
+                #"category": row[1],
+                #"site": row[2],
+                #"tube": row[3],
+                "nom_image": row[1]
+                #"image_json": row[5]
             })
         
         os.makedirs('export', exist_ok=True)
