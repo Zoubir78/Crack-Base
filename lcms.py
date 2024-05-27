@@ -55,12 +55,7 @@ def connect():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS masques (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT NOT NULL,
-            site TEXT NOT NULL,
-            tube TEXT NOT NULL,  -- Nouvelle colonne pour le tube
-            sens TEXT NOT NULL,  -- Nouvelle colonne pour le sens de prise
-            nom_image TEXT NOT NULL,
-            image_json TEXT NOT NULL,
+            data JSON NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')

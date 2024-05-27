@@ -23,7 +23,7 @@ def connect():
     # Créer un curseur
     cursor = connection.cursor()
 
-    # Create the 'images' table
+    # Créer la table 'images'
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS images_rdg (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,19 +36,17 @@ def connect():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
-    print("Table 'images_rdg' created successfully.")
+    print("La table 'images_rdg' a été créée avec succès.")
 
-    # Create the 'masques' table
+    # Créer la table 'masques'
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS masques_rdg (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            category TEXT NOT NULL,
-            nom_image TEXT NOT NULL,
-            image_json TEXT NOT NULL,
+            data TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
-    print("Table 'masques_rdg' created successfully.")
+    print("La table 'masques_rdg' a été créée avec succès.")
 
     # Save the changes
     connection.commit()
