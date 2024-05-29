@@ -33,7 +33,9 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 Voici la façon dont vous pouvez instruire l'installation et la configuration de votre application.
 
 ### Clonez le dépôt
-- `git clone https://github.com/Zoubir78/Crack-Base.git`
+```
+git clone https://github.com/Zoubir78/Crack-Base.git
+```
 
 ### Installez les dépendances Python
 - `cd Crack-Base`
