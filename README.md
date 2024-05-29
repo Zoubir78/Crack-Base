@@ -38,16 +38,22 @@ git clone https://github.com/Zoubir78/Crack-Base.git
 ```
 
 ### Installez les dépendances Python
-- `cd Crack-Base`
-- `pip install -r requirements.txt`
+```
+cd Crack-Base
+```
+```
+pip install -r requirements.txt
+```
 
 ## Utilisation
 Pour lancer l'application via votre LCI :
-- `python app.py`
+```
+python app.py
+```
 
 - N'oubliez pas de créer deux dossiers, un pour les bases de données 'DB' et un autre pour les exports 'export'.
 - Pour plus d'infos sur les modèles d'entrainement et le fichier de configuration, veuillez vous référer à la documentation de MMDetection.
-[MMDetection] (https://mmdetection.readthedocs.io/en/latest/get_started.html)
+[MMDetection] (https://mmdetection.readthedocs.io/en/3.x/get_started.html)
 
 ### Licence
 Distribué sans licence.
