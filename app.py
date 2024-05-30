@@ -128,7 +128,16 @@ class CrackBase(Tk):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fusion-img.py")
         subprocess.run(["python", "fusion-img.py"])
 
-        messagebox.showinfo("Script exécuté", "La fusion des images a été exécutée avec succès.")
+    # Fonction pour exécuter DLTA_AI_app
+    def run_dlta_ai(self):
+        # Obtient le chemin absolu du dossier où se trouve le fichier actuel
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        # Crée le chemin complet du script à exécuter
+        script_path = os.path.join(base_path, "..", "dlta-ai", "DLTA_AI_app", "__main__.py")
+        # Exécute le script en utilisant le chemin absolu
+        subprocess.run(["python", script_path])
+
+        messagebox.showinfo("Script exécuté", "Le script a été exécuté avec succès.")
 
     # Fonctions pour exécuter les fichiers "coco-format"
     def execute_program2(self):
@@ -223,6 +232,11 @@ class CrackBase(Tk):
         sam = tk.Menu(menu, tearoff=0)
         sam.add_command(label="Exécuter SAM", command=self.executer2)
         menu.add_cascade(label="SAM", menu=sam)
+
+        dlta = Menu(menu, tearoff=0) 
+        dlta = tk.Menu(menu, tearoff=0)
+        dlta.add_command(label="Exécuter", command=self.run_dlta_ai)
+        menu.add_cascade(label="DLTA_AI", menu=dlta)
 
         labelme = Menu(menu, tearoff=0) 
         labelme = tk.Menu(menu, tearoff=0)
