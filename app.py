@@ -30,6 +30,7 @@ from deepCrack import *
 from grandMare import *
 from annotation import *
 from newdb import *
+#from ttkthemes import ThemedStyle
 import webbrowser
 
 buffer = io.StringIO()
@@ -1297,14 +1298,14 @@ class Frames8(Frame):
         self.entry_var = StringVar()
         button5 = ttk.Button(self, text=f"Modifier le fichier Config", width=40, command=self.execute_program)
         button6 = ttk.Button(self, text=f"Afficher le fichier Config", width=40, command=self.open_config_file)
-        button7 = ttk.Button(self, text=f"Help Config", width=40, command=self.lire_fichier)
+        #button7 = ttk.Button(self, text=f"Help Config", width=40, command=self.lire_fichier)
         button8 = ttk.Button(self, text=f"Exécuter COCO Viewer", width=40, command=self.run_cocoviewer)
         button9 = ttk.Button(self, text=f"Entraîner le modèle", width=40, command=self.executer3)
         button10 = ttk.Button(self, text=f"Tester le modèle", width=40, command=self.executer2)
       
         self.canvas_button = self.canvas.create_window(920, 500, window=button5)
         self.canvas_button = self.canvas.create_window(920, 530, window=button6)
-        self.canvas_button = self.canvas.create_window(920, 560, window=button7)
+        #self.canvas_button = self.canvas.create_window(920, 560, window=button7)
         self.canvas_button = self.canvas.create_window(920, 590, window=button8)
         self.canvas_button = self.canvas.create_window(920, 620, window=button9)
         self.canvas_button = self.canvas.create_window(920, 650, window=button10)
@@ -1342,11 +1343,13 @@ class Frames8(Frame):
         subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
 
     def executer3(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mmdetection", "tools", "train_final.py")
-        subprocess.Popen(["python", chemin], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".." ,"mmdetection", "tools", "train.py")
+        chemin_terminal = r"C:\Users\z.marouf-araibi\AppData\Local\anaconda3\Scripts\anaconda.exe"
+        args_terminal = ["run", "-n", "mmdet-env", "python", chemin_script]
+        subprocess.Popen([chemin_terminal] + args_terminal, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
     def executer2(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mmdetection", "tools", "test.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mmdetection", "tools", "test.py")
         subprocess.run(["python", chemin])
 
     def add(self, event):
