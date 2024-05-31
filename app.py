@@ -1394,22 +1394,19 @@ class View(Frame):
         ttk.Button(button_frame, text="Voir les données LCMS", command=self.view_lcms_data).pack(side=tk.LEFT, padx=5, pady=5)
         ttk.Button(button_frame, text="Voir les données Fers apparents", command=lambda: self.view_other_table_data("fer_apparents")).pack(side=tk.LEFT, padx=5, pady=5)
         ttk.Button(button_frame, text="Voir les données Fissures", command=lambda: self.view_other_table_data("fissures")).pack(side=tk.LEFT, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir les données Nouvelle BDD", command=lambda: self.view_other_table_data("nouvelle_bdd")).pack(side=tk.LEFT, padx=5, pady=5)
-        # ttk.Button(button_frame, text="Supprimer des données", command=lambda: self.delete_data("nom_de_l_image.jpg")).pack(side=tk.LEFT, padx=5, pady=5)
 
         frame = ttk.Frame(self.canvas)
         frame.pack(side=tk.TOP, padx=5, pady=5)
 
         # Entrée de saisie
         self.entryvar = tk.StringVar()
-        entry = ttk.Entry(self, textvariable=self.entryvar, width=100, font=("Helvetica", 12, "normal"))
-        entry.pack(side=tk.TOP, padx=5, pady=5)
+        entry = ttk.Entry(frame, textvariable=self.entryvar, width=80, font=("Helvetica", 12, "normal"))
+        entry.pack(side=tk.LEFT, padx=5, pady=5)
         entry.bind("<Return>", self.search_box)
-        
-        search_button = ttk.Button(self, text="Recherche", command=lambda: self.search_box(None))
-        search_button.pack(side=tk.TOP, padx=5, pady=5)
-        
-        #self.databases = ["lcms_database.db", "database2.db"]  # Liste des bases de données
+
+        # Bouton de recherche
+        search_button = ttk.Button(frame, text="Recherche", command=lambda: self.search_box(None))
+        search_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         # Bouton de suppression
         del_button = ttk.Button(button_frame, text="Supprimer", width=20, command=self.delete_item)
@@ -1431,10 +1428,6 @@ class View(Frame):
         self.table_combobox = ttk.Combobox(frame, width=40)
         self.table_combobox.grid(row=0, column=3, padx=5, pady=5)
         self.table_combobox.bind("<<ComboboxSelected>>", self.display_selected_table)
-
-        # Bouton pour afficher les données de la table spécifiée
-        self.show_table_button = ttk.Button(frame, text="Afficher la table", command=self.display_selected_table)
-        self.show_table_button.grid(row=0, column=4, columnspan=4, padx=5, pady=5)
 
         # Ajout d'une fenêtre défilante pour le tableau
         scrollbar = Scrollbar(self.canvas, orient=tk.VERTICAL)
@@ -1468,6 +1461,29 @@ class View(Frame):
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors du chargement des tables : {e}")
 
+    def update_search_placeholder(self, event):
+        table_name = self.table_combobox.get()
+        database_name = self.database_combobox.get()
+        if not database_name or not table_name:
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(f"PRAGMA table_info({table_name});")
+            columns = cursor.fetchall()
+            column_names = [column[1] for column in columns]
+            placeholder_text = f"Veuillez saisir le {', '.join(column_names)} ..."
+            self.entry.delete(0, tk.END)
+            self.entry.insert(0, placeholder_text)
+            self.entry.bind("<FocusIn>", lambda event: self.entry.delete(0, tk.END))
+            connection.close()
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des colonnes : {e}")
+
+
     def explorer(self):
         dossier_db = os.path.abspath(self.db_directory)
         if os.name == 'nt':  # Windows
@@ -1487,6 +1503,36 @@ class View(Frame):
             else:
                 messagebox.showinfo("Aucun résultat trouvé", "Désolé, vous n'avez pas trouvé ce que vous cherchiez.")
 
+    def search(self, query):
+        results = []
+        db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
+        for db_file in db_files:
+            db_path = os.path.join(self.db_directory, db_file)
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            tables = cursor.fetchall()
+            for table in tables:
+                table_name = table[0]
+
+                cursor.execute(f"PRAGMA table_info({table_name});")
+                columns = cursor.fetchall()
+                column_names = [column[1] for column in columns]
+
+                for column in column_names:
+                    try:
+                        cursor.execute(f"SELECT * FROM {table_name} WHERE {column} LIKE ?", ('%' + query + '%',))
+                        rows = cursor.fetchall()
+                        for row in rows:
+                            results.append((db_file, table_name) + row)
+                    except sqlite3.OperationalError as e:
+                        # Gérer les erreurs, par exemple les colonnes blob qui ne peuvent pas être recherchées avec LIKE
+                        print(f"Erreur lors de la recherche dans {db_file}.{table_name}.{column}: {e}")
+
+            conn.close()
+        return results
+
     def delete_item(self):
         try:
             index = self.tree.selection()[0]  # Obtenir l'index de la ligne sélectionnée dans le tableau
@@ -1500,7 +1546,7 @@ class View(Frame):
         for col in columns:
             self.tree.heading(col, text=col)
             self.tree.column(col, width=100)
-        
+
         # Effacer les anciennes données
         self.tree.delete(*self.tree.get_children())
 
@@ -1550,36 +1596,6 @@ class View(Frame):
         cursor.execute("DELETE FROM images WHERE nom_image = ?", (name,))
         connection.commit()
         connection.close()
-    
-    def search(self, query):
-        results = []
-        db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
-        for db_file in db_files:
-            db_path = os.path.join(self.db_directory, db_file)
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-            tables = cursor.fetchall()
-            for table in tables:
-                table_name = table[0]
-                
-                cursor.execute(f"PRAGMA table_info({table_name});")
-                columns = cursor.fetchall()
-                column_names = [column[1] for column in columns]
-                
-                for column in column_names:
-                    try:
-                        cursor.execute(f"SELECT * FROM {table_name} WHERE {column} LIKE ?", ('%' + query + '%',))
-                        rows = cursor.fetchall()
-                        for row in rows:
-                            results.append((db_file, table_name) + row)
-                    except sqlite3.OperationalError as e:
-                        # Gérer les erreurs, par exemple les colonnes blob qui ne peuvent pas être recherchées avec LIKE
-                        print(f"Erreur lors de la recherche dans {db_file}.{table_name}.{column}: {e}")
-            
-            conn.close()
-        return results
 
     def display_selected_table(self, event=None):
         database_name = self.database_combobox.get()
