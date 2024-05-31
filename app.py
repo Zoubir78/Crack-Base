@@ -130,15 +130,15 @@ class CrackBase(Tk):
         subprocess.run(["python", "fusion-img.py"])
 
     # Fonction pour exécuter DLTA_AI_app
-    def run_dlta_ai(self):
+    #def run_dlta_ai(self):
         # Obtient le chemin absolu du dossier où se trouve le fichier actuel
-        base_path = os.path.dirname(os.path.abspath(__file__))
+    #    base_path = os.path.dirname(os.path.abspath(__file__))
         # Crée le chemin complet du script à exécuter
-        script_path = os.path.join(base_path, "..", "dlta-ai", "DLTA_AI_app", "__main__.py")
+    #    script_path = os.path.join(base_path, "..", "dlta-ai", "DLTA_AI_app", "__main__.py")
         # Exécute le script en utilisant le chemin absolu
-        subprocess.run(["python", script_path])
+    #    subprocess.run(["python", script_path])
 
-        messagebox.showinfo("Script exécuté", "Le script a été exécuté avec succès.")
+    #    messagebox.showinfo("Script exécuté", "Le script a été exécuté avec succès.")
 
     # Fonctions pour exécuter les fichiers "coco-format"
     def execute_program2(self):
@@ -234,10 +234,10 @@ class CrackBase(Tk):
         sam.add_command(label="Exécuter SAM", command=self.executer2)
         menu.add_cascade(label="SAM", menu=sam)
 
-        dlta = Menu(menu, tearoff=0) 
-        dlta = tk.Menu(menu, tearoff=0)
-        dlta.add_command(label="Exécuter", command=self.run_dlta_ai)
-        menu.add_cascade(label="DLTA_AI", menu=dlta)
+        #dlta = Menu(menu, tearoff=0) 
+        #dlta = tk.Menu(menu, tearoff=0)
+        #dlta.add_command(label="Exécuter", command=self.run_dlta_ai)
+        #menu.add_cascade(label="DLTA_AI", menu=dlta)
 
         labelme = Menu(menu, tearoff=0) 
         labelme = tk.Menu(menu, tearoff=0)
@@ -263,6 +263,11 @@ class CrackBase(Tk):
         a_propos = Menu(menu, tearoff=0)
         menu.add_cascade(label="A propos", command=lambda: self.show_page("a_propos"))
 
+        # Style sombre pour ttk
+        style = ttk.Style(self)
+        self.tk.call("source", "azure.tcl")
+        self.tk.call("set_theme", "dark")
+
         # Sidebar
         self.sidebar = Frame(self, width=100, bg="#484D7A")
         self.sidebar.pack(side=LEFT, fill=Y)
@@ -282,15 +287,15 @@ class CrackBase(Tk):
         sidebutton1.grid(row=1, pady=2, padx=5)
 
         # Sous-boutons
-        self.side_button_lcms = Button(self.sidebar, text="LCMS", bg="white", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("LCMS"), font=("FontAwesome", 9, "bold"))
+        self.side_button_lcms = Button(self.sidebar, text="LCMS", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("LCMS"), font=("FontAwesome", 9, "bold"))
         self.side_button_lcms.grid(row=1, column=1, pady=(0, 70), padx=6)
         self.side_button_lcms.grid_remove()  # Caché initialement
 
-        self.side_button_2d = Button(self.sidebar, text="Images 2D", bg="white", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("2d"), font=("FontAwesome", 9, "bold"))
+        self.side_button_2d = Button(self.sidebar, text="Images 2D", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("2d"), font=("FontAwesome", 9, "bold"))
         self.side_button_2d.grid(row=1, column=1, pady=(4, 4), padx=6)
         self.side_button_2d.grid_remove()  # Caché initialement
 
-        self.side_button_NB = Button(self.sidebar, text="+", bg="white", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
+        self.side_button_NB = Button(self.sidebar, text="+", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
         self.side_button_NB.grid(row=1, column=1, pady=(70, 0), padx=6)
         self.side_button_NB.grid_remove()  # Caché initialement
 
@@ -298,15 +303,15 @@ class CrackBase(Tk):
         sidebutton2.grid(row=2, pady=2, padx=5)
 
         # Sous-boutons
-        self.side_button_fa = Button(self.sidebar, text="Fer apparent", bg="white", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("fer apparent"), font=("FontAwesome", 9, "bold"))
+        self.side_button_fa = Button(self.sidebar, text="Fer apparent", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("fer apparent"), font=("FontAwesome", 9, "bold"))
         self.side_button_fa.grid(row=2, column=1, pady=(0, 70), padx=6)
         self.side_button_fa.grid_remove()  # Caché initialement
 
-        self.side_button_fes = Button(self.sidebar, text="Fissures", bg="white", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("fissures"), font=("FontAwesome", 9, "bold"))
+        self.side_button_fes = Button(self.sidebar, text="Fissures", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("fissures"), font=("FontAwesome", 9, "bold"))
         self.side_button_fes.grid(row=2, column=1, pady=(4, 4), padx=6)
         self.side_button_fes.grid_remove()  # Caché initialement
 
-        self.side_button_NB1 = Button(self.sidebar, text="+", bg="white", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
+        self.side_button_NB1 = Button(self.sidebar, text="+", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
         self.side_button_NB1.grid(row=2, column=1, pady=(70, 0), padx=6)
         self.side_button_NB1.grid_remove()  # Caché initialement
 
@@ -403,7 +408,7 @@ class Home(Frame):
         # Ajout de l'image de fond et des textes au Canvas.
         self.canvas_image = self.canvas.create_image(60, 60, image=self.main, anchor=NW)
 
-        self.canvas_text1 = self.canvas.create_text(520, 30, text="""Bienvenue sur Crack Base - ENDSUM""", font=("Castellar", 20, "italic", "bold"), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(520, 30, text="""Bienvenue sur Crack Base - ENDSUM""", font=("Castellar", 20, "italic", "bold"), fill="white")
 
 
 class Frames(Frame):
@@ -415,22 +420,22 @@ class Frames(Frame):
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
         self.canvas_image = self.canvas.create_image(10, 10, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(790, 40, text=f"{category}", font=("Castellar", 30, "italic"), fill="#2C3054")
-        self.canvas_text2 = self.canvas.create_text(790, 75, text=f"(Images, profondeur, VT)", font=("Castellar", 13), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(790, 40, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(790, 75, text=f"(Images, profondeur, VT)", font=("Castellar", 13), fill="white")
         self.canvas_text3 = self.canvas.create_text(800, 180,
                                                     text=f"Le capteur LCMS analyse la projection d'une ligne laser \nsur la paroi du tunnel,"
                                                     "fournissant à chaque acquisition \nun profil de profondeur et un profil"
                                                     "d'intensité.\nCelles-ci sont progressivement agrégées au fur et à mesure \nque le"
                                                     "véhicule avance pour former des images \net des cartes de profondeur, avec une"
                                                     "résolution spatiale \nde 1 × 2 mm et une résolution de profondeur submillimétrique.",
-                                                    font=("times new roman", 12, "italic", "normal"), fill="black")
+                                                    font=("times new roman", 12, "italic", "normal"), fill="white")
 
         self.canvas_text4 = self.canvas.create_text(780, 350,
                                                     text=f"Nomenclature de nommage '{category.lower()}' :\n - Un dossier par séquence\n "
                                                     "- Nom de dossier : “TE_D_18062_H1870_A0” → \n TE : Tube Est (TE) ou Tube Ouest (TO) \n "
                                                     "D (ou C) : sens de prise (sens décroissant ou croissant) \n 18062 : numéro séquence (incrémental) \n "
                                                     "H (Hauteur à partir du sol du gerbeur en mm) \n A (angle en degrés des capteurs , 0 = à l’horizontal)",
-                                                    font=("times new roman", 12, "normal"), fill="black")
+                                                    font=("times new roman", 12, "normal"), fill="white")
         
         self.entry_var = StringVar()
         self.check_var = BooleanVar()
@@ -450,14 +455,14 @@ class Frames(Frame):
         button2 = ttk.Button(self, text=f"Ajouter des données (profondeur)", width=40, command=lambda: upload_depths(self, category))
         button22 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=40, command=lambda: upload_masques(self, category))
 
-        self.canvas_button1 = self.canvas.create_window(700, 510, window=button1)
-        self.canvas_export_button1 = self.canvas.create_window(890, 510, window=export_button1)
-        self.canvas_progress1 = self.canvas.create_window(750, 540, window=self.progress1)
-        self.canvas_button2 = self.canvas.create_window(700, 570, window=button2)
-        self.canvas_export_button2 = self.canvas.create_window(890, 570, window=export_button2)
-        self.canvas_progress2 = self.canvas.create_window(750, 600, window=self.progress2)
-        self.canvas_button22 = self.canvas.create_window(700, 640, window=button22)
-        self.canvas_export_button22 = self.canvas.create_window(890, 640, window=export_button22)
+        self.canvas_button1 = self.canvas.create_window(750, 510, window=button1)
+        self.canvas_export_button1 = self.canvas.create_window(950, 510, window=export_button1)
+        self.canvas_progress1 = self.canvas.create_window(800, 540, window=self.progress1)
+        self.canvas_button2 = self.canvas.create_window(750, 570, window=button2)
+        self.canvas_export_button2 = self.canvas.create_window(950, 570, window=export_button2)
+        self.canvas_progress2 = self.canvas.create_window(800, 600, window=self.progress2)
+        self.canvas_button22 = self.canvas.create_window(750, 640, window=button22)
+        self.canvas_export_button22 = self.canvas.create_window(950, 640, window=export_button22)
 
     def add(self, table):
         site, tube, sens = select_site_details(self)
@@ -516,16 +521,16 @@ class Frames2(Frame):
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=tk.TRUE)
         
-        self.canvas_text1 = self.canvas.create_text(500, 40, text=f"{category}", font=("Castellar", 30, "italic"), fill="#2C3054")
-        self.canvas_text2 = self.canvas.create_text(500, 75, text=f"(Images visibles, VT, pas de profondeur)", font=("Castellar", 13), fill="#2C3054")
-        self.canvas_text3 = self.canvas.create_text(340, 120, text=f"- Tunnel Rive-de-Gier (RDG)", font=("times new roman", 12, "normal", "bold"), fill="black")
+        self.canvas_text1 = self.canvas.create_text(500, 40, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(500, 75, text=f"(Images visibles, VT, pas de profondeur)", font=("Castellar", 13), fill="white")
+        self.canvas_text3 = self.canvas.create_text(340, 120, text=f"- Tunnel Rive-de-Gier (RDG)", font=("times new roman", 12, "normal", "bold"), fill="white")
         self.canvas_text4 = self.canvas.create_text(340, 220, text=f"→ Acquisition par un véhicule, sous forme de séquences, par bande (par passage) \n"
                                                                     "2 images par mètre, tunnel 80 m environ, total entre 160 et 180 images \n"
                                                                     "Nomenclature :\n 1 dossier  par passage. 2 types de caméras : \nles caméras de relevés sont indiqués dans le nom du dossier avec le mot “Voute”. \n"
                                                                     "Les autres dossiers sont des images pour la localisation odométrique, il n’y a pas d’indication “Voute” \n"
                                                                     "Nom : VT_RDG_Voute_0deg_sens_moins. \n"
                                                                     "1 sous-dossier numéroté contient l’image originale et l’image binaire (VT)",
-                                                               font=("times new roman", 12, "normal"), fill="black")
+                                                               font=("times new roman", 12, "normal"), fill="white")
         
         self.progress1 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
 
@@ -543,13 +548,13 @@ class Frames2(Frame):
         self.canvas_export_button1 = self.canvas.create_window(950, 200, window=export_button004)
         self.canvas_progress1 = self.canvas.create_window(800, 240, window=self.progress1)
 
-        self.canvas_text3 = self.canvas.create_text(340, 320, text=f"- Tunnel piéton (Benfeld)", font=("times new roman", 12, "normal", "bold"), fill="black")
+        self.canvas_text3 = self.canvas.create_text(340, 320, text=f"- Tunnel piéton (Benfeld)", font=("times new roman", 12, "normal", "bold"), fill="white")
         self.canvas_text5 = self.canvas.create_text(260, 390, text=f"→ Acquisition “à la volée” par un smartphone \n"
                                                                     "4 sous dossiers CC-S, CC-C, CS-C, CS-S \n"
                                                                     "CC = coté centre ou ; CS = côté station \n"
                                                                     "- C ou -S = Cloudy , ou Sunny \n"
                                                                     "1 sous-dossier numéroté contient l’image originale et l’image binaire (VT)",
-                                                               font=("times new roman", 12, "normal"), fill="black")
+                                                               font=("times new roman", 12, "normal"), fill="white")
         
         self.progress01 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
 
@@ -568,12 +573,12 @@ class Frames2(Frame):
         self.canvas_export_button1 = self.canvas.create_window(950, 390, window=export_button002)
         self.canvas_progress01 = self.canvas.create_window(800, 430, window=self.progress01)
 
-        self.canvas_text3 = self.canvas.create_text(340, 470, text=f"- Base CODEBRIM", font=("times new roman", 12, "normal", "bold"), fill="black")
+        self.canvas_text3 = self.canvas.create_text(340, 470, text=f"- Base CODEBRIM", font=("times new roman", 12, "normal", "bold"), fill="white")
         self.canvas_text6 = self.canvas.create_text(260, 520, text=f"→ Images à la volée, tailles différentes \n"
                                                                     "Récupéré d’un papier avec base d’images désordres sur OA \n"
                                                                     "Ajout de la VT en segmentation \n"
                                                                     "1 sous-dossier numéroté contient l’image originale et l’image binaire (VT)",
-                                                               font=("times new roman", 12, "normal"), fill="black")
+                                                               font=("times new roman", 12, "normal"), fill="white")
         
         self.progress02 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
 
@@ -592,10 +597,10 @@ class Frames2(Frame):
         self.canvas_export_button1 = self.canvas.create_window(950, 520, window=export_button006)
         self.canvas_progress02 = self.canvas.create_window(800, 550, window=self.progress02)
 
-        self.canvas_text3 = self.canvas.create_text(340, 580, text=f"- Base UFR", font=("times new roman", 12, "normal", "bold"), fill="black")
+        self.canvas_text3 = self.canvas.create_text(340, 580, text=f"- Base UFR", font=("times new roman", 12, "normal", "bold"), fill="white")
         self.canvas_text7 = self.canvas.create_text(280, 620, text=f"→ Images à la volée, 2 capteurs (Apple ou Samsung) \n"
                                                                     "2 types de VT (à l’obejt , comme autres bases, et sous forme de bande ou mask)",
-                                                               font=("times new roman", 12, "normal"), fill="black")
+                                                               font=("times new roman", 12, "normal"), fill="white")
         
         self.progress03 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
 
@@ -768,10 +773,10 @@ class Frames3(Frame):
         self.canvas.pack(fill=BOTH, expand=TRUE)
         #self.selected_tables = []  # Default table
         self.canvas_image = self.canvas.create_image(280, 20, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(700, 70, text=f"{category}", font=("Castellar", 30, "italic"), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(700, 70, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(160, 500,
                                                     text=f"Pour afficher vos données enregistrées \n'{category.lower()}', cliquez sur le menu View \n "
-                                                         f"de la barre de menu et sélectionnez \n'View {category}'.", font=("times new roman", 12, "normal"), fill="black")
+                                                         f"de la barre de menu et sélectionnez \n'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
 
         self.entry_var = StringVar()
         #entry = ttk.Entry(self, textvariable=self.entry_var, width=50)
@@ -897,10 +902,10 @@ class Frames4(Frame):
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
         self.canvas_image = self.canvas.create_image(20, 50, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(800, 180,
                                                     text=f"Pour afficher vos données enregistrées '{category.lower()}',\ncliquez sur le menu View "
-                                                         f"de la barre de menu \net sélectionnez 'View {category}'.", font=("times new roman", 12, "normal"), fill="black")
+                                                         f"de la barre de menu \net sélectionnez 'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
 
         self.progress001 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
         self.progress002 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
@@ -1017,10 +1022,10 @@ class Frames5(Frame):
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
         self.canvas_image = self.canvas.create_image(10, 50, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(900, 180,
                                                     text=f"Pour créer une nouvelle base de données,\ncliquez sur le boutton "
-                                                         f"'{category.lower()}' ci-dessous.\nVous-pouvez aussi configurer la nouvelle table \nen cliquant sur 'Nouvelle Table'", font=("times new roman", 12, "normal"), fill="black")
+                                                         f"'{category.lower()}' ci-dessous.\nVous-pouvez aussi configurer la nouvelle table \nen cliquant sur 'Nouvelle Table'", font=("times new roman", 12, "normal"), fill="white")
       
         self.entry_var = StringVar()
         #entry = ttk.Entry(self, textvariable=self.entry_var, width=50)
@@ -1058,15 +1063,15 @@ class Frames6(Frame):
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
         self.canvas_image = self.canvas.create_image(10, 50, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(920, 230,
-                                                    text=f"Bienvenue sur Crack Base! \nVotre solution complète de gestion de bases de données. \nConçue pour répondre aux besoins des \npassionnés de données, Crack Base offre une expérience \nintuitive et puissante pour gérer efficacement \ntoutes vos données.", font=("times new roman", 13, "italic"), fill="black")
+                                                    text=f"Bienvenue sur Crack Base! \nVotre solution complète de gestion de bases de données. \nConçue pour répondre aux besoins des \npassionnés de données, Crack Base offre une expérience \nintuitive et puissante pour gérer efficacement \ntoutes vos données.", font=("times new roman", 13, "italic"), fill="white")
 
         self.canvas_text3 = self.canvas.create_text(380, 480,
-                                                    text=f"Avec Crack Base, vous pouvez créer, modifier et interroger des bases de données avec facilité. \nNotre interface conviviale vous permet de naviguer sans effort à travers vos ensembles de données, \nde créer des rapports personnalisés et d'analyser vos informations pour des insights précieux.", font=("times new roman", 13, "italic"), fill="black")
+                                                    text=f"Avec Crack Base, vous pouvez créer, modifier et interroger des bases de données avec facilité. \nNotre interface conviviale vous permet de naviguer sans effort à travers vos ensembles de données, \nde créer des rapports personnalisés et d'analyser vos informations pour des insights précieux.", font=("times new roman", 13, "italic"), fill="white")
 
         self.canvas_text4 = self.canvas.create_text(400, 580,
-                                                    text=f"Que vous soyez un développeur cherchant à gérer des données volumineuses, un analyste de données \nexplorant des tendances complexes ou un étudiant apprenant les bases de la gestion de bases de données, \nCrack Base est l'outil idéal pour vos besoins.", font=("times new roman", 13, "italic"), fill="black")
+                                                    text=f"Que vous soyez un développeur cherchant à gérer des données volumineuses, un analyste de données \nexplorant des tendances complexes ou un étudiant apprenant les bases de la gestion de bases de données, \nCrack Base est l'outil idéal pour vos besoins.", font=("times new roman", 13, "italic"), fill="white")
       
         self.entry_var = StringVar()
     
@@ -1090,9 +1095,9 @@ class Frames7(Frame):
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
         self.canvas_image = self.canvas.create_image(30, 30, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(380, 420, text=f"{category}", font=("Castellar", 20, "italic"), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(380, 420, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(400, 520,
-                                                    text=f"Avec notre application, vous avez la liberté d'ajouter autant de sites que vous le souhaitez. \nEn quelques clics, vous pouvez créer un nouveau site en utilisant le bouton <Nouveau site>. \nDe là, vous avez le choix : \nvous pouvez intégrer ce site à une base de données existante pour une gestion centralisée et organisée, \nou bien créer une toute nouvelle base de données dédiée à ce site spécifique. \nCette flexibilité vous permet de personnaliser votre expérience selon vos besoins \net de structurer vos données de la manière qui vous convient le mieux.", font=("times new roman", 13, "italic"), fill="black")
+                                                    text=f"Avec notre application, vous avez la liberté d'ajouter autant de sites que vous le souhaitez. \nEn quelques clics, vous pouvez créer un nouveau site en utilisant le bouton <Nouveau site>. \nDe là, vous avez le choix : \nvous pouvez intégrer ce site à une base de données existante pour une gestion centralisée et organisée, \nou bien créer une toute nouvelle base de données dédiée à ce site spécifique. \nCette flexibilité vous permet de personnaliser votre expérience selon vos besoins \net de structurer vos données de la manière qui vous convient le mieux.", font=("times new roman", 13, "italic"), fill="white")
         
         self.entry_var = StringVar()
         self.sites = []  # Attribut pour stocker la liste des sites
@@ -1291,9 +1296,9 @@ class Frames8(Frame):
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
         self.canvas_image = self.canvas.create_image(80, 10, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(380, 500, text=f"{category}", font=("Castellar", 20, "italic"), fill="#2C3054")
+        self.canvas_text1 = self.canvas.create_text(380, 500, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(400, 600,
-                                                    text=f"La première étape consiste à modifier le fichier de configuration du modèle de détection. \nCe fichier contient tous les paramètres nécessaires à l'entraînement du modèle, \ntels que la structure du réseau neuronal, les hyperparamètres de l'entraînement, \nles chemins des jeux de données, et les prétraitements des images. \nPour notre projet, nous avons adapté ce fichier pour inclure des informations spécifiques \nsur les types d'équipements à détecter et les annotations correspondantes. \nCela permet au modèle d'apprendre à distinguer entre différents équipements \navec une grande précision.", font=("times new roman", 13, "italic"), fill="black")
+                                                    text=f"La première étape consiste à modifier le fichier de configuration du modèle de détection. \nCe fichier contient tous les paramètres nécessaires à l'entraînement du modèle, \ntels que la structure du réseau neuronal, les hyperparamètres de l'entraînement, \nles chemins des jeux de données, et les prétraitements des images. \nPour notre projet, nous avons adapté ce fichier pour inclure des informations spécifiques \nsur les types d'équipements à détecter et les annotations correspondantes. \nCela permet au modèle d'apprendre à distinguer entre différents équipements \navec une grande précision.", font=("times new roman", 13, "italic"), fill="white")
       
         self.entry_var = StringVar()
         button5 = ttk.Button(self, text=f"Modifier le fichier Config", width=40, command=self.execute_program)
@@ -1601,7 +1606,6 @@ class View(Frame):
         # Ajouter un footer
         footer = tk.Label(text="© Crack Base 2024 - ENDSUM", relief=tk.SUNKEN, anchor=tk.W, font=("Castellar", 12, "italic"), bg="black", fg="white")
         footer.grid(row=6, column=0, sticky="ew")
-
 
 app = CrackBase()
 app.title("Crack Base 2.0 - ENDSUM")
