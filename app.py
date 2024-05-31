@@ -419,7 +419,7 @@ class Frames(Frame):
         self.image = ImageTk.PhotoImage(image)
         self.canvas = Canvas(self)
         self.canvas.pack(fill=BOTH, expand=TRUE)
-        self.canvas_image = self.canvas.create_image(10, 10, image=self.image, anchor=NW)
+        self.canvas_image = self.canvas.create_image(20, 50, image=self.image, anchor=NW)
         self.canvas_text1 = self.canvas.create_text(790, 40, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(790, 75, text=f"(Images, profondeur, VT)", font=("Castellar", 13), fill="white")
         self.canvas_text3 = self.canvas.create_text(800, 180,
@@ -1029,9 +1029,9 @@ class Frames5(Frame):
       
         self.entry_var = StringVar()
         #entry = ttk.Entry(self, textvariable=self.entry_var, width=50)
-        button5 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=create_new_database)
-        button6 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=create_table_in_database)
-        button7 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=add_data_to_database)
+        button5 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=nouvelle_bdd)
+        button6 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=table_nouvelle_bdd)
+        button7 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=donnees_nouvelle_bdd)
 
         #entry.bind("<Return>", self.add)
         button5.bind("<Return>", self.add)
@@ -1177,7 +1177,7 @@ class Frames7(Frame):
             db_path = os.path.join('DB', chosen_database)
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO sites (name) VALUES (?)", (site_name,))
+            cursor.execute("INSERT INTO images VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (site_name,))
             conn.commit()
             conn.close()
             messagebox.showinfo("Succès", f"Le site {site_name} a été ajouté à la base de données {chosen_database}.")
@@ -1193,11 +1193,17 @@ class Frames7(Frame):
             new_db_path = os.path.join(db_folder, f"{new_db_name}.db")
             conn = sqlite3.connect(new_db_path)
             cursor = conn.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS sites (
+            cursor.execute('''CREATE TABLE IF NOT EXISTS images (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                name TEXT NOT NULL
+                                category TEXT NOT NULL,
+                                site TEXT NOT NULL,
+                                tube TEXT NOT NULL,  -- Nouvelle colonne pour le tube
+                                sens TEXT NOT NULL,  -- Nouvelle colonne pour le sens de prise
+                                nom_image TEXT NOT NULL,
+                                image_json TEXT NOT NULL,
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMPLL
                               );''')
-            cursor.execute("INSERT INTO sites (name) VALUES (?)", (site_name,))
+            cursor.execute("INSERT INTO images VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (site_name,))
             conn.commit()
             conn.close()
             messagebox.showinfo("Succès", f"La nouvelle base de données {new_db_name} a été créée et le site {site_name} y a été ajouté.")
@@ -1301,19 +1307,19 @@ class Frames8(Frame):
                                                     text=f"La première étape consiste à modifier le fichier de configuration du modèle de détection. \nCe fichier contient tous les paramètres nécessaires à l'entraînement du modèle, \ntels que la structure du réseau neuronal, les hyperparamètres de l'entraînement, \nles chemins des jeux de données, et les prétraitements des images. \nPour notre projet, nous avons adapté ce fichier pour inclure des informations spécifiques \nsur les types d'équipements à détecter et les annotations correspondantes. \nCela permet au modèle d'apprendre à distinguer entre différents équipements \navec une grande précision.", font=("times new roman", 13, "italic"), fill="white")
       
         self.entry_var = StringVar()
-        button5 = ttk.Button(self, text=f"Modifier le fichier Config", width=40, command=self.execute_program)
-        button6 = ttk.Button(self, text=f"Afficher le fichier Config", width=40, command=self.open_config_file)
-        #button7 = ttk.Button(self, text=f"Help Config", width=40, command=self.lire_fichier)
-        button8 = ttk.Button(self, text=f"Exécuter COCO Viewer", width=40, command=self.run_cocoviewer)
-        button9 = ttk.Button(self, text=f"Entraîner le modèle", width=40, command=self.executer3)
-        button10 = ttk.Button(self, text=f"Tester le modèle", width=40, command=self.executer2)
+        button5 = ttk.Button(self, text=f"Modifier le fichier Config", width=30, command=self.execute_program)
+        button6 = ttk.Button(self, text=f"Afficher le fichier Config", width=30, command=self.open_config_file)
+        #button7 = ttk.Button(self, text=f"Help Config", width=30, command=self.lire_fichier)
+        button8 = ttk.Button(self, text=f"Exécuter COCO Viewer", width=30, command=self.run_cocoviewer)
+        button9 = ttk.Button(self, text=f"Entraîner le modèle", width=30, command=self.executer3)
+        button10 = ttk.Button(self, text=f"Tester le modèle", width=30, command=self.executer2)
       
-        self.canvas_button = self.canvas.create_window(900, 500, window=button5)
-        self.canvas_button = self.canvas.create_window(900, 540, window=button6)
-        #self.canvas_button = self.canvas.create_window(900, 560, window=button7)
-        self.canvas_button = self.canvas.create_window(900, 580, window=button8)
-        self.canvas_button = self.canvas.create_window(900, 620, window=button9)
-        self.canvas_button = self.canvas.create_window(900, 660, window=button10)
+        self.canvas_button = self.canvas.create_window(860, 500, window=button5)
+        self.canvas_button = self.canvas.create_window(860, 540, window=button6)
+        #self.canvas_button = self.canvas.create_window(860, 560, window=button7)
+        self.canvas_button = self.canvas.create_window(860, 580, window=button8)
+        self.canvas_button = self.canvas.create_window(860, 620, window=button9)
+        self.canvas_button = self.canvas.create_window(860, 660, window=button10)
 
     def execute_program(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "option-config.py")
@@ -1540,12 +1546,44 @@ class View(Frame):
         except IndexError:
             pass
 
-    def display_data(self, table_name, columns, data):
+    def view_all_data(self):
+        try:
+            all_data = []
+            all_columns = []
+            db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
+
+            for db_file in db_files:
+                db_path = os.path.join(self.db_directory, db_file)
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+                tables = cursor.fetchall()
+
+                for table in tables:
+                    table_name = table[0]
+                    cursor.execute(f"SELECT * FROM {table_name}")
+                    data = cursor.fetchall()
+                    columns = [d[0] for d in cursor.description]
+                    table_data = [(db_file, table_name) + row for row in data]
+
+                    # Ajouter les données et colonnes à la liste globale
+                    all_data.extend(table_data)
+                    all_columns = ["Base de données", "Table", "id", "category", "site", "tube", "sens", "nom_image"] 
+
+                connection.close()
+
+            # Afficher toutes les données accumulées
+            self.display_data("Toutes les données", all_columns, all_data)
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+
+    def display_data(self, title, columns, data):
         # Ajouter les colonnes au Treeview
         self.tree["columns"] = columns
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=100)
+            self.tree.column(col, width=40)
 
         # Effacer les anciennes données
         self.tree.delete(*self.tree.get_children())
@@ -1554,24 +1592,9 @@ class View(Frame):
         for row in data:
             self.tree.insert("", "end", values=row)
 
-    def view_all_data(self):
-        try:
-            db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
-            for db_file in db_files:
-                db_path = os.path.join(self.db_directory, db_file)
-                connection = sqlite3.connect(db_path)
-                cursor = connection.cursor()
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-                tables = cursor.fetchall()
-                for table in tables:
-                    table_name = table[0]
-                    cursor.execute(f"SELECT * FROM {table_name}")
-                    data = cursor.fetchall()
-                    self.display_data(table_name, [d[0] for d in cursor.description], data)
-                connection.close()
-        except sqlite3.Error as e:
-            print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+        # Afficher le titre (optionnel)
+        print(title)
+
 
     def view_other_table_data(self, table_name):
         try:

@@ -15,7 +15,7 @@ from PIL import Image, ImageTk
 from datetime import datetime
 
 
-def create_new_database(self):
+def nouvelle_bdd(self):
    # Fonction pour créer une nouvelle base de données
     new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
     if new_db_name:
@@ -30,7 +30,7 @@ def create_new_database(self):
             new_connection.commit()
             new_connection.close()
 
-def create_table_in_database(self):
+def table_nouvelle_bdd(self):
     # Fonction pour créer une nouvelle table dans la base de données existante
     db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
 
@@ -60,7 +60,7 @@ def create_table_in_database(self):
                 connection.commit()
                 connection.close()
 
-def add_data_to_database(self):
+def donnees_nouvelle_bdd(self):
     # Fonction pour ajouter des données à la base de données
     db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
 
