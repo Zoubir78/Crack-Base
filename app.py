@@ -455,14 +455,14 @@ class Frames(Frame):
         button2 = ttk.Button(self, text=f"Ajouter des données (profondeur)", width=40, command=lambda: upload_depths(self, category))
         button22 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=40, command=lambda: upload_masques(self, category))
 
-        self.canvas_button1 = self.canvas.create_window(750, 510, window=button1)
-        self.canvas_export_button1 = self.canvas.create_window(950, 510, window=export_button1)
-        self.canvas_progress1 = self.canvas.create_window(800, 540, window=self.progress1)
-        self.canvas_button2 = self.canvas.create_window(750, 570, window=button2)
-        self.canvas_export_button2 = self.canvas.create_window(950, 570, window=export_button2)
-        self.canvas_progress2 = self.canvas.create_window(800, 600, window=self.progress2)
-        self.canvas_button22 = self.canvas.create_window(750, 640, window=button22)
-        self.canvas_export_button22 = self.canvas.create_window(950, 640, window=export_button22)
+        self.canvas_button1 = self.canvas.create_window(750, 470, window=button1)
+        self.canvas_export_button1 = self.canvas.create_window(950, 470, window=export_button1)
+        self.canvas_progress1 = self.canvas.create_window(800, 500, window=self.progress1)
+        self.canvas_button2 = self.canvas.create_window(750, 540, window=button2)
+        self.canvas_export_button2 = self.canvas.create_window(950, 540, window=export_button2)
+        self.canvas_progress2 = self.canvas.create_window(800, 570, window=self.progress2)
+        self.canvas_button22 = self.canvas.create_window(750, 610, window=button22)
+        self.canvas_export_button22 = self.canvas.create_window(950, 610, window=export_button22)
 
     def add(self, table):
         site, tube, sens = select_site_details(self)
@@ -543,9 +543,9 @@ class Frames2(Frame):
         button003.pack(pady=10)
 
         self.canvas_button = self.canvas.create_window(760, 160, window=button03)
-        self.canvas_export_button1 = self.canvas.create_window(950, 160, window=export_button003)
+        self.canvas_export_button1 = self.canvas.create_window(980, 160, window=export_button003)
         self.canvas_button = self.canvas.create_window(760, 200, window=button003)
-        self.canvas_export_button1 = self.canvas.create_window(950, 200, window=export_button004)
+        self.canvas_export_button1 = self.canvas.create_window(980, 200, window=export_button004)
         self.canvas_progress1 = self.canvas.create_window(800, 240, window=self.progress1)
 
         self.canvas_text3 = self.canvas.create_text(340, 320, text=f"- Tunnel piéton (Benfeld)", font=("times new roman", 12, "normal", "bold"), fill="white")
@@ -568,9 +568,9 @@ class Frames2(Frame):
         button001.pack(pady=10)
 
         self.canvas_button = self.canvas.create_window(760, 350, window=button01)
-        self.canvas_export_button1 = self.canvas.create_window(950, 350, window=export_button001)
+        self.canvas_export_button1 = self.canvas.create_window(980, 350, window=export_button001)
         self.canvas_button = self.canvas.create_window(760, 390, window=button001)
-        self.canvas_export_button1 = self.canvas.create_window(950, 390, window=export_button002)
+        self.canvas_export_button1 = self.canvas.create_window(980, 390, window=export_button002)
         self.canvas_progress01 = self.canvas.create_window(800, 430, window=self.progress01)
 
         self.canvas_text3 = self.canvas.create_text(340, 470, text=f"- Base CODEBRIM", font=("times new roman", 12, "normal", "bold"), fill="white")
@@ -592,9 +592,9 @@ class Frames2(Frame):
         button002.pack(pady=10)
 
         self.canvas_button = self.canvas.create_window(760, 480, window=button02)
-        self.canvas_export_button1 = self.canvas.create_window(950, 480, window=export_button005)
+        self.canvas_export_button1 = self.canvas.create_window(980, 480, window=export_button005)
         self.canvas_button = self.canvas.create_window(760, 520, window=button002)
-        self.canvas_export_button1 = self.canvas.create_window(950, 520, window=export_button006)
+        self.canvas_export_button1 = self.canvas.create_window(980, 520, window=export_button006)
         self.canvas_progress02 = self.canvas.create_window(800, 550, window=self.progress02)
 
         self.canvas_text3 = self.canvas.create_text(340, 580, text=f"- Base UFR", font=("times new roman", 12, "normal", "bold"), fill="white")
@@ -614,9 +614,9 @@ class Frames2(Frame):
         button004.pack(pady=10)
 
         self.canvas_button = self.canvas.create_window(760, 600, window=button04)
-        self.canvas_export_button1 = self.canvas.create_window(950, 600, window=export_button007)
+        self.canvas_export_button1 = self.canvas.create_window(980, 600, window=export_button007)
         self.canvas_button = self.canvas.create_window(760, 640, window=button004)
-        self.canvas_export_button1 = self.canvas.create_window(950, 640, window=export_button008)
+        self.canvas_export_button1 = self.canvas.create_window(980, 640, window=export_button008)
         self.canvas_progress03 = self.canvas.create_window(800, 670, window=self.progress03)
         
         self.entry_var = StringVar()
@@ -774,9 +774,9 @@ class Frames3(Frame):
         #self.selected_tables = []  # Default table
         self.canvas_image = self.canvas.create_image(280, 20, image=self.image, anchor=NW)
         self.canvas_text1 = self.canvas.create_text(700, 70, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
-        self.canvas_text2 = self.canvas.create_text(160, 500,
-                                                    text=f"Pour afficher vos données enregistrées \n'{category.lower()}', cliquez sur le menu View \n "
-                                                         f"de la barre de menu et sélectionnez \n'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
+        #self.canvas_text2 = self.canvas.create_text(160, 500,
+        #                                            text=f"Pour afficher vos données enregistrées \n'{category.lower()}', cliquez sur le menu View \n "
+        #                                                 f"de la barre de menu et sélectionnez \n'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
 
         self.entry_var = StringVar()
         #entry = ttk.Entry(self, textvariable=self.entry_var, width=50)
@@ -811,13 +811,13 @@ class Frames3(Frame):
         self.table_choice_button4.bind("<Return>", self.add)
         #self.canvas_entry = self.canvas.create_window(600, 700, window=entry)
         self.canvas_button = self.canvas.create_window(140, 180, window=button01)
-        self.canvas_button = self.canvas.create_window(140, 200, window=self.table_choice_button)
-        self.canvas_button = self.canvas.create_window(140, 240, window=button02)
-        self.canvas_button = self.canvas.create_window(140, 260, window=self.table_choice_button2)
-        self.canvas_button = self.canvas.create_window(140, 300, window=button03)
-        self.canvas_button = self.canvas.create_window(140, 320, window=self.table_choice_button3)
-        self.canvas_button = self.canvas.create_window(140, 360, window=button04)
-        self.canvas_button = self.canvas.create_window(140, 380, window=self.table_choice_button4)
+        self.canvas_button = self.canvas.create_window(140, 220, window=self.table_choice_button)
+        self.canvas_button = self.canvas.create_window(140, 280, window=button02)
+        self.canvas_button = self.canvas.create_window(140, 320, window=self.table_choice_button2)
+        self.canvas_button = self.canvas.create_window(140, 380, window=button03)
+        self.canvas_button = self.canvas.create_window(140, 420, window=self.table_choice_button3)
+        self.canvas_button = self.canvas.create_window(140, 480, window=button04)
+        self.canvas_button = self.canvas.create_window(140, 520, window=self.table_choice_button4)
 
     def choose_table_and_upload(self, category):
         self.open_table_selection()
@@ -903,9 +903,9 @@ class Frames4(Frame):
         self.canvas.pack(fill=BOTH, expand=TRUE)
         self.canvas_image = self.canvas.create_image(20, 50, image=self.image, anchor=NW)
         self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
-        self.canvas_text2 = self.canvas.create_text(800, 180,
-                                                    text=f"Pour afficher vos données enregistrées '{category.lower()}',\ncliquez sur le menu View "
-                                                         f"de la barre de menu \net sélectionnez 'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
+        #self.canvas_text2 = self.canvas.create_text(800, 180,
+        #                                            text=f"Pour afficher vos données enregistrées '{category.lower()}',\ncliquez sur le menu View "
+        #                                                 f"de la barre de menu \net sélectionnez 'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
 
         self.progress001 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
         self.progress002 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
@@ -927,16 +927,16 @@ class Frames4(Frame):
         button6 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=45, command=lambda: upload_masques_grand(self, category))
         button6.pack(pady=10)
 
-        self.canvas_button = self.canvas.create_window(760, 300, window=button3)
-        self.canvas_export_button00 = self.canvas.create_window(950, 300, window=export_button00)
-        self.canvas_button = self.canvas.create_window(760, 340, window=button4)
-        self.canvas_export_button11 = self.canvas.create_window(950, 340, window=export_button11)
-        self.canvas_progress001 = self.canvas.create_window(760, 380, window=self.progress001)
-        self.canvas_button = self.canvas.create_window(760, 420, window=button5)
-        self.canvas_export_button22 = self.canvas.create_window(950, 420, window=export_button22)
-        self.canvas_button = self.canvas.create_window(760, 460, window=button6)
-        self.canvas_export_button33 = self.canvas.create_window(950, 460, window=export_button33)
-        self.canvas_progress002 = self.canvas.create_window(760, 500, window=self.progress002)
+        self.canvas_button = self.canvas.create_window(760, 160, window=button3)
+        self.canvas_export_button00 = self.canvas.create_window(980, 160, window=export_button00)
+        self.canvas_button = self.canvas.create_window(760, 200, window=button4)
+        self.canvas_export_button11 = self.canvas.create_window(980, 200, window=export_button11)
+        self.canvas_progress001 = self.canvas.create_window(760, 240, window=self.progress001)
+        self.canvas_button = self.canvas.create_window(760, 280, window=button5)
+        self.canvas_export_button22 = self.canvas.create_window(980, 280, window=export_button22)
+        self.canvas_button = self.canvas.create_window(760, 320, window=button6)
+        self.canvas_export_button33 = self.canvas.create_window(980, 320, window=export_button33)
+        self.canvas_progress002 = self.canvas.create_window(760, 360, window=self.progress002)
 
         self.entry_var = StringVar()
     
@@ -1111,14 +1111,14 @@ class Frames7(Frame):
         button10 = ttk.Button(self, text=f"Liste des sites", width=40, command=self.show_sites_list)
         button11 = ttk.Button(self, text=f"Modifier/Supprimer un site", width=40, command=self.modify_or_delete_site)
 
-        self.canvas_button = self.canvas.create_window(920, 40, window=button5)
-        self.canvas_button = self.canvas.create_window(920, 80, window=button4)
-        self.canvas_button = self.canvas.create_window(920, 120, window=button6)
-        self.canvas_button = self.canvas.create_window(920, 160, window=button7)
-        self.canvas_button = self.canvas.create_window(920, 200, window=button8)
-        self.canvas_button = self.canvas.create_window(920, 240, window=button9)
-        self.canvas_button = self.canvas.create_window(920, 280, window=button10)
-        self.canvas_button = self.canvas.create_window(920, 320, window=button11)
+        self.canvas_button = self.canvas.create_window(900, 50, window=button5)
+        self.canvas_button = self.canvas.create_window(900, 90, window=button4)
+        self.canvas_button = self.canvas.create_window(900, 130, window=button6)
+        self.canvas_button = self.canvas.create_window(900, 170, window=button7)
+        self.canvas_button = self.canvas.create_window(900, 210, window=button8)
+        self.canvas_button = self.canvas.create_window(900, 250, window=button9)
+        self.canvas_button = self.canvas.create_window(900, 290, window=button10)
+        self.canvas_button = self.canvas.create_window(900, 330, window=button11)
 
     def add_new_site(self):
         site_name = simpledialog.askstring("Nouveau site", "Entrez le nom du nouveau site:")
@@ -1308,12 +1308,12 @@ class Frames8(Frame):
         button9 = ttk.Button(self, text=f"Entraîner le modèle", width=40, command=self.executer3)
         button10 = ttk.Button(self, text=f"Tester le modèle", width=40, command=self.executer2)
       
-        self.canvas_button = self.canvas.create_window(920, 500, window=button5)
-        self.canvas_button = self.canvas.create_window(920, 530, window=button6)
-        #self.canvas_button = self.canvas.create_window(920, 560, window=button7)
-        self.canvas_button = self.canvas.create_window(920, 590, window=button8)
-        self.canvas_button = self.canvas.create_window(920, 620, window=button9)
-        self.canvas_button = self.canvas.create_window(920, 650, window=button10)
+        self.canvas_button = self.canvas.create_window(900, 500, window=button5)
+        self.canvas_button = self.canvas.create_window(900, 540, window=button6)
+        #self.canvas_button = self.canvas.create_window(900, 560, window=button7)
+        self.canvas_button = self.canvas.create_window(900, 580, window=button8)
+        self.canvas_button = self.canvas.create_window(900, 620, window=button9)
+        self.canvas_button = self.canvas.create_window(900, 660, window=button10)
 
     def execute_program(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "option-config.py")
