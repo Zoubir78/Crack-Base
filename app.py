@@ -907,8 +907,8 @@ class Frames3(Frame):
             messagebox.showinfo("Doit contenir plus de 2 caractères","Les caractères saisis sont trop courts.")
         self.entry_var.set("")
 
-image_paths2 = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg", "images/11215-2.jpg", "images/11215-3.jpg", "images/11215-4.jpg"]
-mask_paths2 = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png", "images/11215-2.png", "images/11215-3.png", "images/11215-4.png"]
+image_paths2 = ["images/input_0.png", "images/input_1.png", "images/input_2.png", "images/input_3.png", "images/input_4.png", "images/input_5.png", "images/input_6.png", "images/input_7.png", "images/input_8.png"]
+mask_paths2 = ["images/0.png", "images/1.png", "images/2.png", "images/3.png", "images/4.png", "images/5.png", "images/6.png", "images/7.png", "images/8.png"]
 
 class TableSelectionWindow(tk.Toplevel):
     def __init__(self, parent):
