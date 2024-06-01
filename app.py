@@ -628,7 +628,7 @@ class Frames2(Frame):
 
         self.canvas_text3 = self.canvas.create_text(340, 580, text=f"- Base UFR", font=("times new roman", 12, "normal", "bold"), fill="white")
         self.canvas_text7 = self.canvas.create_text(280, 620, text=f"→ Images à la volée, 2 capteurs (Apple ou Samsung) \n"
-                                                                    "2 types de VT (à l’obejt , comme autres bases, et sous forme de bande ou mask)",
+                                                                    "2 types de VT (à l’objet , comme autres bases, et sous forme de bande ou mask)",
                                                                font=("times new roman", 12, "normal"), fill="white")
         
         self.progress03 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
