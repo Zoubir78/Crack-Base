@@ -327,8 +327,8 @@ class CrackBase(Tk):
         # Créer les différents Frames ; La classe Frames prend les arguments du parent, de la catégorie et du chemin d'accès au fichier de l'image.
         self.frames = {"Accueil": Home(body, image_paths, mask_paths), "LCMS": Frames(body, "LCMS", "images\\LCMS.png"), 
                         "2d": Frames2(body, "Images 2D", "images\\image-2d.jpg"),
-                        "fer apparent": Frames3(body, "Fer apparent", "images\\fer-apparent.png"),
-                        "fissures": Frames4(body, "Fissures", "images\\fissures.jpg"), 
+                        "fer apparent": Frames3(body, "Fer apparent", image_paths2, mask_paths2),
+                        "fissures": Frames4(body, "Fissures", image_paths1, mask_paths1), 
                         "sites": Frames7(body, "Sites", "images\\VT.png"),
                         "nouvelle_BDD": Frames5(body, "Nouvelle BDD", "images\\database.png"),
                         "equipements": Frames8(body, "Equipements", "images\\detect.png"),
@@ -408,7 +408,7 @@ class Home(Frame):
         self.canvas.pack(fill=BOTH, expand=True)
 
         # Ajout du texte de bienvenue
-        self.canvas_text1 = self.canvas.create_text(520, 30, text="""Bienvenue sur Crack Base - ENDSUM""", 
+        self.canvas_text1 = self.canvas.create_text(580, 30, text="""Bienvenue sur Crack Base - ENDSUM""", 
                                                     font=("Castellar", 20, "italic", "bold"), fill="white")
 
         self.load_images()
@@ -793,16 +793,16 @@ class Frames2(Frame):
 
 class Frames3(Frame):
     selected_tables = []
-    def __init__(self, parent, category, image_path):
+    def __init__(self, parent, category, image_paths2, mask_paths2):
         Frame.__init__(self, parent, bg="gray")
-        image = Image.open(image_path)
+        self.image_paths2 = image_paths2
+        self.mask_paths2 = mask_paths2
+        self.image_objects2 = []
+        self.mask_objects2 = []
         self.category = category
-        self.image = ImageTk.PhotoImage(image)
-        self.canvas = Canvas(self)
-        self.canvas.pack(fill=BOTH, expand=TRUE)
-        #self.selected_tables = []  # Default table
-        self.canvas_image = self.canvas.create_image(280, 20, image=self.image, anchor=NW)
-        self.canvas_text1 = self.canvas.create_text(700, 70, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
+        self.canvas = Canvas(self, width=1050, height=800)
+        self.canvas.pack(fill=BOTH, expand=True)
+        self.canvas_text1 = self.canvas.create_text(700, 30, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         #self.canvas_text2 = self.canvas.create_text(160, 500,
         #                                            text=f"Pour afficher vos données enregistrées \n'{category.lower()}', cliquez sur le menu View \n "
         #                                                 f"de la barre de menu et sélectionnez \n'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
@@ -839,14 +839,38 @@ class Frames3(Frame):
         button04.bind("<Return>", self.add)
         self.table_choice_button4.bind("<Return>", self.add)
         #self.canvas_entry = self.canvas.create_window(600, 700, window=entry)
-        self.canvas_button = self.canvas.create_window(140, 180, window=button01)
-        self.canvas_button = self.canvas.create_window(140, 220, window=self.table_choice_button)
-        self.canvas_button = self.canvas.create_window(140, 280, window=button02)
-        self.canvas_button = self.canvas.create_window(140, 320, window=self.table_choice_button2)
-        self.canvas_button = self.canvas.create_window(140, 380, window=button03)
-        self.canvas_button = self.canvas.create_window(140, 420, window=self.table_choice_button3)
-        self.canvas_button = self.canvas.create_window(140, 480, window=button04)
-        self.canvas_button = self.canvas.create_window(140, 520, window=self.table_choice_button4)
+        self.canvas_button = self.canvas.create_window(180, 180, window=button01)
+        self.canvas_button = self.canvas.create_window(180, 220, window=self.table_choice_button)
+        self.canvas_button = self.canvas.create_window(180, 280, window=button02)
+        self.canvas_button = self.canvas.create_window(180, 320, window=self.table_choice_button2)
+        self.canvas_button = self.canvas.create_window(180, 380, window=button03)
+        self.canvas_button = self.canvas.create_window(180, 420, window=self.table_choice_button3)
+        self.canvas_button = self.canvas.create_window(180, 480, window=button04)
+        self.canvas_button = self.canvas.create_window(180, 520, window=self.table_choice_button4)
+
+        self.load_images2()
+        self.create_image_grid2()
+
+    def load_images2(self):
+        for img_path, mask_path in zip(self.image_paths2, self.mask_paths2):
+            img = Image.open(img_path).resize((200, 200))  # Redimensionner les images pour qu'elles s'adaptent à la grille
+            mask = Image.open(mask_path).resize((200, 200))
+            self.image_objects2.append(ImageTk.PhotoImage(img))
+            self.mask_objects2.append(ImageTk.PhotoImage(mask))
+
+    def create_image_grid2(self):
+        for i, (img_obj, mask_obj) in enumerate(zip(self.image_objects2, self.mask_objects2)):
+            x = (i % 3) * 210 + 370  # Calculer la position x pour la grille (3 images par ligne, espacement de 210 pixels)
+            y = (i // 3) * 210 + 70  # Calculer la position y pour la grille (espacement de 210 pixels)
+            image_id = self.canvas.create_image(x, y, image=img_obj, anchor=NW)
+            self.canvas.tag_bind(image_id, "<Enter>", lambda e, mask=mask_obj, img_id=image_id: self.on_hover(mask, img_id))
+            self.canvas.tag_bind(image_id, "<Leave>", lambda e, img=img_obj, img_id=image_id: self.on_leave(img, img_id))
+
+    def on_hover(self, mask_image, image_id):
+        self.canvas.itemconfig(image_id, image=mask_image)
+
+    def on_leave(self, original_image, image_id):
+        self.canvas.itemconfig(image_id, image=original_image)
 
     def choose_table_and_upload(self, category):
         self.open_table_selection()
@@ -882,6 +906,9 @@ class Frames3(Frame):
         else :
             messagebox.showinfo("Doit contenir plus de 2 caractères","Les caractères saisis sont trop courts.")
         self.entry_var.set("")
+
+image_paths2 = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg", "images/11215-2.jpg", "images/11215-3.jpg", "images/11215-4.jpg"]
+mask_paths2 = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png", "images/11215-2.png", "images/11215-3.png", "images/11215-4.png"]
 
 class TableSelectionWindow(tk.Toplevel):
     def __init__(self, parent):
@@ -923,18 +950,22 @@ class TableSelectionWindow(tk.Toplevel):
         self.destroy()
 
 class Frames4(Frame):
-    def __init__(self, parent, category, image_path):
+    def __init__(self, parent, category, image_paths1, mask_paths1):
         Frame.__init__(self, parent, bg="gray")
-        image = Image.open(image_path)
+        self.image_paths1 = image_paths1
+        self.mask_paths1 = mask_paths1
+        self.image_objects1 = []
+        self.mask_objects1 = []
         self.category = category
-        self.image = ImageTk.PhotoImage(image)
-        self.canvas = Canvas(self)
-        self.canvas.pack(fill=BOTH, expand=TRUE)
-        self.canvas_image = self.canvas.create_image(20, 50, image=self.image, anchor=NW)
+        self.canvas = Canvas(self, width=1050, height=800)
+        self.canvas.pack(fill=BOTH, expand=True)
         self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         #self.canvas_text2 = self.canvas.create_text(800, 180,
         #                                            text=f"Pour afficher vos données enregistrées '{category.lower()}',\ncliquez sur le menu View "
         #                                                 f"de la barre de menu \net sélectionnez 'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
+
+        self.load_images1()
+        self.create_image_grid1()
 
         self.progress001 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
         self.progress002 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
@@ -968,6 +999,27 @@ class Frames4(Frame):
         self.canvas_progress002 = self.canvas.create_window(760, 360, window=self.progress002)
 
         self.entry_var = StringVar()
+
+    def load_images1(self):
+        for img_path, mask_path in zip(self.image_paths1, self.mask_paths1):
+            img = Image.open(img_path).resize((200, 200))  # Redimensionner les images pour qu'elles s'adaptent à la grille
+            mask = Image.open(mask_path).resize((200, 200))
+            self.image_objects1.append(ImageTk.PhotoImage(img))
+            self.mask_objects1.append(ImageTk.PhotoImage(mask))
+
+    def create_image_grid1(self):
+        for i, (img_obj, mask_obj) in enumerate(zip(self.image_objects1, self.mask_objects1)):
+            x = (i % 2) * 210 + 60  # Calculer la position x pour la grille (2 images par ligne, espacement de 210 pixels)
+            y = (i // 2) * 210 + 60  # Calculer la position y pour la grille (espacement de 210 pixels)
+            image_id = self.canvas.create_image(x, y, image=img_obj, anchor=NW)
+            self.canvas.tag_bind(image_id, "<Enter>", lambda e, mask=mask_obj, img_id=image_id: self.on_hover(mask, img_id))
+            self.canvas.tag_bind(image_id, "<Leave>", lambda e, img=img_obj, img_id=image_id: self.on_leave(img, img_id))
+
+    def on_hover(self, mask_image, image_id):
+        self.canvas.itemconfig(image_id, image=mask_image)
+
+    def on_leave(self, original_image, image_id):
+        self.canvas.itemconfig(image_id, image=original_image)
     
     def add(self, event):
         entry = self.entry_var.get()  # Obtient le contenu de la zone d'entrée saisie par l'utilisateur.
@@ -1041,6 +1093,10 @@ class Frames4(Frame):
 
     def export_masques_data03(self):
         self.export_data1('masques_grand', 'masques_data_grand.json')
+
+# Chemins des images et des masques
+image_paths1 = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg"]
+mask_paths1 = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png"]
 
 class Frames5(Frame):
     def __init__(self, parent, category, image_path):
