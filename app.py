@@ -325,7 +325,7 @@ class CrackBase(Tk):
         sidebutton5.grid(row=5, pady=2, padx=5)
 
         # Créer les différents Frames ; La classe Frames prend les arguments du parent, de la catégorie et du chemin d'accès au fichier de l'image.
-        self.frames = {"Accueil": Home(body), "LCMS": Frames(body, "LCMS", "images\\LCMS.png"), 
+        self.frames = {"Accueil": Home(body, image_paths, mask_paths), "LCMS": Frames(body, "LCMS", "images\\LCMS.png"), 
                         "2d": Frames2(body, "Images 2D", "images\\image-2d.jpg"),
                         "fer apparent": Frames3(body, "Fer apparent", "images\\fer-apparent.png"),
                         "fissures": Frames4(body, "Fissures", "images\\fissures.jpg"), 
@@ -397,18 +397,47 @@ class CrackBase(Tk):
             number += 1     
 
 class Home(Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, image_paths, mask_paths):
         Frame.__init__(self, parent)
-        image = Image.open("images\\cracks-seg-1.png")
-        self.main = ImageTk.PhotoImage(image)
+        self.image_paths = image_paths
+        self.mask_paths = mask_paths
+        self.image_objects = []
+        self.mask_objects = []
 
-        self.canvas = Canvas(self, width=1050)
-        self.canvas.pack(fill=BOTH, expand=TRUE)
+        self.canvas = Canvas(self, width=1050, height=800)
+        self.canvas.pack(fill=BOTH, expand=True)
 
-        # Ajout de l'image de fond et des textes au Canvas.
-        self.canvas_image = self.canvas.create_image(60, 60, image=self.main, anchor=NW)
+        # Ajout du texte de bienvenue
+        self.canvas_text1 = self.canvas.create_text(520, 30, text="""Bienvenue sur Crack Base - ENDSUM""", 
+                                                    font=("Castellar", 20, "italic", "bold"), fill="white")
 
-        self.canvas_text1 = self.canvas.create_text(520, 30, text="""Bienvenue sur Crack Base - ENDSUM""", font=("Castellar", 20, "italic", "bold"), fill="white")
+        self.load_images()
+        self.create_image_grid()
+
+    def load_images(self):
+        for img_path, mask_path in zip(self.image_paths, self.mask_paths):
+            img = Image.open(img_path).resize((200, 200))  # Redimensionner les images pour qu'elles s'adaptent à la grille
+            mask = Image.open(mask_path).resize((200, 200))
+            self.image_objects.append(ImageTk.PhotoImage(img))
+            self.mask_objects.append(ImageTk.PhotoImage(mask))
+
+    def create_image_grid(self):
+        for i, (img_obj, mask_obj) in enumerate(zip(self.image_objects, self.mask_objects)):
+            x = (i % 5) * 210 + 60  # Calculer la position x pour la grille (5 images par ligne, espacement de 210 pixels)
+            y = (i // 5) * 210 + 60  # Calculer la position y pour la grille (espacement de 210 pixels)
+            image_id = self.canvas.create_image(x, y, image=img_obj, anchor=NW)
+            self.canvas.tag_bind(image_id, "<Enter>", lambda e, mask=mask_obj, img_id=image_id: self.on_hover(mask, img_id))
+            self.canvas.tag_bind(image_id, "<Leave>", lambda e, img=img_obj, img_id=image_id: self.on_leave(img, img_id))
+
+    def on_hover(self, mask_image, image_id):
+        self.canvas.itemconfig(image_id, image=mask_image)
+
+    def on_leave(self, original_image, image_id):
+        self.canvas.itemconfig(image_id, image=original_image)
+
+# Chemins des images et des masques
+image_paths = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg", "images/11215-2.jpg", "images/11215-3.jpg", "images/11215-4.jpg", "images/11215-5.jpg", "images/11215-6.jpg", "images/11215-7.jpg", "images/11215-8.jpg", "images/11215-9.jpg", "images/11215-10.jpg"]
+mask_paths = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png", "images/11215-2.png", "images/11215-3.png", "images/11215-4.png", "images/11215-5.png", "images/11215-6.png", "images/11215-7.png", "images/11215-8.png", "images/11215-9.png", "images/11215-10.png"]
 
 
 class Frames(Frame):
