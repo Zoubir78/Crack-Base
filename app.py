@@ -280,10 +280,10 @@ class CrackBase(Tk):
         self.body = body
 
         # Ajouter des bouttons à la barre latérale
-        sidebutton0 = Button(self.sidebar, text="Accueil", bg="gray", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("Accueil"), font=("Arial", 9, "bold"))
+        sidebutton0 = Button(self.sidebar, text="Accueil", bg="#525659", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("Accueil"), font=("Arial", 9, "bold"))
         sidebutton0.grid(row=0, pady=3, padx=5)
 
-        sidebutton1 = Button(self.sidebar, text="Type d\'images", bg="gray", relief=SUNKEN, width=15, height=7, command=self.toggle_side_button, font=("Arial", 9, "bold"))
+        sidebutton1 = Button(self.sidebar, text="Images", bg="#525659", relief=SUNKEN, width=15, height=7, command=self.toggle_side_button, font=("Arial", 9, "bold"))
         sidebutton1.grid(row=1, pady=2, padx=5)
 
         # Sous-boutons
@@ -299,7 +299,7 @@ class CrackBase(Tk):
         self.side_button_NB.grid(row=1, column=1, pady=(70, 0), padx=6)
         self.side_button_NB.grid_remove()  # Caché initialement
 
-        sidebutton2 = Button(self.sidebar, text="Type de désordre", bg="gray", relief=SUNKEN, width=15, height=7, command=self.toggle_side_button2, font=("Arial", 9, "bold"))
+        sidebutton2 = Button(self.sidebar, text="Désordres", bg="#525659", relief=SUNKEN, width=15, height=7, command=self.toggle_side_button2, font=("Arial", 9, "bold"))
         sidebutton2.grid(row=2, pady=2, padx=5)
 
         # Sous-boutons
@@ -315,13 +315,13 @@ class CrackBase(Tk):
         self.side_button_NB1.grid(row=2, column=1, pady=(70, 0), padx=6)
         self.side_button_NB1.grid_remove()  # Caché initialement
 
-        sidebutton4 = Button(self.sidebar, text="Equipements", bg="gray", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("equipements"), font=("Arial", 9, "bold"))
+        sidebutton4 = Button(self.sidebar, text="Equipements", bg="#525659", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("equipements"), font=("Arial", 9, "bold"))
         sidebutton4.grid(row=3, pady=2, padx=5)
 
-        sidebutton3 = Button(self.sidebar, text="Sites", bg="gray", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("sites"), font=("Arial", 9, "bold"))
+        sidebutton3 = Button(self.sidebar, text="Sites", bg="#525659", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("sites"), font=("Arial", 9, "bold"))
         sidebutton3.grid(row=4, pady=2, padx=5)
 
-        sidebutton5 = Button(self.sidebar, text="View", bg="gray", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("view"), font=("Arial", 9, "bold"))
+        sidebutton5 = Button(self.sidebar, text="View", bg="#525659", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("view"), font=("Arial", 9, "bold"))
         sidebutton5.grid(row=5, pady=2, padx=5)
 
         # Créer les différents Frames ; La classe Frames prend les arguments du parent, de la catégorie et du chemin d'accès au fichier de l'image.
