@@ -194,6 +194,11 @@ class CrackBase(Tk):
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
 
+        # Style sombre pour ttk
+        style = ttk.Style(self)
+        self.tk.call("source", "azure.tcl")
+        self.tk.call("set_theme", "dark")
+
         # Ajouter la barre de menu
         menu = Menu(self)
         self.config(menu=menu)
@@ -263,10 +268,7 @@ class CrackBase(Tk):
         a_propos = Menu(menu, tearoff=0)
         menu.add_cascade(label="A propos", command=lambda: self.show_page("a_propos"))
 
-        # Style sombre pour ttk
-        style = ttk.Style(self)
-        self.tk.call("source", "azure.tcl")
-        self.tk.call("set_theme", "dark")
+        
 
         # Sidebar
         self.sidebar = Frame(self, width=100, bg="#484D7A")
