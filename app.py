@@ -112,12 +112,10 @@ class CrackBase(Tk):
 
             #messagebox.showinfo("Script exécuté", "Le script SAM a été exécuté avec succès.")
 
-    # Fonction pour exécuter Labelme
-    #def executer_executable(self):
-    #    try:
-    #        subprocess.run(["Labelme.exe"])
-    #    except FileNotFoundError:
-    #        messagebox.showerror("Erreur", "Impossible de trouver l'exécutable.")     
+    # Fonction pour exécuter Options
+    def executer6(self):
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "labelme\\widgets\\ClassesWidget.py")
+        subprocess.run(["python", "labelme\\widgets\\ClassesWidget.py"])     
 
     # Fonction pour exécuter npz_img
     def run_npz_img(self):
@@ -244,10 +242,8 @@ class CrackBase(Tk):
         #dlta.add_command(label="Exécuter", command=self.run_dlta_ai)
         #menu.add_cascade(label="DLTA_AI", menu=dlta)
 
-        #labelme = Menu(menu, tearoff=0) 
-        #labelme = tk.Menu(menu, tearoff=0)
-        #labelme.add_command(label="Exécuter", command=self.executer_executable)
-        #menu.add_cascade(label="Labelme", menu=labelme)
+        options = Menu(menu, tearoff=0) 
+        menu.add_cascade(label="Options", command=self.executer6)
 
         coco = Menu(menu, tearoff=0) 
         coco.add_command(label="Copie les masques", command=self.execute_program5)
@@ -1441,10 +1437,9 @@ class Frames8(Frame):
         subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
 
     def executer3(self):
-        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".." ,"mmdetection", "tools", "train.py")
-        chemin_terminal = r"C:\Users\z.marouf-araibi\AppData\Local\anaconda3\Scripts\anaconda.exe"
-        args_terminal = ["run", "-n", "mmdet-env", "python", chemin_script]
-        subprocess.Popen([chemin_terminal] + args_terminal, creationflags=subprocess.CREATE_NEW_CONSOLE)
+        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dlta-ai", "DLTA_AI_app", "mmdetection", "tools", "train.py")
+        chemin_interpreteur = "C:/Users/z.marouf-araibi/Desktop/dlta-ai/.venv/Scripts/python.exe"
+        subprocess.run([chemin_interpreteur, chemin_script])
 
     def executer2(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mmdetection", "tools", "test.py")
