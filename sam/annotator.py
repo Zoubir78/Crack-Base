@@ -32,6 +32,8 @@ from labelme import PY2
 from labelme.label_file import LabelFile
 from labelme.label_file import LabelFileError
 
+import tkinter as tk
+from tkinter import ttk
 
 from shape import Shape
 
@@ -48,7 +50,7 @@ from segment_anything import sam_model_registry, SamPredictor
 
 LABEL_COLORMAP = imgviz.label_colormap()
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, tk.Tk):
 
     FIT_WINDOW, FIT_WIDTH, MANUAL_ZOOM = 0, 1, 2
 
@@ -58,6 +60,11 @@ class MainWindow(QMainWindow):
         self.model_type = model_type
         self.keep_input_size = keep_input_size
         self.max_size = float(max_size)
+
+        # Style sombre pour ttk
+        style = ttk.Style(self)
+        self.tk.call("source", "azure.tcl")
+        self.tk.call("set_theme", "dark")
 
         self.image_id = 1
         self.annotation_id = 1

@@ -126,6 +126,11 @@ class CrackBase(Tk):
     def run_fusion_img(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fusion-img.py")
         subprocess.run(["python", "fusion-img.py"])
+    
+    # Fonction pour exécuter mat2img
+    def run_mat2img(self):
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mat2img\\mat2img.py")
+        subprocess.run(["python", "mat2img\\mat2img.py"])
 
     # Fonction pour exécuter DLTA_AI_app
     #def run_dlta_ai(self):
@@ -215,7 +220,9 @@ class CrackBase(Tk):
 
         fusion_img = Menu(menu, tearoff=0) 
         fusion_img = tk.Menu(menu, tearoff=0)
-        fusion_img.add_command(label="Exécuter", command=self.run_fusion_img)
+        fusion_img.add_command(label="Exécuter fusion-img", command=self.run_fusion_img)
+        fusion_img.add_separator()
+        fusion_img.add_command(label="Exécuter mat2img", command=self.run_mat2img)
         menu.add_cascade(label="Fusion-img", menu=fusion_img)
 
         help_menu = Menu(self, tearoff=0)
