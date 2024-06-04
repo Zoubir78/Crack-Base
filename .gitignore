@@ -31,3 +31,6 @@ venv/
 
 # Fichiers de SAM
 vit_b.pth
+
+# Fichiers de train
+/work_dirs/
