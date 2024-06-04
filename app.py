@@ -1397,25 +1397,25 @@ class Frames8(Frame):
                                                     text=f"La première étape consiste à modifier le fichier de configuration du modèle de détection. \nCe fichier contient tous les paramètres nécessaires à l'entraînement du modèle, \ntels que la structure du réseau neuronal, les hyperparamètres de l'entraînement, \nles chemins des jeux de données, et les prétraitements des images. \nPour notre projet, nous avons adapté ce fichier pour inclure des informations spécifiques \nsur les types d'équipements à détecter et les annotations correspondantes. \nCela permet au modèle d'apprendre à distinguer entre différents équipements \navec une grande précision.", font=("times new roman", 13, "italic"), fill="white")
       
         self.entry_var = StringVar()
-        button5 = ttk.Button(self, text=f"Modifier le fichier Config", width=30, command=self.execute_program)
-        button6 = ttk.Button(self, text=f"Afficher le fichier Config", width=30, command=self.open_config_file)
-        #button7 = ttk.Button(self, text=f"Help Config", width=30, command=self.lire_fichier)
-        button8 = ttk.Button(self, text=f"Exécuter COCO Viewer", width=30, command=self.run_cocoviewer)
-        button9 = ttk.Button(self, text=f"Entraîner le modèle", width=30, command=self.executer3)
-        button10 = ttk.Button(self, text=f"Tester le modèle", width=30, command=self.executer2)
+        button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_cocoviewer)
+        button6 = ttk.Button(self, text=f"Modifier le fichier Config", width=30, command=self.execute_program)
+        button7 = ttk.Button(self, text=f"Choix du modèle", width=30, command=self.open_file) 
+        button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
+        button9 = ttk.Button(self, text=f"Afficher le resultat", width=30, command=self.executer2)
+        button10 = ttk.Button(self, text=f"Choix Epoch", width=30, command=self.executer1)
       
-        self.canvas_button = self.canvas.create_window(860, 500, window=button5)
-        self.canvas_button = self.canvas.create_window(860, 540, window=button6)
-        #self.canvas_button = self.canvas.create_window(860, 560, window=button7)
-        self.canvas_button = self.canvas.create_window(860, 580, window=button8)
-        self.canvas_button = self.canvas.create_window(860, 620, window=button9)
-        self.canvas_button = self.canvas.create_window(860, 660, window=button10)
+        self.canvas_button = self.canvas.create_window(860, 490, window=button5)
+        self.canvas_button = self.canvas.create_window(860, 525, window=button6)
+        self.canvas_button = self.canvas.create_window(860, 560, window=button7)
+        self.canvas_button = self.canvas.create_window(860, 595, window=button8)
+        self.canvas_button = self.canvas.create_window(860, 630, window=button9)
+        self.canvas_button = self.canvas.create_window(860, 665, window=button10)
 
     def execute_program(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "option-config.py")
         subprocess.run(["python", chemin])
 
-    def open_config_file(self):
+    def open_file(self):
         root = tk.Tk()
         root.title("Fichier de Configuration")
         root.geometry("1000x800")
@@ -1428,11 +1428,6 @@ class Frames8(Frame):
             config_text.insert(tk.END, config_content)
         root.mainloop()
 
-    def lire_fichier(self):
-        filepath = 'C:/Users/z.marouf-araibi/Desktop/crack-base-project/mmdetection/configs/my_custom/doc-my_custom_config.txt'
-        contenu = self.lire_fichier(filepath)
-        print(contenu)
-
     def run_cocoviewer(self):
         images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
         if not images_dir:
@@ -1444,11 +1439,14 @@ class Frames8(Frame):
         subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
 
     def executer3(self):
-        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dlta-ai", "DLTA_AI_app", "mmdetection", "tools", "train.py")
-        chemin_interpreteur = "C:/Users/z.marouf-araibi/Desktop/dlta-ai/.venv/Scripts/python.exe"
-        subprocess.run([chemin_interpreteur, chemin_script])
+        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
+        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
 
     def executer2(self):
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mmdetection", "tools", "test.py")
+        subprocess.run(["python", chemin])
+
+    def executer1(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mmdetection", "tools", "test.py")
         subprocess.run(["python", chemin])
 
