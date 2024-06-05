@@ -220,8 +220,8 @@ class CrackBase(Tk):
 
         fusion_img = Menu(menu, tearoff=0) 
         fusion_img = tk.Menu(menu, tearoff=0)
-        fusion_img.add_command(label="Exécuter fusion-img", command=self.run_fusion_img)
-        fusion_img.add_separator()
+        #fusion_img.add_command(label="Exécuter fusion-img", command=self.run_fusion_img)
+        #fusion_img.add_separator()
         fusion_img.add_command(label="Exécuter mat2img", command=self.run_mat2img)
         menu.add_cascade(label="Fusion-img", menu=fusion_img)
 
