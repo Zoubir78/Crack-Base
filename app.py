@@ -1726,9 +1726,11 @@ class View(Frame):
         footer = tk.Label(text="© Crack Base 2024 - ENDSUM", relief=tk.SUNKEN, anchor=tk.W, font=("Castellar", 12, "italic"), bg="black", fg="white")
         footer.grid(row=6, column=0, sticky="ew")
 
-app = CrackBase()
-app.title("Crack Base 2.0 - ENDSUM")
-app.iconbitmap("images\\app.ico")
-app.maxsize(1300,800)
-app.minsize(1300,800)
-app.mainloop()
+if __name__ == "__main__":
+    app = CrackBase()
+    app.title("Crack Base 2.0 - ENDSUM")
+    app.iconbitmap("images\\app.ico")
+    app.maxsize(1300,800)
+    app.minsize(1300,800)
+    app.mainloop()
+
