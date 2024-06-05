@@ -4,81 +4,88 @@ Created on 2 avr. 2024
 @author: Zoubeir Marouf
 '''
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-import ast
-import re  # Importer le module re pour les expressions régulières
+from tkinter import messagebox, ttk
+import re
 
 class ConfigModifierApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Configuration Modifier")
-        self.root.geometry("800x400")
+        self.root.title("Configuration")
+        self.root.geometry("450x600")
+
+        # Style sombre pour ttk
+        style = ttk.Style(self.root)
+        self.root.tk.call("source", "azure.tcl")
+        self.root.tk.call("set_theme", "dark")
 
         # Variables pour stocker les options et leurs valeurs
         self.options = {}
         self.option_vars = {}
 
-        # Créer un champ d'entrée pour spécifier le chemin vers le fichier de configuration
-        self.config_path_label = tk.Label(root, text="Chemin vers le Fichier de Configuration :")
-        self.config_path_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        # Entry pour le chemin du fichier de config
         self.config_path_entry = tk.Entry(root)
-        self.config_path_entry.grid(row=0, column=1, padx=5, pady=5, sticky="we")
-
-        # Créer un bouton pour parcourir et sélectionner le fichier de configuration
-        self.browse_button = tk.Button(root, text="Parcourir", command=self.browse_config)
-        self.browse_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
+        #self.config_path_entry.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.config_path_entry.insert(0, r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\configs\my_custom\my_custom_config.py")
 
         # Frame pour afficher les options et leurs valeurs
-        self.options_frame = ttk.LabelFrame(root, text="Options à Modifier")
+        self.options_frame = ttk.LabelFrame(root, text="Options à modifier")
         self.options_frame.grid(row=1, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
-        # Créer un bouton pour appliquer les modifications
-        self.apply_button = tk.Button(root, text="Sauvegarder les Modifications", command=self.apply_changes)
-        self.apply_button.grid(row=0, column=3, padx=5, pady=5, sticky="e")
-
         # Créer un bouton pour réinitialiser les valeurs par défaut
-        self.reset_button = tk.Button(root, text="Réinitialiser les Valeurs par Défaut", command=self.reset_defaults)
-        self.reset_button.grid(row=1, column=3, padx=5, pady=5, sticky="e")
+        self.reset_button = tk.Button(root, text="Réinitialiser les valeurs par défaut", command=self.reset_defaults)
+        self.reset_button.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+
+        # Créer un bouton pour sauvegarder les modifications
+        self.save_button = tk.Button(root, text="Sauvegarder les modifications", command=self.save_changes)
+        self.save_button.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
         # Créer un label pour afficher les messages d'état
         self.status_label = tk.Label(root, text="", fg="green")
-        self.status_label.grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
+        self.status_label.grid(row=3, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
 
         # Configurer le système de grille pour redimensionner les colonnes et les lignes
         root.columnconfigure(1, weight=1)
         root.rowconfigure(1, weight=1)
 
-    def browse_config(self):
-        # Ouvrir une boîte de dialogue pour parcourir et sélectionner le fichier de configuration
-        file_path = filedialog.askopenfilename(filetypes=[("Python files", "*.py")])
-        self.config_path_entry.delete(0, tk.END)
-        self.config_path_entry.insert(0, file_path)
-
         # Analyser le fichier de configuration pour extraire les options et leurs valeurs
-        self.parse_config(file_path)
+        self.parse_config(self.config_path_entry.get())
 
     def parse_config(self, file_path):
-        self.options = {}
+        self.options = {
+            "model_type": "MaskRCNN",
+            "backbone_type": "ResNet",
+            "checkpoint": "torchvision://resnet18",
+            "neck_type": "FPN",
+            "loss_cls_weight": 1.0,
+            "loss_bbox_weight": 1.0
+        }
 
         with open(file_path, 'r') as f:
-            # Lire chaque ligne du fichier
-            for line in f:
-                # Supprimer les espaces et les caractères de nouvelle ligne
-                line = line.strip()
+            content = f.read()
 
-                # Ignorer les lignes vides ou celles qui sont des commentaires
-                if not line or line.startswith("#"):
-                    continue
+            model_type_match = re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
+            if model_type_match:
+                self.options["model_type"] = model_type_match.group(1)
 
-                # Vérifier si la ligne contient une assignation de variable
-                if "=" in line:
-                    # Séparer la ligne en nom d'option et valeur
-                    option, value = line.split("=", 1)
+            backbone_type_match = re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
+            if backbone_type_match:
+                self.options["backbone_type"] = backbone_type_match.group(1)
 
-                    # Ajouter l'option et sa valeur à notre dictionnaire
-                    option = option.strip()
-                    value = value.strip()
-                    self.options[option] = value
+            checkpoint_match = re.search(r"init_cfg\s*=\s*dict\s*\(.*checkpoint\s*=\s*'([\w:/]+)'", content, re.DOTALL)
+            if checkpoint_match:
+                self.options["checkpoint"] = checkpoint_match.group(1)
+
+            neck_type_match = re.search(r"neck\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
+            if neck_type_match:
+                self.options["neck_type"] = neck_type_match.group(1)
+
+            loss_cls_weight_match = re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", content, re.DOTALL)
+            if loss_cls_weight_match:
+                self.options["loss_cls_weight"] = float(loss_cls_weight_match.group(1))
+
+            loss_bbox_weight_match = re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", content, re.DOTALL)
+            if loss_bbox_weight_match:
+                self.options["loss_bbox_weight"] = float(loss_bbox_weight_match.group(1))
 
         # Afficher les options dans la frame
         self.show_options()
@@ -88,77 +95,105 @@ class ConfigModifierApp:
         for widget in self.options_frame.winfo_children():
             widget.destroy()
 
-        # Déterminer le nombre de colonnes en fonction du nombre d'options
-        num_options = len(self.options)
-        num_columns = 3
-        options_per_column = (num_options + num_columns - 1) // num_columns  # Arrondi supérieur
+        # Model type
+        model_label = tk.Label(self.options_frame, text="Model Type")
+        model_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        model_var = tk.StringVar(value=self.options["model_type"])
+        model_menu = ttk.Combobox(self.options_frame, textvariable=model_var, values=["MaskRCNN", "OtherModel1", "OtherModel2"])
+        model_menu.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["model_type"] = model_var
 
-        # Créer des champs d'entrée pour chaque option
-        for i, (option, value) in enumerate(self.options.items()):
-            # Calculer la position de la colonne et de la ligne en fonction de l'indice de l'option
-            col = i % num_columns
-            row = i // num_columns
+        # Backbone type
+        backbone_label = tk.Label(self.options_frame, text="Backbone Type")
+        backbone_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        backbone_var = tk.StringVar(value=self.options["backbone_type"])
+        backbone_menu = ttk.Combobox(self.options_frame, textvariable=backbone_var, values=["ResNet", "OtherBackbone1", "OtherBackbone2"])
+        backbone_menu.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["backbone_type"] = backbone_var
 
-            # Label pour afficher le nom de l'option
-            label = tk.Label(self.options_frame, text=option)
-            label.grid(row=row, column=col*2, padx=5, pady=5, sticky="w")
+        # Checkpoint
+        checkpoint_label = tk.Label(self.options_frame, text="Checkpoint")
+        checkpoint_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        checkpoint_var = tk.StringVar(value=self.options["checkpoint"])
+        checkpoint_menu = ttk.Combobox(self.options_frame, textvariable=checkpoint_var, values=["torchvision://resnet18", "torchvision://resnet50", "torchvision://resnet101"])
+        checkpoint_menu.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["checkpoint"] = checkpoint_var
 
-            # Champ d'entrée pour modifier la valeur de l'option
-            entry_var = tk.StringVar(value=value)
-            entry = tk.Entry(self.options_frame, textvariable=entry_var, width=20)
-            entry.grid(row=row, column=col*2 + 1, padx=5, pady=5, sticky="w")
+        # Neck type
+        neck_label = tk.Label(self.options_frame, text="Neck Type")
+        neck_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
+        neck_var = tk.StringVar(value=self.options["neck_type"])
+        neck_menu = ttk.Combobox(self.options_frame, textvariable=neck_var, values=["FPN", "OtherNeck1", "OtherNeck2"])
+        neck_menu.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["neck_type"] = neck_var
 
-            # Ajouter la variable d'option à notre dictionnaire pour y accéder plus tard
-            self.option_vars[option] = entry_var
+        # Loss cls weight
+        loss_cls_label = tk.Label(self.options_frame, text="Loss Class Weight")
+        loss_cls_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+        loss_cls_var = tk.DoubleVar(value=self.options["loss_cls_weight"])
+        loss_cls_scale = tk.Scale(self.options_frame, variable=loss_cls_var, from_=1.0, to=10.0, resolution=0.1, orient=tk.HORIZONTAL)
+        loss_cls_scale.grid(row=4, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["loss_cls_weight"] = loss_cls_var
+
+        # Loss bbox weight
+        loss_bbox_label = tk.Label(self.options_frame, text="Loss Bbox Weight")
+        loss_bbox_label.grid(row=5, column=0, padx=5, pady=5, sticky="w")
+        loss_bbox_var = tk.DoubleVar(value=self.options["loss_bbox_weight"])
+        loss_bbox_scale = tk.Scale(self.options_frame, variable=loss_bbox_var, from_=1.0, to=10.0, resolution=0.1, orient=tk.HORIZONTAL)
+        loss_bbox_scale.grid(row=5, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["loss_bbox_weight"] = loss_bbox_var
+
+    def save_config(self, file_path):
+        try:
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+
+            with open(file_path, 'w') as f:
+                for line in lines:
+                    if re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
+                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.option_vars['model_type'].get()}'", line)
+                    elif re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
+                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.option_vars['backbone_type'].get()}'", line)
+                    elif re.search(r"init_cfg\s*=\s*dict\s*\(.*checkpoint\s*=\s*'([\w:/]+)'", line):
+                        line = re.sub(r"checkpoint\s*=\s*'[\w:/]+'", f"checkpoint = '{self.option_vars['checkpoint'].get()}'", line)
+                    elif re.search(r"neck\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
+                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.option_vars['neck_type'].get()}'", line)
+                    elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
+                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.option_vars['loss_cls_weight'].get()}", line)
+                    elif re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
+                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.option_vars['loss_bbox_weight'].get()}", line)
+
+                    f.write(line)
+
+            self.status_label.config(text="Modifications appliquées avec succès!", fg="green")
+
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de l'application des modifications: {e}")
 
     def apply_changes(self):
         config_path = self.config_path_entry.get()
-
-        if not config_path:
-            messagebox.showerror("Erreur", "Veuillez spécifier le chemin du fichier de configuration.")
-            return
-
-        # Mettre à jour les valeurs des options avec celles saisies par l'utilisateur
-        for option, var in self.option_vars.items():
-            self.options[option] = var.get()
-
-        # Lire le contenu du fichier de configuration
-        with open(config_path, 'r') as f:
-            content = f.read()
-
-        # Modifier le contenu du fichier avec les nouvelles valeurs d'options
-        for option, value in self.options.items():
-            # Utiliser une expression régulière pour trouver et remplacer la valeur de l'option dans le contenu
-            content = re.sub(rf"^\s*{re.escape(option)}\s*=\s*.*$", f"{option} = {value}", content, flags=re.MULTILINE)
-
-        # Écrire les modifications dans le fichier de configuration
-        with open(config_path, 'w') as f:
-            f.write(content)
-
-        # Mettre à jour l'affichage des options après avoir écrit dans le fichier
-        self.parse_config(config_path)
-
-        self.status_label.config(text="Modifications sauvegardées avec succès !", fg="green")
-
+        self.save_config(config_path)
 
     def reset_defaults(self):
-        # Remettre les valeurs par défaut pour toutes les options
-        for option, var in self.option_vars.items():
-            default_value = self.get_default_value(option)
-            var.set(default_value)
-
-    def get_default_value(self, option):
-        # Définir les valeurs par défaut pour chaque option (à adapter selon votre besoin)
         default_values = {
-            "lr": "1e-3",
-            "momentum": "0.9",
-            "weight_decay": "1e-4",
-            # Ajouter d'autres options avec leurs valeurs par défaut
+            "model_type": "MaskRCNN",
+            "backbone_type": "ResNet",
+            "checkpoint": "torchvision://resnet18",
+            "neck_type": "FPN",
+            "loss_cls_weight": 1.0,
+            "loss_bbox_weight": 1.0
         }
 
-        return default_values.get(option, "")
+        for key, var in self.option_vars.items():
+            var.set(default_values[key])
 
-# Créer une fenêtre principale
-root = tk.Tk()
-app = ConfigModifierApp(root)
-root.mainloop()
+        self.status_label.config(text="Valeurs réinitialisées par défaut!", fg="green")
+
+    def save_changes(self):
+        config_path = self.config_path_entry.get()
+        self.save_config(config_path)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ConfigModifierApp(root)
+    root.mainloop()

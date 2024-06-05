@@ -244,11 +244,6 @@ class CrackBase(Tk):
         sam.add_command(label="Exécuter SAM", command=self.executer2)
         menu.add_cascade(label="SAM", menu=sam)
 
-        #dlta = Menu(menu, tearoff=0) 
-        #dlta = tk.Menu(menu, tearoff=0)
-        #dlta.add_command(label="Exécuter", command=self.run_dlta_ai)
-        #menu.add_cascade(label="DLTA_AI", menu=dlta)
-
         options = Menu(menu, tearoff=0) 
         menu.add_cascade(label="Options", command=self.executer6)
 
@@ -270,8 +265,6 @@ class CrackBase(Tk):
 
         a_propos = Menu(menu, tearoff=0)
         menu.add_cascade(label="A propos", command=lambda: self.show_page("a_propos"))
-
-        
 
         # Sidebar
         self.sidebar = Frame(self, width=100, bg="#484D7A")
@@ -1398,7 +1391,7 @@ class Frames8(Frame):
       
         self.entry_var = StringVar()
         button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_cocoviewer)
-        button6 = ttk.Button(self, text=f"Modifier le fichier Config", width=30, command=self.execute_program)
+        button6 = ttk.Button(self, text=f"Options Config", width=30, command=self.execute_program)
         button7 = ttk.Button(self, text=f"Choix du modèle", width=30, command=self.open_file) 
         button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
         button9 = ttk.Button(self, text=f"Afficher le resultat", width=30, command=self.executer2)
@@ -1443,11 +1436,11 @@ class Frames8(Frame):
         subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
 
     def executer2(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mmdetection", "tools", "test.py")
-        subprocess.run(["python", chemin])
+        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_resultat.bat")
+        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
 
     def executer1(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "mmdetection", "tools", "test.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mmdetection", "choix-epoch.py")
         subprocess.run(["python", chemin])
 
     def add(self, event):
