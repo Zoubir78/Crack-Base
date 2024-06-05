@@ -1410,7 +1410,7 @@ class Frames8(Frame):
 
     def open_file(self):
         root = tk.Tk()
-        root.title("Fichier de Configuration")
+        root.title("Choisir un modèle")
         root.geometry("1000x800")
         file_path = filedialog.askopenfilename(filetypes=[("Fichiers de configuration", "*.py"), ("Tous les fichiers", "*.*")])
         if file_path:

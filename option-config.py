@@ -11,7 +11,7 @@ class ConfigModifierApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Configuration")
-        self.root.geometry("450x600")
+        self.root.geometry("410x600")
 
         # Style sombre pour ttk
         style = ttk.Style(self.root)
