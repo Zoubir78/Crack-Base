@@ -1096,6 +1096,8 @@ class Frames4(Frame):
 image_paths1 = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg"]
 mask_paths1 = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png"]
 
+import subprocess  # Ajoutez ceci en haut de votre fichier
+
 class Frames5(Frame):
     def __init__(self, parent, category, image_path):
         Frame.__init__(self, parent, bg="gray")
@@ -1111,31 +1113,91 @@ class Frames5(Frame):
                                                          f"'{category.lower()}' ci-dessous.\nVous-pouvez aussi configurer la nouvelle table \nen cliquant sur 'Nouvelle Table'", font=("times new roman", 12, "normal"), fill="white")
       
         self.entry_var = StringVar()
-        #entry = ttk.Entry(self, textvariable=self.entry_var, width=50)
-        button5 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=nouvelle_bdd)
-        button6 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=table_nouvelle_bdd)
-        button7 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=donnees_nouvelle_bdd)
 
-        #entry.bind("<Return>", self.add)
-        button5.bind("<Return>", self.add)
-        button6.bind("<Return>", self.add)
-        button7.bind("<Return>", self.add)
+        button5 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=self.nouvelle_bdd)
+        button6 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=self.table_nouvelle_bdd)
+        button7 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=self.donnees_nouvelle_bdd)
 
-        #self.canvas_entry = self.canvas.create_window(880, 500, window=entry)
         self.canvas_button = self.canvas.create_window(900, 300, window=button5)
         self.canvas_button = self.canvas.create_window(900, 340, window=button6)
         self.canvas_button = self.canvas.create_window(900, 380, window=button7)
     
-    def add(self, event):
-        entry = self.entry_var.get()  # Obtient le contenu de la zone d'entrée saisie par l'utilisateur.
-        if len(entry.strip()) > 2:
-            messagebox.showinfo("Ajouté avec succès", f"{entry.title().strip()} a été ajouté avec succès")
-            insert(entry.title().strip(), self.category)
-        elif len(entry.strip()) < 1:
-            pass
-        else :
-            messagebox.showinfo("Doit contenir plus de 2 caractères","Les caractères saisis sont trop courts.")
-        self.entry_var.set("")
+    def nouvelle_bdd(self):
+        # Fonction pour créer une nouvelle base de données
+        new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
+        if new_db_name:
+            new_db_path = filedialog.asksaveasfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+
+            if new_db_path:
+                # Créer une connexion à la nouvelle base de données
+                new_connection = sqlite3.connect(new_db_path)
+                new_cursor = new_connection.cursor()
+
+                # Enregistrez les modifications et fermez la connexion à la nouvelle base de données
+                new_connection.commit()
+                new_connection.close()
+
+    def table_nouvelle_bdd(self):
+        # Fonction pour créer une nouvelle table dans la base de données existante
+        db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+
+        if db_path:
+            # Créer une connexion à la base de données existante
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+
+            # Demander le nom de la nouvelle table
+            table_name = simpledialog.askstring("Nom de la Table", "Entrez le nom de la nouvelle table:")
+
+            if table_name:
+                # Demander les champs de la nouvelle table
+                fields = simpledialog.askstring("Champs de la Table", "Entrez les champs de la nouvelle table (séparés par des virgules):")
+
+                if fields:
+                    # Créer la nouvelle table
+                    create_table_query = f'''
+                        CREATE TABLE IF NOT EXISTS {table_name} (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            {fields}
+                        );
+                    '''
+                    cursor.execute(create_table_query)
+
+                    # Enregistrez les modifications et fermez la connexion à la base de données
+                    connection.commit()
+                    connection.close()
+
+    def donnees_nouvelle_bdd(self):
+        # Fonction pour ajouter des données à la base de données
+        db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+
+        if db_path:
+            # Créer une connexion à la base de données existante
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+
+            # Demander à l'utilisateur les données à ajouter
+            data_to_add = simpledialog.askstring("Ajouter des Données", "Entrez les données à ajouter (séparées par des virgules):")
+
+            if data_to_add:
+                # Diviser les données en une liste
+                data_list = data_to_add.split(',')
+
+                # Créer une requête d'insertion en fonction du nombre de données fournies
+                placeholders = ', '.join(['?' for _ in data_list])
+                insert_query = f'INSERT INTO votre_table ({", ".join(data_list)}) VALUES ({placeholders})'
+
+                # Demander à l'utilisateur de confirmer l'ajout
+                confirmation = messagebox.askyesno("Confirmation", f"Voulez-vous vraiment ajouter les données suivantes ?\n{data_list}")
+
+                if confirmation:
+                    # Exécuter la requête d'insertion
+                    cursor.execute(insert_query, data_list)
+
+                    # Enregistrez les modifications et fermez la connexion à la base de données
+                    connection.commit()
+                    connection.close()
+
 
 class Frames6(Frame):
     def __init__(self, parent, category, image_path):
@@ -1188,9 +1250,9 @@ class Frames7(Frame):
         button5 = ttk.Button(self, text=f"Nouveau site", width=40, command=self.add_new_site)
         button4 = ttk.Button(self, text=f"Choisir une BDD", width=40, command=self.choose_database_for_site)
         button6 = ttk.Button(self, text=f"BDD existante", width=40, command=self.add_site_to_existing_database)
-        button7 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=self.create_new_database_and_add_site)
-        button8 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=self.create_table_in_database)
-        button9 = ttk.Button(self, text=f"Ajouter des données", width=40, command=self.add_data_to_database)
+        button7 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=self.nouvelle_bdd)
+        button8 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=self.table_nouvelle_bdd)
+        button9 = ttk.Button(self, text=f"Ajouter des données", width=40, command=self.donnees_nouvelle_bdd)
         button10 = ttk.Button(self, text=f"Liste des sites", width=40, command=self.show_sites_list)
         button11 = ttk.Button(self, text=f"Modifier/Supprimer un site", width=40, command=self.modify_or_delete_site)
 
@@ -1267,39 +1329,39 @@ class Frames7(Frame):
         except Error as e:
             messagebox.showerror("Erreur", f"Une erreur s'est produite : {e}")
 
-    def create_new_database_and_add_site(self, site_name):
+    def nouvelle_bdd(self):
+        # Fonction pour créer une nouvelle base de données
         new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
         if new_db_name:
-            db_folder = 'DB'
-            if not os.path.exists(db_folder):
-                os.makedirs(db_folder)
-            new_db_path = os.path.join(db_folder, f"{new_db_name}.db")
-            conn = sqlite3.connect(new_db_path)
-            cursor = conn.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS images (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                category TEXT NOT NULL,
-                                site TEXT NOT NULL,
-                                tube TEXT NOT NULL,  -- Nouvelle colonne pour le tube
-                                sens TEXT NOT NULL,  -- Nouvelle colonne pour le sens de prise
-                                nom_image TEXT NOT NULL,
-                                image_json TEXT NOT NULL,
-                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMPLL
-                              );''')
-            cursor.execute("INSERT INTO images VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (site_name,))
-            conn.commit()
-            conn.close()
-            messagebox.showinfo("Succès", f"La nouvelle base de données {new_db_name} a été créée et le site {site_name} y a été ajouté.")
+            new_db_path = filedialog.asksaveasfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
 
-    def create_table_in_database(self):
+            if new_db_path:
+                # Créer une connexion à la nouvelle base de données
+                new_connection = sqlite3.connect(new_db_path)
+                new_cursor = new_connection.cursor()
+
+                # Enregistrez les modifications et fermez la connexion à la nouvelle base de données
+                new_connection.commit()
+                new_connection.close()
+
+    def table_nouvelle_bdd(self):
+        # Fonction pour créer une nouvelle table dans la base de données existante
         db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+
         if db_path:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
+            # Créer une connexion à la base de données existante
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+
+            # Demander le nom de la nouvelle table
             table_name = simpledialog.askstring("Nom de la Table", "Entrez le nom de la nouvelle table:")
+
             if table_name:
+                # Demander les champs de la nouvelle table
                 fields = simpledialog.askstring("Champs de la Table", "Entrez les champs de la nouvelle table (séparés par des virgules):")
+
                 if fields:
+                    # Créer la nouvelle table
                     create_table_query = f'''
                         CREATE TABLE IF NOT EXISTS {table_name} (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1307,28 +1369,41 @@ class Frames7(Frame):
                         );
                     '''
                     cursor.execute(create_table_query)
-                    conn.commit()
-                    conn.close()
-                    messagebox.showinfo("Succès", f"La table {table_name} a été créée dans la base de données {db_path}.")
 
-    def add_data_to_database(self):
+                    # Enregistrez les modifications et fermez la connexion à la base de données
+                    connection.commit()
+                    connection.close()
+
+    def donnees_nouvelle_bdd(self):
+        # Fonction pour ajouter des données à la base de données
         db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+
         if db_path:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            table_name = simpledialog.askstring("Nom de la Table", "Entrez le nom de la table:")
-            if table_name:
-                data_to_add = simpledialog.askstring("Ajouter des Données", "Entrez les données à ajouter (séparées par des virgules):")
-                if data_to_add:
-                    data_list = data_to_add.split(',')
-                    placeholders = ', '.join(['?' for _ in data_list])
-                    insert_query = f'INSERT INTO {table_name} VALUES ({placeholders})'
-                    confirmation = messagebox.askyesno("Confirmation", f"Voulez-vous vraiment ajouter les données suivantes ?\n{data_list}")
-                    if confirmation:
-                        cursor.execute(insert_query, data_list)
-                        conn.commit()
-                        conn.close()
-                        messagebox.showinfo("Succès", "Les données ont été ajoutées avec succès.")
+            # Créer une connexion à la base de données existante
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+
+            # Demander à l'utilisateur les données à ajouter
+            data_to_add = simpledialog.askstring("Ajouter des Données", "Entrez les données à ajouter (séparées par des virgules):")
+
+            if data_to_add:
+                # Diviser les données en une liste
+                data_list = data_to_add.split(',')
+
+                # Créer une requête d'insertion en fonction du nombre de données fournies
+                placeholders = ', '.join(['?' for _ in data_list])
+                insert_query = f'INSERT INTO votre_table ({", ".join(data_list)}) VALUES ({placeholders})'
+
+                # Demander à l'utilisateur de confirmer l'ajout
+                confirmation = messagebox.askyesno("Confirmation", f"Voulez-vous vraiment ajouter les données suivantes ?\n{data_list}")
+
+                if confirmation:
+                    # Exécuter la requête d'insertion
+                    cursor.execute(insert_query, data_list)
+
+                    # Enregistrez les modifications et fermez la connexion à la base de données
+                    connection.commit()
+                    connection.close()
 
     def modify_or_delete_site(self):
         site_name = simpledialog.askstring("Modifier/Supprimer un Site", "Entrez le nom du site à modifier ou supprimer:")
@@ -1390,7 +1465,7 @@ class Frames8(Frame):
                                                     text=f"La première étape consiste à modifier le fichier de configuration du modèle de détection. \nCe fichier contient tous les paramètres nécessaires à l'entraînement du modèle, \ntels que la structure du réseau neuronal, les hyperparamètres de l'entraînement, \nles chemins des jeux de données, et les prétraitements des images. \nPour notre projet, nous avons adapté ce fichier pour inclure des informations spécifiques \nsur les types d'équipements à détecter et les annotations correspondantes. \nCela permet au modèle d'apprendre à distinguer entre différents équipements \navec une grande précision.", font=("times new roman", 13, "italic"), fill="white")
       
         self.entry_var = StringVar()
-        button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_cocoviewer)
+        button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_coco_view)
         button6 = ttk.Button(self, text=f"Options Config", width=30, command=self.execute_program)
         button7 = ttk.Button(self, text=f"Choix du modèle", width=30, command=self.open_file) 
         button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
@@ -1425,15 +1500,25 @@ class Frames8(Frame):
             
         root.mainloop()
 
-    def run_cocoviewer(self):
+    #def run_cocoviewer(self):
+    #    images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
+    #    if not images_dir:
+    #        return
+    #    annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
+    #    if not annotations_file:
+    #        return
+    #    chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
+    #    subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
+
+    def run_coco_view(self):
         images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
         if not images_dir:
             return
         annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
         if not annotations_file:
             return
-        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
-        subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
+        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "coco-view.py")
+        subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file])
 
     def executer3(self):
         chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
