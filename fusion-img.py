@@ -7,11 +7,17 @@ import cv2
 import numpy as np
 import os
 from tkinter import filedialog, Tk, Label, Entry, Button, Checkbutton, IntVar, StringVar
+from tkinter import ttk
 
 def select_folder_and_options():
     root = Tk()
     root.title("Options d'image")
     root.geometry("700x250")
+
+    # Style sombre pour ttk
+    style = ttk.Style(root)
+    root.tk.call("source", "azure.tcl")
+    root.tk.call("set_theme", "dark")
 
     folder_path = StringVar()
 

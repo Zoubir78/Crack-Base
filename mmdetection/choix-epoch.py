@@ -104,5 +104,5 @@ plot_loss(axs[1, 1], loss_intensite, loss_cls_intensite, loss_bbox_intensite, lo
 plot_loss(axs[2, 0], loss_profondeur, loss_cls_profondeur, loss_bbox_profondeur, loss_mask_profondeur, "Profondeur Losses")
 plot_loss(axs[2, 1], loss_fusion, loss_cls_fusion, loss_bbox_fusion, loss_mask_fusion, "Fusion Losses")
 
-plt.tight_layout()
+plt.tight_layout(pad=4.0)  # Ajouter des marges
 plt.show()

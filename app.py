@@ -113,9 +113,9 @@ class CrackBase(Tk):
             #messagebox.showinfo("Script exécuté", "Le script SAM a été exécuté avec succès.")
 
     # Fonction pour exécuter Options
-    def executer6(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "labelme\\widgets\\ClassesWidget.py")
-        subprocess.run(["python", "labelme\\widgets\\ClassesWidget.py"])     
+    #def executer6(self):
+    #    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "labelme\\widgets\\ClassesWidget.py")
+    #    subprocess.run(["python", "labelme\\widgets\\ClassesWidget.py"])     
 
     # Fonction pour exécuter npz_img
     def run_npz_img(self):
@@ -220,9 +220,9 @@ class CrackBase(Tk):
 
         fusion_img = Menu(menu, tearoff=0) 
         fusion_img = tk.Menu(menu, tearoff=0)
-        #fusion_img.add_command(label="Exécuter fusion-img", command=self.run_fusion_img)
-        #fusion_img.add_separator()
         fusion_img.add_command(label="Exécuter mat2img", command=self.run_mat2img)
+        fusion_img.add_separator()
+        fusion_img.add_command(label="Exécuter fusion-img", command=self.run_fusion_img)
         menu.add_cascade(label="Fusion-img", menu=fusion_img)
 
         help_menu = Menu(self, tearoff=0)
@@ -244,8 +244,8 @@ class CrackBase(Tk):
         sam.add_command(label="Exécuter SAM", command=self.executer2)
         menu.add_cascade(label="SAM", menu=sam)
 
-        options = Menu(menu, tearoff=0) 
-        menu.add_cascade(label="Options", command=self.executer6)
+        #options = Menu(menu, tearoff=0) 
+        #menu.add_cascade(label="Options", command=self.executer6)
 
         coco = Menu(menu, tearoff=0) 
         coco.add_command(label="Copie les masques", command=self.execute_program5)
@@ -1412,13 +1412,17 @@ class Frames8(Frame):
         root = tk.Tk()
         root.title("Choisir un modèle")
         root.geometry("1000x800")
-        file_path = filedialog.askopenfilename(filetypes=[("Fichiers de configuration", "*.py"), ("Tous les fichiers", "*.*")])
+
+        initial_dir = r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\configs\my_custom\mask_rcnn"
+        file_path = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Fichiers des modèles", "*.py"), ("Tous les fichiers", "*.*")])
+        
         if file_path:
             with open(file_path, 'r') as f:
                 config_content = f.read()
             config_text = tk.Text(root, wrap="word")
             config_text.pack(expand=True, fill="both")
             config_text.insert(tk.END, config_content)
+            
         root.mainloop()
 
     def run_cocoviewer(self):
