@@ -30,7 +30,7 @@ model = dict(
             target_stds=[1.0, 1.0, 1.0, 1.0]),
         loss_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
-        loss_bbox=dict(type='L1Loss', loss_weight=2.1)),
+        loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
     roi_head=dict(
         type='StandardRoIHead',
         bbox_roi_extractor=dict(
@@ -50,8 +50,8 @@ model = dict(
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=2.2),
-            loss_bbox=dict(type='L1Loss', loss_weight=2.1)),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=2.6),
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
         mask_roi_extractor=dict(
             type='SingleRoIExtractor',
             roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
@@ -120,36 +120,6 @@ dataset_type = 'CustomCocoDataset'
 data_root = 'data/coco/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-albu_train_transforms = [
-    dict(
-        type='GaussNoise',
-        var_limit=(20.0, 60.0),
-        mean=0,
-        per_channel=False,
-        p=0.9),
-    dict(
-        type='RandomBrightnessContrast',
-        brightness_limit=[-0.2, 0.2],
-        contrast_limit=[-0.25, 0.25],
-        p=1.0),
-    dict(
-        type='OneOf',
-        transforms=[
-            dict(type='Blur', blur_limit=(3, 5), p=1.0),
-            dict(type='MedianBlur', blur_limit=(3, 5), p=1.0)
-        ],
-        p=0.3),
-    dict(
-        type='ShiftScaleRotate',
-        shift_limit=0.1,
-        scale_limit=(-0.3, 0.8),
-        rotate_limit=10,
-        interpolation=1,
-        border_mode=0,
-        value=0,
-        p=1),
-    dict(type='ImageCompression', quality_lower=30, quality_upper=50, p=0.95)
-]
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
@@ -239,8 +209,6 @@ data = dict(
         'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/DEP/annotation_lcms_train.json',
         img_prefix=
         'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train',
-        jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/DEP',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
@@ -257,6 +225,8 @@ data = dict(
                 type='Collect',
                 keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
         ],
+        jet_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -271,8 +241,6 @@ data = dict(
         'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/annotation_lcms_val.json',
         img_prefix=
         'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/',
-        jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/DEP',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -292,6 +260,8 @@ data = dict(
                     dict(type='Collect', keys=['img'])
                 ])
         ],
+        jet_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -306,8 +276,6 @@ data = dict(
         'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/annotation_lcms_test.json',
         img_prefix=
         'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/',
-        jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/DEP',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -327,6 +295,8 @@ data = dict(
                     dict(type='Collect', keys=['img'])
                 ])
         ],
+        jet_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -353,6 +323,36 @@ log_level = 'INFO'
 load_from = 'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/checkpoints/resnet152-394f9c45.pth'
 resume_from = None
 workflow = [('train', 1)]
+albu_train_transforms = [
+    dict(
+        type='GaussNoise',
+        var_limit=(20.0, 60.0),
+        mean=0,
+        per_channel=False,
+        p=0.9),
+    dict(
+        type='RandomBrightnessContrast',
+        brightness_limit=[-0.2, 0.2],
+        contrast_limit=[-0.25, 0.25],
+        p=1.0),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(type='Blur', blur_limit=(3, 5), p=1.0),
+            dict(type='MedianBlur', blur_limit=(3, 5), p=1.0)
+        ],
+        p=0.3),
+    dict(
+        type='ShiftScaleRotate',
+        shift_limit=0.1,
+        scale_limit=(-0.3, 0.8),
+        rotate_limit=10,
+        interpolation=1,
+        border_mode=0,
+        value=0,
+        p=1),
+    dict(type='ImageCompression', quality_lower=30, quality_upper=50, p=0.95)
+]
 opencv_num_threads = 0
 mp_start_method = 'fork'
 auto_scale_lr = dict(enable=False, base_batch_size=16)

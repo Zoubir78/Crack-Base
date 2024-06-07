@@ -1465,9 +1465,9 @@ class Frames8(Frame):
                                                     text=f"La première étape consiste à modifier le fichier de configuration du modèle de détection. \nCe fichier contient tous les paramètres nécessaires à l'entraînement du modèle, \ntels que la structure du réseau neuronal, les hyperparamètres de l'entraînement, \nles chemins des jeux de données, et les prétraitements des images. \nPour notre projet, nous avons adapté ce fichier pour inclure des informations spécifiques \nsur les types d'équipements à détecter et les annotations correspondantes. \nCela permet au modèle d'apprendre à distinguer entre différents équipements \navec une grande précision.", font=("times new roman", 13, "italic"), fill="white")
       
         self.entry_var = StringVar()
-        button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_coco_view)
+        button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_cocoviewer)
         button6 = ttk.Button(self, text=f"Options Config", width=30, command=self.execute_program)
-        button7 = ttk.Button(self, text=f"Choix du modèle", width=30, command=self.open_file) 
+        button7 = ttk.Button(self, text=f"Voir config", width=30, command=self.open_file) 
         button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
         button9 = ttk.Button(self, text=f"Afficher le resultat", width=30, command=self.executer2)
         button10 = ttk.Button(self, text=f"Choix Epoch", width=30, command=self.executer1)
@@ -1488,7 +1488,7 @@ class Frames8(Frame):
         root.title("Choisir un modèle")
         root.geometry("1000x800")
 
-        initial_dir = r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\configs\my_custom\mask_rcnn"
+        initial_dir = r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\configs\my_custom\my_custom_config.py"
         file_path = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Fichiers des modèles", "*.py"), ("Tous les fichiers", "*.*")])
         
         if file_path:
@@ -1500,25 +1500,25 @@ class Frames8(Frame):
             
         root.mainloop()
 
-    #def run_cocoviewer(self):
-    #    images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
-    #    if not images_dir:
-    #        return
-    #    annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
-    #    if not annotations_file:
-    #        return
-    #    chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
-    #    subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
-
-    def run_coco_view(self):
+    def run_cocoviewer(self):
         images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
         if not images_dir:
             return
         annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
         if not annotations_file:
             return
-        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "coco-view.py")
-        subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file])
+        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
+        subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
+
+    #def run_coco_view(self):
+    #    images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
+    #    if not images_dir:
+    #        return
+    #    annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
+    #    if not annotations_file:
+    #        return
+    #    chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "coco-view.py")
+    #    subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file])
 
     def executer3(self):
         chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
@@ -1818,7 +1818,7 @@ class View(Frame):
 if __name__ == "__main__":
     app = CrackBase()
     app.title("Crack Base 2.0 - ENDSUM")
-    app.iconbitmap("images\\app.ico")
+    app.iconbitmap("images/app.ico")
     app.maxsize(1300,800)
     app.minsize(1300,800)
     app.mainloop()

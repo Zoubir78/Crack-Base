@@ -24,7 +24,6 @@ class ConfigModifierApp:
 
         # Entry pour le chemin du fichier de config
         self.config_path_entry = tk.Entry(root)
-        #self.config_path_entry.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.config_path_entry.insert(0, r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\configs\my_custom\my_custom_config.py")
 
         # Frame pour afficher les options et leurs valeurs
@@ -54,10 +53,10 @@ class ConfigModifierApp:
         self.options = {
             "model_type": "MaskRCNN",
             "backbone_type": "ResNet",
-            "checkpoint": "torchvision://resnet18",
-            "neck_type": "FPN",
+            "checkpoint": "torchvision://resnet18",      
             "loss_cls_weight": 1.0,
-            "loss_bbox_weight": 1.0
+            "loss_bbox_weight": 1.0,
+            "max_epochs": 12
         }
 
         with open(file_path, 'r') as f:
@@ -67,17 +66,13 @@ class ConfigModifierApp:
             if model_type_match:
                 self.options["model_type"] = model_type_match.group(1)
 
-            backbone_type_match = re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
+            backbone_type_match = re.search(r"backbone\s*=\\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
             if backbone_type_match:
                 self.options["backbone_type"] = backbone_type_match.group(1)
 
             checkpoint_match = re.search(r"init_cfg\s*=\s*dict\s*\(.*checkpoint\s*=\s*'([\w:/]+)'", content, re.DOTALL)
             if checkpoint_match:
                 self.options["checkpoint"] = checkpoint_match.group(1)
-
-            neck_type_match = re.search(r"neck\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
-            if neck_type_match:
-                self.options["neck_type"] = neck_type_match.group(1)
 
             loss_cls_weight_match = re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", content, re.DOTALL)
             if loss_cls_weight_match:
@@ -86,6 +81,10 @@ class ConfigModifierApp:
             loss_bbox_weight_match = re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", content, re.DOTALL)
             if loss_bbox_weight_match:
                 self.options["loss_bbox_weight"] = float(loss_bbox_weight_match.group(1))
+
+            max_epochs_match = re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", content, re.DOTALL)
+            if max_epochs_match:
+                self.options["max_epochs"] = int(max_epochs_match.group(1))
 
         # Afficher les options dans la frame
         self.show_options()
@@ -99,7 +98,7 @@ class ConfigModifierApp:
         model_label = tk.Label(self.options_frame, text="Model Type")
         model_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         model_var = tk.StringVar(value=self.options["model_type"])
-        model_menu = ttk.Combobox(self.options_frame, textvariable=model_var, values=["MaskRCNN", "OtherModel1", "OtherModel2"])
+        model_menu = ttk.Combobox(self.options_frame, textvariable=model_var, values=["MaskRCNN", "cascade_MaskRCNN", "FasterRCNN"])
         model_menu.grid(row=0, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["model_type"] = model_var
 
@@ -107,7 +106,7 @@ class ConfigModifierApp:
         backbone_label = tk.Label(self.options_frame, text="Backbone Type")
         backbone_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         backbone_var = tk.StringVar(value=self.options["backbone_type"])
-        backbone_menu = ttk.Combobox(self.options_frame, textvariable=backbone_var, values=["ResNet", "OtherBackbone1", "OtherBackbone2"])
+        backbone_menu = ttk.Combobox(self.options_frame, textvariable=backbone_var, values=["ResNet", "ResNet-50", "MMBNet"])
         backbone_menu.grid(row=1, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["backbone_type"] = backbone_var
 
@@ -119,13 +118,13 @@ class ConfigModifierApp:
         checkpoint_menu.grid(row=2, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["checkpoint"] = checkpoint_var
 
-        # Neck type
-        neck_label = tk.Label(self.options_frame, text="Neck Type")
-        neck_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
-        neck_var = tk.StringVar(value=self.options["neck_type"])
-        neck_menu = ttk.Combobox(self.options_frame, textvariable=neck_var, values=["FPN", "OtherNeck1", "OtherNeck2"])
-        neck_menu.grid(row=3, column=1, padx=5, pady=5, sticky="w")
-        self.option_vars["neck_type"] = neck_var
+        # Max epochs
+        max_epochs_label = tk.Label(self.options_frame, text="Max Epochs")
+        max_epochs_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
+        max_epochs_var = tk.IntVar(value=self.options["max_epochs"])
+        max_epochs_scale = tk.Scale(self.options_frame, variable=max_epochs_var, from_=1, to=150, orient=tk.HORIZONTAL)
+        max_epochs_scale.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["max_epochs"] = max_epochs_var
 
         # Loss cls weight
         loss_cls_label = tk.Label(self.options_frame, text="Loss Class Weight")
@@ -156,8 +155,8 @@ class ConfigModifierApp:
                         line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.option_vars['backbone_type'].get()}'", line)
                     elif re.search(r"init_cfg\s*=\s*dict\s*\(.*checkpoint\s*=\s*'([\w:/]+)'", line):
                         line = re.sub(r"checkpoint\s*=\s*'[\w:/]+'", f"checkpoint = '{self.option_vars['checkpoint'].get()}'", line)
-                    elif re.search(r"neck\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
-                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.option_vars['neck_type'].get()}'", line)
+                    elif re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", line):
+                        line = re.sub(r"max_epochs\s*=\s*\d+", f"max_epochs = {self.option_vars['max_epochs'].get()}", line)
                     elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
                         line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.option_vars['loss_cls_weight'].get()}", line)
                     elif re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
@@ -179,7 +178,7 @@ class ConfigModifierApp:
             "model_type": "MaskRCNN",
             "backbone_type": "ResNet",
             "checkpoint": "torchvision://resnet18",
-            "neck_type": "FPN",
+            "max_epochs": 12,
             "loss_cls_weight": 1.0,
             "loss_bbox_weight": 1.0
         }
