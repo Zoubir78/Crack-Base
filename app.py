@@ -8,6 +8,7 @@ import sys, io
 import cv2
 import subprocess
 import json
+import logging
 from tkinter import *
 from tkinter import simpledialog
 from tkinter import Checkbutton, BooleanVar
@@ -1451,8 +1452,16 @@ class Frames7(Frame):
             except Error as e:
                 messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la suppression de {site_name} dans {db}: {e}")
 
+# Configurer le logger
+logging.basicConfig(
+    filename='application.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 class Frames8(Frame):
     def __init__(self, parent, category, image_path):
+        logging.info('Initialisation de Frames8 avec category: %s et image_path: %s', category, image_path)
         Frame.__init__(self, parent, bg="gray")
         image = Image.open(image_path)
         self.category = category
@@ -1469,7 +1478,7 @@ class Frames8(Frame):
         button6 = ttk.Button(self, text=f"Options Config", width=30, command=self.execute_program)
         button7 = ttk.Button(self, text=f"Voir config", width=30, command=self.open_file) 
         button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
-        button9 = ttk.Button(self, text=f"Afficher le resultat", width=30, command=self.executer2)
+        button9 = ttk.Button(self, text=f"Afficher le résultat", width=30, command=self.executer2)
         button10 = ttk.Button(self, text=f"Choix Epoch", width=30, command=self.executer1)
       
         self.canvas_button = self.canvas.create_window(860, 490, window=button5)
@@ -1481,9 +1490,11 @@ class Frames8(Frame):
 
     def execute_program(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "option-config.py")
+        logging.info('Exécution du programme option-config.py avec chemin: %s', chemin)
         subprocess.run(["python", chemin])
 
     def open_file(self):
+        logging.info('Ouverture du fichier de configuration')
         root = tk.Tk()
         root.title("Choisir un modèle")
         root.geometry("1000x800")
@@ -1492,65 +1503,71 @@ class Frames8(Frame):
         file_path = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Fichiers des modèles", "*.py"), ("Tous les fichiers", "*.*")])
         
         if file_path:
+            logging.info('Fichier sélectionné: %s', file_path)
             with open(file_path, 'r') as f:
                 config_content = f.read()
             config_text = tk.Text(root, wrap="word")
             config_text.pack(expand=True, fill="both")
             config_text.insert(tk.END, config_content)
+        else:
+            logging.warning('Aucun fichier sélectionné')
             
         root.mainloop()
 
     def run_cocoviewer(self):
+        logging.info('Exécution de COCO Viewer')
         images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
         if not images_dir:
+            logging.warning('Aucun répertoire d\'images sélectionné')
             return
         annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
         if not annotations_file:
+            logging.warning('Aucun fichier d\'annotations sélectionné')
             return
         chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
+        logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s', images_dir, annotations_file)
         subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
-
-    #def run_coco_view(self):
-    #    images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
-    #    if not images_dir:
-    #        return
-    #    annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
-    #    if not annotations_file:
-    #        return
-    #    chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "coco-view.py")
-    #    subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file])
 
     def executer3(self):
         chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
+        logging.info('Exécution du batch pour l\'entraînement: %s', chemin_batch)
         subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
 
     def executer2(self):
         chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_resultat.bat")
+        logging.info('Exécution du batch pour afficher le résultat: %s', chemin_batch)
         subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
 
     def executer1(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mmdetection", "choix-epoch.py")
+        logging.info('Exécution du script choix-epoch.py: %s', chemin)
         subprocess.run(["python", chemin])
 
     def add(self, event):
         entry = self.entry_var.get()
+        logging.info('Ajout de l\'entrée: %s', entry)
         if len(entry.strip()) > 2:
             messagebox.showinfo("Ajouté avec succès", f"{entry.title().strip()} a été ajouté avec succès")
             insert(entry.title().strip(), self.category)
         elif len(entry.strip()) < 1:
+            logging.warning('Aucune entrée fournie')
             pass
         else:
             messagebox.showinfo("Doit contenir plus de 2 caractères","Les caractères saisis sont trop courts.")
         self.entry_var.set("")
 
+    @staticmethod
     def lire_fichier(filepath):
+        logging.info('Lecture du fichier: %s', filepath)
         try:
             with open(filepath, 'r', encoding='utf-8') as file:
                 contenu = file.read()
             return contenu
         except FileNotFoundError:
+            logging.error('Le fichier n\'existe pas: %s', filepath)
             return "Le fichier n'existe pas."
         except Exception as e:
+            logging.error('Erreur lors de la lecture du fichier: %s', e)
             return f"Une erreur s'est produite : {e}"
 
 class View(Frame):
