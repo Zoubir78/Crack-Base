@@ -31,13 +31,17 @@ from deepCrack import *
 from grandMare import *
 from annotation import *
 from newdb import *
-#from ttkthemes import ThemedStyle
+from ttkthemes import ThemedTk
 import webbrowser
 
 buffer = io.StringIO()
 sys.stdout = sys.stderr = buffer 
 
 class CrackBase(Tk):
+
+    def restart_application(self):
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
 
     # Fonction pour exécuter le script d'annotation
     def executer(self):
@@ -211,7 +215,10 @@ class CrackBase(Tk):
         menu.add_command(label="Menu", command=self.toggle_sidebar)
 
         file = Menu(menu, tearoff=0) 
-        file.add_command(label="Exit", command=self.destroy)
+        # Ajouter un bouton Actualiser à la barre de menu
+        file.add_command(label="Actualiser", command=self.restart_application)
+        file.add_separator()
+        file.add_command(label="Fermer", command=self.destroy)
         menu.add_cascade(label="File", menu=file)
 
         npz_img = Menu(menu, tearoff=0) 
@@ -1489,7 +1496,7 @@ class Frames8(Frame):
         self.entry_var = StringVar()
         button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_cocoviewer)
         button6 = ttk.Button(self, text=f"Options Config", width=30, command=self.execute_program)
-        button7 = ttk.Button(self, text=f"Voir config", width=30, command=self.open_file) 
+        button7 = ttk.Button(self, text=f"Voir les logs", width=30, command=self.open_log_files) 
         button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
         button9 = ttk.Button(self, text=f"Afficher le résultat", width=30, command=self.executer2)
         button10 = ttk.Button(self, text=f"Choix Epoch", width=30, command=self.executer1)
@@ -1506,25 +1513,54 @@ class Frames8(Frame):
         logging.info('Exécution du programme option-config.py avec chemin: %s', chemin)
         subprocess.run(["python", chemin])
 
-    def open_file(self):
-        logging.info('Ouverture du fichier de configuration')
-        root = tk.Tk()
-        root.title("Choisir un modèle")
+    def open_log_files(self):
+        logging.info('Ouverture des fichiers de logs')
+        root = ThemedTk(theme="equilux")
+        root.title("Logs")
         root.geometry("1000x800")
 
-        initial_dir = r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\configs\my_custom\my_custom_config.py"
-        file_path = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Fichiers des modèles", "*.py"), ("Tous les fichiers", "*.*")])
-        
-        if file_path:
-            logging.info('Fichier sélectionné: %s', file_path)
-            with open(file_path, 'r') as f:
-                config_content = f.read()
-            config_text = tk.Text(root, wrap="word")
-            config_text.pack(expand=True, fill="both")
-            config_text.insert(tk.END, config_content)
-        else:
-            logging.warning('Aucun fichier sélectionné')
-            
+        # Récupérer la liste des fichiers logs dans le premier dossier
+        log_files1 = [f for f in os.listdir(log_directory) if os.path.isfile(os.path.join(log_directory, f))]
+
+        # Récupérer la liste des fichiers logs dans le deuxième dossier et filtrer les fichiers .log
+        log_directory2 = r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\work_dirs\my_custom_config"
+        log_files2 = [f for f in os.listdir(log_directory2) if os.path.isfile(os.path.join(log_directory2, f)) and f.endswith(".log")]
+
+        # Fonction pour afficher le contenu du fichier log correspondant au fichier sélectionné dans la liste déroulante
+        def show_selected_log(event, log_combobox):
+            selected_log = log_combobox.get()
+            log_directory_selected = log_directory if log_combobox == log_combobox1 else log_directory2
+            with open(os.path.join(log_directory_selected, selected_log), 'r') as f:
+                log_content = f.read()
+            log_text.delete("1.0", tk.END)  # Effacer le texte précédent
+            log_text.insert(tk.END, log_content)
+
+        # Créer une frame pour placer les listes déroulantes côte à côte
+        combobox_frame = tk.Frame(root)
+        combobox_frame.pack(side="top", pady=10)
+
+        # Ajouter une étiquette pour le premier répertoire
+        label1 = tk.Label(combobox_frame, text="Equipements logs")
+        label1.pack(side="left", padx=10)
+
+        # Créer une liste déroulante pour sélectionner les fichiers de log du premier répertoire
+        log_combobox1 = ttk.Combobox(combobox_frame, values=log_files1, width=50)
+        log_combobox1.pack(side="left", padx=10)
+        log_combobox1.bind("<<ComboboxSelected>>", lambda event: show_selected_log(event, log_combobox1))  # Passer log_combobox1 comme argument
+
+        # Ajouter une étiquette pour le deuxième répertoire
+        label2 = tk.Label(combobox_frame, text="Train logs")
+        label2.pack(side="left", padx=10)
+
+        # Créer une liste déroulante pour sélectionner les fichiers de log filtrés du deuxième répertoire
+        log_combobox2 = ttk.Combobox(combobox_frame, values=log_files2, width=50)
+        log_combobox2.pack(side="left", padx=10)
+        log_combobox2.bind("<<ComboboxSelected>>", lambda event: show_selected_log(event, log_combobox2))  # Passer log_combobox2 comme argument
+
+        # Ajoutez un widget Text pour afficher le contenu du fichier log sélectionné
+        log_text = tk.Text(root, wrap="word", bg="black", fg="white", font=("Arial", 10))
+        log_text.pack(expand=True, fill="both")
+
         root.mainloop()
 
     def run_cocoviewer(self):
@@ -1603,7 +1639,7 @@ class View(Frame):
         frame = ttk.Frame(self.canvas)
         frame.pack(side=tk.TOP, padx=5, pady=5)
 
-         # Entrée de saisie
+        # Entrée de saisie
         self.entryvar = tk.StringVar()
         entry = ttk.Entry(frame, textvariable=self.entryvar, width=80, font=("Helvetica", 12, "normal"))
         entry.pack(side=tk.LEFT, padx=5, pady=5)
@@ -1642,13 +1678,6 @@ class View(Frame):
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.tree.yview)
 
-        # Liaison de l'événement de survol de la souris
-        self.tree.bind("<Motion>", self.on_treeview_hover)
-
-        # Créer une zone de dessin pour le schéma du tunnel
-        self.tunnel_canvas = Canvas(self, width=1200, height=90, bg='grey')
-        self.tunnel_canvas.pack(side=tk.BOTTOM, fill=tk.X, expand=False)
-
         self.db_directory = "DB"  # Dossier contenant les bases de données
         self.load_databases()  # Charger les bases de données au démarrage
 
@@ -1672,28 +1701,6 @@ class View(Frame):
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors du chargement des tables : {e}")
-
-    def update_search_placeholder(self, event):
-        table_name = self.table_combobox.get()
-        database_name = self.database_combobox.get()
-        if not database_name or not table_name:
-            return
-
-        db_path = os.path.join(self.db_directory, database_name)
-        try:
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
-            cursor.execute(f"PRAGMA table_info({table_name});")
-            columns = cursor.fetchall()
-            column_names = [column[1] for column in columns]
-            placeholder_text = f"Veuillez saisir le {', '.join(column_names)} ..."
-            self.entry.delete(0, tk.END)
-            self.entry.insert(0, placeholder_text)
-            self.entry.bind("<FocusIn>", lambda event: self.entry.delete(0, tk.END))
-            connection.close()
-        except sqlite3.Error as e:
-            print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des colonnes : {e}")
 
     def explorer(self):
         dossier_db = os.path.abspath(self.db_directory)
@@ -1747,8 +1754,8 @@ class View(Frame):
 
     def delete_item(self):
         try:
-            index = self.tree.selection()[0]  # Obtenir l'index de la ligne sélectionnée dans le tableau
-            self.tree.delete(index)  # Supprimer la ligne sélectionnée
+            selected_item = self.tree.selection()[0]  # Obtenir l'index de la ligne sélectionnée dans le tableau
+            self.tree.delete(selected_item)  # Supprimer la ligne sélectionnée
         except IndexError:
             pass
 
@@ -1773,7 +1780,7 @@ class View(Frame):
                         if not all_columns:
                             cursor.execute(f"PRAGMA table_info({table_name});")
                             columns_info = cursor.fetchall()
-                            all_columns = [info[1] for info in columns_info]
+                            all_columns = ["Base de données", "Table"] + [info[1] for info in columns_info]
                         # Ajouter les données de cette table à la liste globale
                         all_data.extend([(db_file, table_name) + row for row in table_data])
 
@@ -1790,7 +1797,7 @@ class View(Frame):
         self.tree["columns"] = columns
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=40)
+            self.tree.column(col, width=100, anchor='center')  # Ajustez la largeur et l'ancrage selon vos besoins
 
         # Effacer les anciennes données
         self.tree.delete(*self.tree.get_children())
@@ -1809,8 +1816,9 @@ class View(Frame):
             cursor = connection.cursor()
             cursor.execute(f"SELECT * FROM {table_name}")
             data = cursor.fetchall()
+            column_names = [description[0] for description in cursor.description]
             connection.close()
-            self.display_data(table_name, [d[0] for d in cursor.description], data)
+            self.display_data(table_name, column_names, data)
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
@@ -1848,58 +1856,57 @@ class View(Frame):
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
 
-    def on_treeview_hover(self, event):
-        item = self.tree.identify_row(event.y)
-        if item:
-            item_values = self.tree.item(item, "values")
-            self.show_tunnel_schema(item_values)
+    #def on_treeview_hover(self, event):
+    #    item = self.tree.identify_row(event.y)
+    #    if item:
+    #        item_values = self.tree.item(item, "values")
+    #        self.show_tunnel_schema(item_values)
 
-    def show_tunnel_schema(self, item_values):
-        # Efface le canvas existant
-        self.tunnel_canvas.delete("all")
+    #def show_tunnel_schema(self, item_values):
+    #    # Efface le canvas existant
+    #    self.tunnel_canvas.delete("all")
 
-        # Vérifier si la base de données est "lcms_database.db"
-        database_name = self.database_combobox.get()
-        if database_name != "lcms_database.db":
-            return
+    #    # Vérifier si la base de données est "lcms_database.db"
+    #    database_name = self.database_combobox.get()
+    #    if database_name != "lcms_database.db":
+    #        return
 
-        # Extrait les informations nécessaires à partir des valeurs de l'élément
-        id = int(item_values[2])  # Supposons que l'id_image est dans la 3ème colonne
-        sens = item_values[6]  # Supposons que le sens de prise est dans la 7ème colonne
+    #    # Extrait les informations nécessaires à partir des valeurs de l'élément
+    #    id = int(item_values[2])  # Supposons que l'id_image est dans la 3ème colonne
+    #    sens = item_values[6]  # Supposons que le sens de prise est dans la 7ème colonne
 
-        # Paramètres du tunnel
-        tunnel_length = 1150
-        tunnel_depth = 200
-        num_positions = 100  # Nombre de positions d'image à afficher
-        step = tunnel_length / num_positions  # Intervalle entre les positions
+    #    # Paramètres du tunnel
+    #    tunnel_length = 1150
+    #    tunnel_depth = 200
+    #    num_positions = 100  # Nombre de positions d'image à afficher
+    #    step = tunnel_length / num_positions  # Intervalle entre les positions
 
-        # Dessine le tunnel (une simple ligne droite pour cet exemple)
-        self.tunnel_canvas.create_line(50, 100, 750, 100, fill="black", width=10)
+    #    # Dessine le tunnel (une simple ligne droite pour cet exemple)
+    #    self.tunnel_canvas.create_line(50, 100, 750, 100, fill="black", width=10)
 
-        # Générer les positions des images en 2D
-        image_positions = []
-        for i in range(num_positions):
-            x = 5 + i * step
-            y = 40
-            size = 5  # Taille fixe pour les images en 2D
-            image_positions.append((x, y, size))
+    #    # Générer les positions des images en 2D
+    #    image_positions = []
+    #    for i in range(num_positions):
+    #        x = 5 + i * step
+    #        y = 40
+    #        size = 5  # Taille fixe pour les images en 2D
+    #        image_positions.append((x, y, size))
 
-        # Afficher l'ID seulement une fois
-        id_displayed = False
+    #    # Afficher l'ID seulement une fois
+    #    id_displayed = False
 
-        # Affiche les images sur le schéma
-        if sens == 'C':
-            positions = image_positions[:id]  # De 1 à id_image
-        else:  # sens_prise == 'D'
-            positions = image_positions[-id:]  # De la fin à id_image
+    #    # Affiche les images sur le schéma
+    #    if sens == 'C':
+    #        positions = image_positions[:id]  # De 1 à id_image
+    #    else:  # sens_prise == 'D'
+    #        positions = image_positions[-id:]  # De la fin à id_image
 
-        for pos in positions:
-            x, y, size = pos
-            self.tunnel_canvas.create_oval(x - size, y - size, x + size, y + size, fill="blue")
-            if not id_displayed:  # Afficher l'ID seulement si ce n'est pas déjà fait
-                self.tunnel_canvas.create_text(x, y + size + 10, text=str(id), anchor=tk.N)
-                id_displayed = True
-
+    #    for pos in positions:
+    #        x, y, size = pos
+    #        self.tunnel_canvas.create_oval(x - size, y - size, x + size, y + size, fill="blue")
+    #        if not id_displayed:  # Afficher l'ID seulement si ce n'est pas déjà fait
+    #            self.tunnel_canvas.create_text(x, y + size + 10, text=str(id), anchor=tk.N)
+    #            id_displayed = True
 
         # Ajouter un footer
         footer = tk.Label(text="© Crack Base 2024 - ENDSUM", relief=tk.SUNKEN, anchor=tk.W, font=("Castellar", 12, "italic"), bg="black", fg="white")

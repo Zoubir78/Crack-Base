@@ -176,6 +176,7 @@ def upload_lcms(frame, category, table="images"):
         if folder_path:
             image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
             total_images = len(image_files)
+            frame.progress1['maximum'] = total_images
 
             for index, nom_image in enumerate(image_files):
                 # Importer chaque image
@@ -196,18 +197,18 @@ def upload_lcms(frame, category, table="images"):
                 insert(conn, category, site, tube, sens, hauteur, angle, nom_image, json.dumps(image_json), table=table)
 
                 # Afficher la progression actuelle dans la console
-                print(f"Progress: {index + 1}/{image_files} - Imported: {nom_image}")
+                print(f"Progress: {index + 1}/{total_images} - Imported: {nom_image}")
 
-            # Mettre à jour la barre de progression après chaque importation de fichier
-            progress_percentage = (index + 1) / image_files * 100
-            frame.progress1['value'] = progress_percentage
+                # Mettre à jour la barre de progression après chaque importation de fichier
+                progress_percentage = (index + 1) / total_images * 100
+                frame.progress1['value'] = progress_percentage
+                frame.update()  # Mettre à jour l'interface graphique
+
+            # Assurez-vous que la barre de progression atteint 100% à la fin du traitement
+            frame.progress1['value'] = 100
             frame.update()  # Mettre à jour l'interface graphique
 
-        # Assurez-vous que la barre de progression atteint 100% à la fin du traitement
-        frame.progress1['value'] = 100
-        frame.update()  # Mettre à jour l'interface graphique
-
-        messagebox.showinfo("Importation terminée", f"{image_files} fichiers ont été importés avec succès dans la base de données.")
+            messagebox.showinfo("Importation terminée", f"{total_images} fichiers ont été importés avec succès dans la base de données.")
 
     conn.close()
 
@@ -263,14 +264,9 @@ def upload_depths(frame, category, table="profondeur"):
         if folder_path:
             image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
             total_images = len(image_files)
-            frame.progress2['maximum'] = total_images
+            frame.progress1['maximum'] = total_images
 
             for index, nom_image in enumerate(image_files):
-                # Mettre à jour la barre de progression
-                progress_percentage = (index + 1) / total_images * 100
-                frame.progress2['value'] = progress_percentage
-                frame.update()  # Mettre à jour l'interface graphique
-
                 # Importer chaque image
                 image_path = os.path.join(folder_path, nom_image)
                 with open(image_path, 'rb') as image_file:
@@ -289,16 +285,20 @@ def upload_depths(frame, category, table="profondeur"):
                 insert(conn, category, site, tube, sens, hauteur, angle, nom_image, json.dumps(image_json), table=table)
 
                 # Afficher la progression actuelle dans la console
-                print(f"Progress: {progress_percentage}%")
+                print(f"Progress: {index + 1}/{total_images} - Imported: {nom_image}")
+
+                # Mettre à jour la barre de progression après chaque importation de fichier
+                progress_percentage = (index + 1) / total_images * 100
+                frame.progress2['value'] = progress_percentage
+                frame.update()  # Mettre à jour l'interface graphique
 
             # Assurez-vous que la barre de progression atteint 100% à la fin du traitement
             frame.progress2['value'] = 100
             frame.update()  # Mettre à jour l'interface graphique
 
-            # Afficher un message de réussite
-            messagebox.showinfo("Importation terminée", "Données importées avec succès!")
+            messagebox.showinfo("Importation terminée", f"{total_images} fichiers ont été importés avec succès dans la base de données.")
 
-        conn.close()
+    conn.close()
 
 def upload_depths_mat(frame, category, table="mat_files_dep"):
     conn = connect()
@@ -310,7 +310,6 @@ def upload_depths_mat(frame, category, table="mat_files_dep"):
     if folder_path:
         mat_files = [f for f in os.listdir(folder_path) if f.endswith('.mat')]
         total_files = len(mat_files)
-        frame.progress1['maximum'] = total_files
 
         for index, file_name in enumerate(mat_files):
             file_path = os.path.join(folder_path, file_name)
@@ -320,19 +319,19 @@ def upload_depths_mat(frame, category, table="mat_files_dep"):
 
                     insert_mat(conn, file_name, file_data, table)
 
-                    # Mettre à jour la barre de progression
-                    progress_percentage = (index + 1) / total_files * 100
-                    frame.progress1['value'] = progress_percentage
-                    frame.update()  # Mettre à jour l'interface graphique
-
                     # Afficher la progression actuelle dans la console
-                    print(f"Progress: {progress_percentage}% - Imported: {file_name}")
+                    print(f"Progress: {index + 1}/{total_files} - Imported: {file_name}")
 
             except Exception as e:
                 messagebox.showerror("Erreur", f"Une erreur s'est produite lors de l'importation du fichier {file_name} : {e}")
 
+            # Mettre à jour la barre de progression après chaque importation de fichier
+            progress_percentage = (index + 1) / total_files * 100
+            frame.progress2['value'] = progress_percentage
+            frame.update()  # Mettre à jour l'interface graphique
+
         # Assurez-vous que la barre de progression atteint 100% à la fin du traitement
-        frame.progress1['value'] = 100
+        frame.progress2['value'] = 100
         frame.update()  # Mettre à jour l'interface graphique
 
         messagebox.showinfo("Importation terminée", f"{total_files} fichiers ont été importés avec succès dans la base de données.")
