@@ -459,10 +459,10 @@ class Frames(Frame):
                                                     font=("times new roman", 12, "italic", "normal"), fill="white")
 
         self.canvas_text4 = self.canvas.create_text(780, 350,
-                                                    text=f"Nomenclature de nommage '{category.lower()}' :\n - Un dossier par séquence\n "
-                                                    "- Nom de dossier : “TE_D_18062_H1870_A0” → \n TE : Tube Est (TE) ou Tube Ouest (TO) \n "
+                                                    text=f"Nomenclature d'un dossier de données LCMS :\n - Un dossier par séquence\n "
+                                                    "- Nom de dossier : “TE_D_18062_H1870_A0” \n TE : Tube Est (TE) ou Tube Ouest (TO) \n "
                                                     "D (ou C) : sens de prise (sens décroissant ou croissant) \n 18062 : numéro séquence (incrémental) \n "
-                                                    "H (Hauteur à partir du sol du gerbeur en mm) \n A (angle en degrés des capteurs , 0 = à l’horizontal)",
+                                                    "H (hauteur à partir du sol en mm) \n A (angle en degrés des capteurs , 0 = à l’horizontal)",
                                                     font=("times new roman", 12, "normal"), fill="white")
         
         self.entry_var = StringVar()
@@ -472,25 +472,29 @@ class Frames(Frame):
         self.check_var2 = BooleanVar()
         self.check_var2.set(True)
 
-        self.progress1 = Progressbar(self, orient=tk.HORIZONTAL, length=350, mode='determinate')
-        self.progress2 = Progressbar(self, orient=tk.HORIZONTAL, length=350, mode='determinate')
+        self.progress1 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
+        self.progress2 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
 
         export_button1 = ttk.Button(self, text=f"Exporter", command=self.export_images_data)
         export_button2 = ttk.Button(self, text=f"Exporter", command=self.export_depth_data)
         export_button22 = ttk.Button(self, text=f"Exporter", command=self.export_masques_data)
 
         button1 = ttk.Button(self, text=f"Ajouter des données (intensité)", width=40, command=lambda: upload_lcms(self, category))
+        button01 = ttk.Button(self, text=f"Ajouter des données .mat (intensité)", width=40, command=lambda: upload_lcms_mat(self, category))
         button2 = ttk.Button(self, text=f"Ajouter des données (profondeur)", width=40, command=lambda: upload_depths(self, category))
+        button02 = ttk.Button(self, text=f"Ajouter des données .mat (profondeur)", width=40, command=lambda: upload_depths_mat(self, category))
         button22 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=40, command=lambda: upload_masques(self, category))
 
         self.canvas_button1 = self.canvas.create_window(750, 470, window=button1)
         self.canvas_export_button1 = self.canvas.create_window(950, 470, window=export_button1)
-        self.canvas_progress1 = self.canvas.create_window(800, 500, window=self.progress1)
-        self.canvas_button2 = self.canvas.create_window(750, 540, window=button2)
-        self.canvas_export_button2 = self.canvas.create_window(950, 540, window=export_button2)
-        self.canvas_progress2 = self.canvas.create_window(800, 570, window=self.progress2)
-        self.canvas_button22 = self.canvas.create_window(750, 610, window=button22)
-        self.canvas_export_button22 = self.canvas.create_window(950, 610, window=export_button22)
+        self.canvas_progress1 = self.canvas.create_window(750, 500, window=self.progress1)
+        self.canvas_button01 = self.canvas.create_window(750, 530, window=button01)
+        self.canvas_button2 = self.canvas.create_window(750, 570, window=button2)
+        self.canvas_export_button2 = self.canvas.create_window(950, 570, window=export_button2)
+        self.canvas_progress2 = self.canvas.create_window(750, 600, window=self.progress2)
+        self.canvas_button02 = self.canvas.create_window(750, 630, window=button02)
+        self.canvas_button22 = self.canvas.create_window(750, 670, window=button22)
+        self.canvas_export_button22 = self.canvas.create_window(950, 670, window=export_button22)
 
     def add(self, table):
         site, tube, sens = select_site_details(self)
@@ -1452,12 +1456,21 @@ class Frames7(Frame):
             except Error as e:
                 messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la suppression de {site_name} dans {db}: {e}")
 
+# Configuration du système de log
+log_directory = "logs"
+if not os.path.exists(log_directory):
+    os.makedirs(log_directory)
+
+# Créer un handler pour écrire les logs dans un fichier avec l'encodage UTF-8
+file_handler = logging.FileHandler(os.path.join(log_directory, 'equipements.log'), encoding='utf-8')
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
 # Configurer le logger
-logging.basicConfig(
-    filename='application.log',
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(file_handler)
 
 class Frames8(Frame):
     def __init__(self, parent, category, image_path):
@@ -1590,7 +1603,7 @@ class View(Frame):
         frame = ttk.Frame(self.canvas)
         frame.pack(side=tk.TOP, padx=5, pady=5)
 
-        # Entrée de saisie
+         # Entrée de saisie
         self.entryvar = tk.StringVar()
         entry = ttk.Entry(frame, textvariable=self.entryvar, width=80, font=("Helvetica", 12, "normal"))
         entry.pack(side=tk.LEFT, padx=5, pady=5)
@@ -1628,6 +1641,13 @@ class View(Frame):
         self.tree = ttk.Treeview(self.canvas, columns=(), show="headings", yscrollcommand=scrollbar.set)
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.tree.yview)
+
+        # Liaison de l'événement de survol de la souris
+        self.tree.bind("<Motion>", self.on_treeview_hover)
+
+        # Créer une zone de dessin pour le schéma du tunnel
+        self.tunnel_canvas = Canvas(self, width=1200, height=90, bg='grey')
+        self.tunnel_canvas.pack(side=tk.BOTTOM, fill=tk.X, expand=False)
 
         self.db_directory = "DB"  # Dossier contenant les bases de données
         self.load_databases()  # Charger les bases de données au démarrage
@@ -1675,7 +1695,6 @@ class View(Frame):
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des colonnes : {e}")
 
-
     def explorer(self):
         dossier_db = os.path.abspath(self.db_directory)
         if os.name == 'nt':  # Windows
@@ -1710,13 +1729,14 @@ class View(Frame):
 
                 cursor.execute(f"PRAGMA table_info({table_name});")
                 columns = cursor.fetchall()
-                column_names = [column[1] for column in columns]
+                column_names = ["Base de données", "Table"] + [column[1] for column in columns]
 
-                for column in column_names:
+                for column in column_names[2:]:  # Skip the first two columns
                     try:
                         cursor.execute(f"SELECT * FROM {table_name} WHERE {column} LIKE ?", ('%' + query + '%',))
                         rows = cursor.fetchall()
                         for row in rows:
+                            # Ajout des colonnes 'Base de données' et 'Table' au début
                             results.append((db_file, table_name) + row)
                     except sqlite3.OperationalError as e:
                         # Gérer les erreurs, par exemple les colonnes blob qui ne peuvent pas être recherchées avec LIKE
@@ -1748,13 +1768,14 @@ class View(Frame):
                 for table in tables:
                     table_name = table[0]
                     cursor.execute(f"SELECT * FROM {table_name}")
-                    data = cursor.fetchall()
-                    columns = [d[0] for d in cursor.description]
-                    table_data = [(db_file, table_name) + row for row in data]
-
-                    # Ajouter les données et colonnes à la liste globale
-                    all_data.extend(table_data)
-                    all_columns = ["Base de données", "Table", "id", "category", "site", "tube", "sens", "nom_image"] 
+                    table_data = cursor.fetchall()
+                    if table_data:
+                        if not all_columns:
+                            cursor.execute(f"PRAGMA table_info({table_name});")
+                            columns_info = cursor.fetchall()
+                            all_columns = [info[1] for info in columns_info]
+                        # Ajouter les données de cette table à la liste globale
+                        all_data.extend([(db_file, table_name) + row for row in table_data])
 
                 connection.close()
 
@@ -1780,7 +1801,6 @@ class View(Frame):
 
         # Afficher le titre (optionnel)
         print(title)
-
 
     def view_other_table_data(self, table_name):
         try:
@@ -1827,6 +1847,59 @@ class View(Frame):
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+
+    def on_treeview_hover(self, event):
+        item = self.tree.identify_row(event.y)
+        if item:
+            item_values = self.tree.item(item, "values")
+            self.show_tunnel_schema(item_values)
+
+    def show_tunnel_schema(self, item_values):
+        # Efface le canvas existant
+        self.tunnel_canvas.delete("all")
+
+        # Vérifier si la base de données est "lcms_database.db"
+        database_name = self.database_combobox.get()
+        if database_name != "lcms_database.db":
+            return
+
+        # Extrait les informations nécessaires à partir des valeurs de l'élément
+        id = int(item_values[2])  # Supposons que l'id_image est dans la 3ème colonne
+        sens = item_values[6]  # Supposons que le sens de prise est dans la 7ème colonne
+
+        # Paramètres du tunnel
+        tunnel_length = 1150
+        tunnel_depth = 200
+        num_positions = 100  # Nombre de positions d'image à afficher
+        step = tunnel_length / num_positions  # Intervalle entre les positions
+
+        # Dessine le tunnel (une simple ligne droite pour cet exemple)
+        self.tunnel_canvas.create_line(50, 100, 750, 100, fill="black", width=10)
+
+        # Générer les positions des images en 2D
+        image_positions = []
+        for i in range(num_positions):
+            x = 5 + i * step
+            y = 40
+            size = 5  # Taille fixe pour les images en 2D
+            image_positions.append((x, y, size))
+
+        # Afficher l'ID seulement une fois
+        id_displayed = False
+
+        # Affiche les images sur le schéma
+        if sens == 'C':
+            positions = image_positions[:id]  # De 1 à id_image
+        else:  # sens_prise == 'D'
+            positions = image_positions[-id:]  # De la fin à id_image
+
+        for pos in positions:
+            x, y, size = pos
+            self.tunnel_canvas.create_oval(x - size, y - size, x + size, y + size, fill="blue")
+            if not id_displayed:  # Afficher l'ID seulement si ce n'est pas déjà fait
+                self.tunnel_canvas.create_text(x, y + size + 10, text=str(id), anchor=tk.N)
+                id_displayed = True
+
 
         # Ajouter un footer
         footer = tk.Label(text="© Crack Base 2024 - ENDSUM", relief=tk.SUNKEN, anchor=tk.W, font=("Castellar", 12, "italic"), bg="black", fg="white")

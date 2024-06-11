@@ -6,6 +6,24 @@ Created on 2 avr. 2024
 import tkinter as tk
 from tkinter import messagebox, ttk
 import re
+import logging
+import os
+
+# Configuration du système de log
+log_directory = "logs"
+if not os.path.exists(log_directory):
+    os.makedirs(log_directory)
+
+# Créer un handler pour écrire les logs dans un fichier avec l'encodage UTF-8
+file_handler = logging.FileHandler(os.path.join(log_directory, 'options_config.log'), encoding='utf-8')
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# Configurer le logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(file_handler)
 
 class ConfigModifierApp:
     def __init__(self, root):
@@ -48,6 +66,7 @@ class ConfigModifierApp:
 
         # Analyser le fichier de configuration pour extraire les options et leurs valeurs
         self.parse_config(self.config_path_entry.get())
+        logger.info("Application démarrée et fichier de configuration analysé.")
 
     def parse_config(self, file_path):
         self.options = {
@@ -59,14 +78,15 @@ class ConfigModifierApp:
             "max_epochs": 12
         }
 
-        with open(file_path, 'r') as f:
-            content = f.read()
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
 
             model_type_match = re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
             if model_type_match:
                 self.options["model_type"] = model_type_match.group(1)
 
-            backbone_type_match = re.search(r"backbone\s*=\\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
+            backbone_type_match = re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
             if backbone_type_match:
                 self.options["backbone_type"] = backbone_type_match.group(1)
 
@@ -85,6 +105,15 @@ class ConfigModifierApp:
             max_epochs_match = re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", content, re.DOTALL)
             if max_epochs_match:
                 self.options["max_epochs"] = int(max_epochs_match.group(1))
+
+            logger.info(f"Options extraites du fichier de configuration : {self.options}")
+
+        except FileNotFoundError:
+            logger.error(f"Le fichier de configuration {file_path} n'a pas été trouvé.")
+            messagebox.showerror("Erreur", "Le fichier de configuration n'a pas été trouvé.")
+        except Exception as e:
+            logger.error(f"Une erreur s'est produite lors de l'analyse du fichier de configuration : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de l'analyse du fichier de configuration : {e}")
 
         # Afficher les options dans la frame
         self.show_options()
@@ -130,43 +159,49 @@ class ConfigModifierApp:
         loss_cls_label = tk.Label(self.options_frame, text="Loss Class Weight")
         loss_cls_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
         loss_cls_var = tk.DoubleVar(value=self.options["loss_cls_weight"])
-        loss_cls_scale = tk.Scale(self.options_frame, variable=loss_cls_var, from_=1.0, to=10.0, resolution=0.1, orient=tk.HORIZONTAL)
+        loss_cls_scale = tk.Scale(self.options_frame, variable=loss_cls_var, from_=1.0, to=150.0, orient=tk.HORIZONTAL)
         loss_cls_scale.grid(row=4, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["loss_cls_weight"] = loss_cls_var
 
         # Loss bbox weight
-        loss_bbox_label = tk.Label(self.options_frame, text="Loss Bbox Weight")
+        loss_bbox_label = tk.Label(self.options_frame, text="Loss BBox Weight")
         loss_bbox_label.grid(row=5, column=0, padx=5, pady=5, sticky="w")
         loss_bbox_var = tk.DoubleVar(value=self.options["loss_bbox_weight"])
-        loss_bbox_scale = tk.Scale(self.options_frame, variable=loss_bbox_var, from_=1.0, to=10.0, resolution=0.1, orient=tk.HORIZONTAL)
+        loss_bbox_scale = tk.Scale(self.options_frame, variable=loss_bbox_var, from_=1.0, to=150.0, orient=tk.HORIZONTAL)
         loss_bbox_scale.grid(row=5, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["loss_bbox_weight"] = loss_bbox_var
 
     def save_config(self, file_path):
         try:
-            with open(file_path, 'r') as f:
+            for key, var in self.option_vars.items():
+                self.options[key] = var.get()
+
+            with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
 
-            with open(file_path, 'w') as f:
+            with open(file_path, 'w', encoding='utf-8') as f:
                 for line in lines:
                     if re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
-                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.option_vars['model_type'].get()}'", line)
+                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.options['model_type']}'", line)
                     elif re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
-                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.option_vars['backbone_type'].get()}'", line)
+                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.options['backbone_type']}'", line)
                     elif re.search(r"init_cfg\s*=\s*dict\s*\(.*checkpoint\s*=\s*'([\w:/]+)'", line):
-                        line = re.sub(r"checkpoint\s*=\s*'[\w:/]+'", f"checkpoint = '{self.option_vars['checkpoint'].get()}'", line)
+                        line = re.sub(r"checkpoint\s*=\s*'[\w:/]+'", f"checkpoint = '{self.options['checkpoint']}'", line)
                     elif re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", line):
-                        line = re.sub(r"max_epochs\s*=\s*\d+", f"max_epochs = {self.option_vars['max_epochs'].get()}", line)
+                        line = re.sub(r"max_epochs\s*=\s*\d+", f"max_epochs = {self.options['max_epochs']}", line)
                     elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
-                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.option_vars['loss_cls_weight'].get()}", line)
+                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_cls_weight']}", line)
                     elif re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
-                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.option_vars['loss_bbox_weight'].get()}", line)
+                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_bbox_weight']}", line)
 
                     f.write(line)
 
             self.status_label.config(text="Modifications appliquées avec succès!", fg="green")
+            logger.info(f"Modifications sauvegardées dans le fichier {file_path}.")
+            logger.info(f"Nouvelles valeurs des options : {self.options}")
 
         except Exception as e:
+            logger.error(f"Une erreur s'est produite lors de l'application des modifications : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de l'application des modifications: {e}")
 
     def apply_changes(self):
@@ -187,12 +222,19 @@ class ConfigModifierApp:
             var.set(default_values[key])
 
         self.status_label.config(text="Valeurs réinitialisées par défaut!", fg="green")
+        logger.info("Valeurs réinitialisées par défaut.")
+        logger.info(f"Valeurs réinitialisées à : {default_values}")
 
     def save_changes(self):
         config_path = self.config_path_entry.get()
         self.save_config(config_path)
+        logger.info("Modifications sauvegardées par l'utilisateur.")
+        logger.info(f"Valeurs sauvegardées : {self.options}")
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = ConfigModifierApp(root)
     root.mainloop()
+
+
+
