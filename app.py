@@ -1649,8 +1649,8 @@ class View(Frame):
         search_button = ttk.Button(frame, text="Recherche", command=lambda: self.search_box(None))
         search_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        # Bouton de la carte MAP
-        map_button = ttk.Button(frame, text="Carte MAP", command= self.run_lcms_map)
+        # Bouton de la carte LCMS
+        map_button = ttk.Button(frame, text="Carte LCMS", command= self.run_lcms_map)
         map_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         # Bouton de suppression
