@@ -1649,6 +1649,10 @@ class View(Frame):
         search_button = ttk.Button(frame, text="Recherche", command=lambda: self.search_box(None))
         search_button.pack(side=tk.LEFT, padx=5, pady=5)
 
+        # Bouton de la carte MAP
+        map_button = ttk.Button(frame, text="Carte MAP", command= self.run_lcms_map)
+        map_button.pack(side=tk.LEFT, padx=5, pady=5)
+
         # Bouton de suppression
         del_button = ttk.Button(button_frame, text="Supprimer", width=20, command=self.delete_item)
         del_button.pack(side=tk.LEFT, padx=5, pady=5)
@@ -1701,6 +1705,10 @@ class View(Frame):
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors du chargement des tables : {e}")
+    
+    def run_lcms_map(self):
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "carte-folium.py")
+        subprocess.run(["python", chemin])
 
     def explorer(self):
         dossier_db = os.path.abspath(self.db_directory)
