@@ -34,6 +34,11 @@ from newdb import *
 from ttkthemes import ThemedTk
 import webbrowser
 
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, QPushButton, QLabel, QComboBox, QHBoxLayout, QFileDialog, QMessageBox
+from PyQt5.QtOpenGL import QGLWidget
+from OpenGL.GL import *
+from OpenGL.GLUT import *
+
 buffer = io.StringIO()
 sys.stdout = sys.stderr = buffer 
 
@@ -1619,10 +1624,39 @@ class Frames8(Frame):
             logging.error('Erreur lors de la lecture du fichier: %s', e)
             return f"Une erreur s'est produite : {e}"
 
+class OpenGLWidget(QGLWidget):
+    def __init__(self, parent=None):
+        super(OpenGLWidget, self).__init__(parent)
+        self.width = self.size().width()
+        self.height = self.size().height()
+
+    def initializeGL(self):
+        glEnable(GL_DEPTH_TEST)
+
+    def resizeGL(self, width, height):
+        self.width = width
+        self.height = height
+        glViewport(0, 0, self.width, self.height)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        #gluOrtho2D(0, self.width, 0, self.height)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+
+    def paintGL(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glBegin(GL_TRIANGLES)
+        glVertex2f(0, 0)
+        glVertex2f(self.width, 0)
+        glVertex2f(self.width / 2, self.height)
+        glEnd()
+        self.swapBuffers()
 class View(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.canvas = Canvas(self)
+        #self.canvas = OpenGLCanvas(self)
+        
         self.canvas.pack(fill=tk.BOTH, expand=True)
 
         # Ajout d'un cadre pour les boutons
