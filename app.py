@@ -1656,7 +1656,6 @@ class View(Frame):
         Frame.__init__(self, parent)
         self.canvas = Canvas(self)
         #self.canvas = OpenGLCanvas(self)
-        
         self.canvas.pack(fill=tk.BOTH, expand=True)
 
         # Ajout d'un cadre pour les boutons
