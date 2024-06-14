@@ -14,7 +14,7 @@ def draw_boxes(ax, annotations, categories):
     for annotation in annotations:
         bbox = annotation["bbox"]
         category_id = annotation["category_id"]
-        category_name = categories.get(category_id, "Unknown")
+        category_name = categories.get(category_id, "cable")
         xmin, ymin, width, height = map(int, bbox)
         xmax = xmin + width
         ymax = ymin + height

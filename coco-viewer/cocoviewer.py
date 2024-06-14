@@ -20,14 +20,14 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 parser = argparse.ArgumentParser(description="View images with bboxes from the COCO dataset")
-parser.add_argument("-i", "--images", default="", type=str, metavar="PATH", help="/coco/train")
+parser.add_argument("-i", "--images", default="", type=str, metavar="PATH", help="")
 parser.add_argument(
     "-a",
     "--annotations",
     default="",
     type=str,
     metavar="PATH",
-    help="/coco/annotations/annotation_lcms_train.json",
+    help="",
 )
 
 class Data:

@@ -1,35 +1,4 @@
 {
-    "info": {
-        "description": "Exported from DLTA-AI",
-        "year": 2024,
-        "date_created": "2024/05/30"
-    },
-    "categories": [
-        {
-            "id": 81,
-            "name": "boitie elec"
-        },
-        {
-            "id": 82,
-            "name": "passe cable"
-        },
-        {
-            "id": 83,
-            "name": "lumiere"
-        },
-        {
-            "id": 84,
-            "name": "cable"
-        }
-    ],
-    "images": [
-        {
-            "id": 0,
-            "width": 500,
-            "height": 2080,
-            "file_name": "TO_C_18056_H2860_A30_330_I1.jpg"
-        }
-    ],
     "annotations": [
         {
             "id": 0,
@@ -153,5 +122,36 @@
             ],
             "area": 14643.5
         }
-    ]
+    ],
+    "categories": [
+        {
+            "id": 81,
+            "name": "boitie elec"
+        },
+        {
+            "id": 82,
+            "name": "passe cable"
+        },
+        {
+            "id": 83,
+            "name": "lumiere"
+        },
+        {
+            "id": 84,
+            "name": "cable"
+        }
+    ],
+    "images": [
+        {
+            "id": 0,
+            "width": 500,
+            "height": 2080,
+            "file_name": "TO_C_18056_H2860_A30_330_I1.jpg"
+        }
+    ],
+    "info": {
+        "description": "Exported from DLTA-AI",
+        "year": 2024,
+        "date_created": "2024/05/30"
+    }
 }

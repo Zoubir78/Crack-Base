@@ -33,6 +33,7 @@ from annotation import *
 from newdb import *
 from ttkthemes import ThemedTk
 import webbrowser
+import math
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, QPushButton, QLabel, QComboBox, QHBoxLayout, QFileDialog, QMessageBox
 from PyQt5.QtOpenGL import QGLWidget
@@ -1568,6 +1569,20 @@ class Frames8(Frame):
 
         root.mainloop()
 
+    #def run_cocoviewer(self):
+    #    logging.info('Exécution de COCO Viewer')
+    #    images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
+    #    if not images_dir:
+    #        logging.warning('Aucun répertoire d\'images sélectionné')
+    #        return
+    #    annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
+    #    if not annotations_file:
+    #        logging.warning('Aucun fichier d\'annotations sélectionné')
+    #        return
+    #    chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
+    #    logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s', images_dir, annotations_file)
+    #    subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
+
     def run_cocoviewer(self):
         logging.info('Exécution de COCO Viewer')
         images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
@@ -1578,7 +1593,7 @@ class Frames8(Frame):
         if not annotations_file:
             logging.warning('Aucun fichier d\'annotations sélectionné')
             return
-        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
+        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "coco-view.py")
         logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s', images_dir, annotations_file)
         subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
 
@@ -1655,68 +1670,97 @@ class View(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.canvas = Canvas(self)
-        #self.canvas = OpenGLCanvas(self)
         self.canvas.pack(fill=tk.BOTH, expand=True)
 
-        # Ajout d'un cadre pour les boutons
-        button_frame = Frame(self.canvas)
-        button_frame.pack(side=tk.TOP, fill=tk.X)
+        # Cadre principal pour contenir l'image et les contrôles
+        main_frame = Frame(self.canvas)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Cadre pour l'image du tunnel
+        self.image_frame = Frame(main_frame)
+        self.image_frame.pack(side=tk.LEFT, anchor=tk.NW, padx=5, pady=5)
+
+        # Chargement de l'image du tunnel
+        self.tunnel_image_path = 'images/tunnel.png'
+        self.tunnel_canvas = Canvas(self.image_frame, width=500, height=450)
+        self.tunnel_canvas.pack()
+        self.load_tunnel_image()
+
+        # Cadre pour les contrôles (boutons, champ de recherche)
+        control_frame = Frame(main_frame)
+        control_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=5, pady=5)
+
+        # Cadre pour les boutons
+        button_frame = Frame(control_frame)
+        button_frame.pack(fill=tk.X)
 
         # Boutons pour chaque commande
-        ttk.Button(button_frame, text="Voir le dossier des BDD", command=self.explorer).pack(side=tk.LEFT, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir toutes les données", command=self.view_all_data).pack(side=tk.LEFT, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir les données LCMS", command=self.view_lcms_data).pack(side=tk.LEFT, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir les données Fers apparents", command=lambda: self.view_other_table_data("fer_apparents")).pack(side=tk.LEFT, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir les données Fissures", command=lambda: self.view_other_table_data("fissures")).pack(side=tk.LEFT, padx=5, pady=5)
+        ttk.Button(button_frame, text="Voir le dossier des BDD", command=self.explorer).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_frame, text="Voir toutes les données", command=self.view_all_data).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_frame, text="Voir les données LCMS", command=self.view_lcms_data).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_frame, text="Voir les données Fers apparents", command=lambda: self.view_other_table_data("fer_apparents")).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_frame, text="Voir les données Fissures", command=lambda: self.view_other_table_data("fissures")).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_frame, text="Supprimer", width=20, command=self.delete_item).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
-        frame = ttk.Frame(self.canvas)
-        frame.pack(side=tk.TOP, padx=5, pady=5)
+        # Cadre pour l'entrée de recherche et le bouton de recherche
+        search_frame = Frame(control_frame)
+        search_frame.pack(fill=tk.X, padx=5, pady=5)
 
         # Entrée de saisie
         self.entryvar = tk.StringVar()
-        entry = ttk.Entry(frame, textvariable=self.entryvar, width=80, font=("Helvetica", 12, "normal"))
+        entry = ttk.Entry(search_frame, textvariable=self.entryvar, width=40, font=("Helvetica", 12, "normal"))
         entry.pack(side=tk.LEFT, padx=5, pady=5)
         entry.bind("<Return>", self.search_box)
 
         # Bouton de recherche
-        search_button = ttk.Button(frame, text="Recherche", command=lambda: self.search_box(None))
+        search_button = ttk.Button(search_frame, text="Recherche", command=lambda: self.search_box(None))
         search_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         # Bouton de la carte LCMS
-        map_button = ttk.Button(frame, text="Carte LCMS", command= self.run_lcms_map)
+        map_button = ttk.Button(search_frame, text="Carte LCMS", command=self.run_lcms_map)
         map_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        # Bouton de suppression
-        del_button = ttk.Button(button_frame, text="Supprimer", width=20, command=self.delete_item)
-        del_button.pack(side=tk.LEFT, padx=5, pady=5)
-
-        frame = ttk.Frame(self)
-        frame.pack(side=tk.TOP, padx=5, pady=5)
+        # Cadre pour la sélection de la base de données et de la table
+        select_frame = Frame(control_frame)
+        select_frame.pack(fill=tk.X, padx=5, pady=5)
 
         # Sélection de la base de données
-        self.database_label = ttk.Label(frame, text="Base de données:")
+        self.database_label = ttk.Label(select_frame, text="Base de données:")
         self.database_label.grid(row=0, column=0, padx=5, pady=5)
-        self.database_combobox = ttk.Combobox(frame, width=40)
+        self.database_combobox = ttk.Combobox(select_frame, width=40)
         self.database_combobox.grid(row=0, column=1, padx=5, pady=5)
         self.database_combobox.bind("<<ComboboxSelected>>", self.load_tables)
 
         # Sélection de la table
-        self.table_label = ttk.Label(frame, text="Table:")
-        self.table_label.grid(row=0, column=2, padx=5, pady=5)
-        self.table_combobox = ttk.Combobox(frame, width=40)
-        self.table_combobox.grid(row=0, column=3, padx=5, pady=5)
+        self.table_label = ttk.Label(select_frame, text="Table:")
+        self.table_label.grid(row=1, column=0, padx=5, pady=5)
+        self.table_combobox = ttk.Combobox(select_frame, width=40)
+        self.table_combobox.grid(row=1, column=1, padx=5, pady=5)
         self.table_combobox.bind("<<ComboboxSelected>>", self.display_selected_table)
 
+        # Cadre pour le tableau avec barre de défilement
+        self.table_frame = Frame(self.canvas)
+        self.table_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
         # Ajout d'une fenêtre défilante pour le tableau
-        scrollbar = Scrollbar(self.canvas, orient=tk.VERTICAL)
+        scrollbar = Scrollbar(self.table_frame, orient=tk.VERTICAL)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.tree = ttk.Treeview(self.canvas, columns=(), show="headings", yscrollcommand=scrollbar.set)
+        self.tree = ttk.Treeview(self.table_frame, columns=(), show="headings", yscrollcommand=scrollbar.set)
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.tree.yview)
 
-        self.db_directory = "DB"  # Dossier contenant les bases de données
-        self.load_databases()  # Charger les bases de données au démarrage
+        # Chargement des bases de données au démarrage
+        self.db_directory = "DB"
+        self.load_databases()
+
+        # Binding de l'événement de sélection du TreeView
+        self.tree.bind("<<TreeviewSelect>>", self.on_treeview_select)
+
+    def load_tunnel_image(self):
+        self.tunnel_image = Image.open(self.tunnel_image_path)
+        self.tunnel_photo = ImageTk.PhotoImage(self.tunnel_image)
+        self.tunnel_canvas.create_image(0, 0, anchor=tk.NW, image=self.tunnel_photo)
 
     def load_databases(self):
         db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
@@ -1738,7 +1782,7 @@ class View(Frame):
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors du chargement des tables : {e}")
-    
+
     def run_lcms_map(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "carte-folium.py")
         subprocess.run(["python", chemin])
@@ -1819,135 +1863,162 @@ class View(Frame):
                     table_data = cursor.fetchall()
                     if table_data:
                         if not all_columns:
-                            cursor.execute(f"PRAGMA table_info({table_name});")
-                            columns_info = cursor.fetchall()
-                            all_columns = ["Base de données", "Table"] + [info[1] for info in columns_info]
-                        # Ajouter les données de cette table à la liste globale
-                        all_data.extend([(db_file, table_name) + row for row in table_data])
+                            cursor.execute(f"PRAGMA table_info({table_name})")
+                            columns = cursor.fetchall()
+                            all_columns = ["Base de données", "Table"] + [column[1] for column in columns]
+                        for row in table_data:
+                            all_data.append((db_file, table_name) + row)
 
                 connection.close()
 
-            # Afficher toutes les données accumulées
-            self.display_data("Toutes les données", all_columns, all_data)
+            if all_data:
+                self.tree["columns"] = all_columns
+                self.tree.delete(*self.tree.get_children())  # Effacer les données actuelles du tableau
+
+                for col in all_columns:
+                    self.tree.heading(col, text=col)
+                    self.tree.column(col, width=100)
+
+                for row in all_data:
+                    self.tree.insert("", "end", values=row)
+            else:
+                messagebox.showinfo("Info", "Aucune donnée trouvée dans les bases de données.")
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des données : {e}")
 
-    def display_data(self, title, columns, data):
-        # Ajouter les colonnes au Treeview
-        self.tree["columns"] = columns
-        for col in columns:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, width=100, anchor='center')  # Ajustez la largeur et l'ancrage selon vos besoins
-
-        # Effacer les anciennes données
-        self.tree.delete(*self.tree.get_children())
-
-        # Ajouter les nouvelles données
-        for row in data:
-            self.tree.insert("", "end", values=row)
-
-        # Afficher le titre (optionnel)
-        print(title)
+    def view_lcms_data(self):
+        self.view_other_table_data("lcm")
 
     def view_other_table_data(self, table_name):
         try:
-            database_name = self.database_combobox.get()
-            connection = sqlite3.connect(os.path.join(self.db_directory, database_name))
-            cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM {table_name}")
-            data = cursor.fetchall()
-            column_names = [description[0] for description in cursor.description]
-            connection.close()
-            self.display_data(table_name, column_names, data)
+            all_data = []
+            all_columns = []
+            db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
+
+            for db_file in db_files:
+                db_path = os.path.join(self.db_directory, db_file)
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
+                cursor.execute(f"SELECT * FROM {table_name}")
+                table_data = cursor.fetchall()
+                if table_data:
+                    if not all_columns:
+                        cursor.execute(f"PRAGMA table_info({table_name})")
+                        columns = cursor.fetchall()
+                        all_columns = ["Base de données"] + [column[1] for column in columns]
+                    for row in table_data:
+                        all_data.append((db_file,) + row)
+                connection.close()
+
+            if all_data:
+                self.tree["columns"] = all_columns
+                self.tree.delete(*self.tree.get_children())  # Effacer les données actuelles du tableau
+
+                for col in all_columns:
+                    self.tree.heading(col, text=col)
+                    self.tree.column(col, width=100)
+
+                for row in all_data:
+                    self.tree.insert("", "end", values=row)
+            else:
+                messagebox.showinfo("Info", f"Aucune donnée trouvée dans la table '{table_name}'.")
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des données : {e}")
 
-    def view_lcms_data(self):
-        self.view_other_table_data("images")
-
-    def delete_data(self, name):
-        database_name = self.database_combobox.get()
-        connection = sqlite3.connect(os.path.join(self.db_directory, database_name))
-        cursor = connection.cursor()
-        cursor.execute("DELETE FROM images WHERE nom_image = ?", (name,))
-        connection.commit()
-        connection.close()
-
-    def display_selected_table(self, event=None):
+    def display_selected_table(self, event):
         database_name = self.database_combobox.get()
         table_name = self.table_combobox.get()
-
         if not database_name or not table_name:
-            messagebox.showerror("Erreur", "Veuillez sélectionner une base de données et une table.")
             return
 
+        db_path = os.path.join(self.db_directory, database_name)
         try:
-            connection = sqlite3.connect(os.path.join(self.db_directory, database_name))
+            connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
-
             cursor.execute(f"SELECT * FROM {table_name}")
-            data = cursor.fetchall()
-            column_names = [description[0] for description in cursor.description]
+            rows = cursor.fetchall()
+            columns = [description[0] for description in cursor.description]
 
-            self.display_data(table_name, column_names, data)
+            self.tree["columns"] = columns
+            self.tree.delete(*self.tree.get_children())  # Effacer les données actuelles du tableau
+
+            for col in columns:
+                self.tree.heading(col, text=col)
+                self.tree.column(col, width=100)
+
+            for row in rows:
+                self.tree.insert("", "end", values=row)
+
             connection.close()
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des données : {e}")
 
-    #def on_treeview_hover(self, event):
-    #    item = self.tree.identify_row(event.y)
-    #    if item:
-    #        item_values = self.tree.item(item, "values")
-    #        self.show_tunnel_schema(item_values)
+    def on_treeview_select(self, event):
+        # Get the selected row
+        selected_item = self.tree.selection()
+        if not selected_item:
+            return
 
-    #def show_tunnel_schema(self, item_values):
-    #    # Efface le canvas existant
-    #    self.tunnel_canvas.delete("all")
+        item = self.tree.item(selected_item)
+        values = item['values']
 
-    #    # Vérifier si la base de données est "lcms_database.db"
-    #    database_name = self.database_combobox.get()
-    #    if database_name != "lcms_database.db":
-    #        return
+        # Assuming the table columns contain 'sens' and 'angle', find their indices
+        columns = self.tree["columns"]
+        try:
+            sens_index = columns.index('sens')
+            angle_index = columns.index('angle')
+        except ValueError:
+            return
 
-    #    # Extrait les informations nécessaires à partir des valeurs de l'élément
-    #    id = int(item_values[2])  # Supposons que l'id_image est dans la 3ème colonne
-    #    sens = item_values[6]  # Supposons que le sens de prise est dans la 7ème colonne
+        sens = values[sens_index]
+        angle = values[angle_index]
 
-    #    # Paramètres du tunnel
-    #    tunnel_length = 1150
-    #    tunnel_depth = 200
-    #    num_positions = 100  # Nombre de positions d'image à afficher
-    #    step = tunnel_length / num_positions  # Intervalle entre les positions
+        # Now, highlight the relevant sections in the tunnel diagram
+        self.highlight_tunnel_section(sens, angle)
 
-    #    # Dessine le tunnel (une simple ligne droite pour cet exemple)
-    #    self.tunnel_canvas.create_line(50, 100, 750, 100, fill="black", width=10)
+    def highlight_tunnel_section(self, sens, angle):
+        # Clear any previous highlights
+        self.tunnel_canvas.delete("highlight")
 
-    #    # Générer les positions des images en 2D
-    #    image_positions = []
-    #    for i in range(num_positions):
-    #        x = 5 + i * step
-    #        y = 40
-    #        size = 5  # Taille fixe pour les images en 2D
-    #        image_positions.append((x, y, size))
+        # Center of the image
+        x0, y0 = self.tunnel_photo.width() // 2, self.tunnel_photo.height() // 2
+        length = 100  # Length of the line
 
-    #    # Afficher l'ID seulement une fois
-    #    id_displayed = False
+        # Adjust angle based on the 'sens'
+        if sens == 'D':  # Left side of the image
+            if angle == 0:
+                adjusted_angle = 180
+            elif angle == 30:
+                adjusted_angle = 150
+            elif angle == 60:
+                adjusted_angle = 120
+            elif angle == 90:
+                adjusted_angle = 90
+            else:
+                return  # Invalid angle
+        elif sens == 'C':  # Right side of the image
+            if angle == 0:
+                adjusted_angle = 0
+            elif angle == 30:
+                adjusted_angle = 30
+            elif angle == 60:
+                adjusted_angle = 60
+            elif angle == 90:
+                adjusted_angle = 90
+            else:
+                return  # Invalid angle
+        else:
+            return  # Invalid 'sens'
 
-    #    # Affiche les images sur le schéma
-    #    if sens == 'C':
-    #        positions = image_positions[:id]  # De 1 à id_image
-    #    else:  # sens_prise == 'D'
-    #        positions = image_positions[-id:]  # De la fin à id_image
+        # Calculate end point based on the adjusted angle
+        x1 = x0 + length * math.cos(math.radians(adjusted_angle))
+        y1 = y0 - length * math.sin(math.radians(adjusted_angle))  # Inverted y-axis for tkinter
 
-    #    for pos in positions:
-    #        x, y, size = pos
-    #        self.tunnel_canvas.create_oval(x - size, y - size, x + size, y + size, fill="blue")
-    #        if not id_displayed:  # Afficher l'ID seulement si ce n'est pas déjà fait
-    #            self.tunnel_canvas.create_text(x, y + size + 10, text=str(id), anchor=tk.N)
-    #            id_displayed = True
+        # Draw the arrow on the canvas
+        self.tunnel_canvas.create_line(x0, y0, x1, y1, fill="black", width=8, arrow=tk.LAST, tags="highlight")
 
         # Ajouter un footer
         footer = tk.Label(text="© Crack Base 2024 - ENDSUM", relief=tk.SUNKEN, anchor=tk.W, font=("Castellar", 12, "italic"), bg="black", fg="white")
