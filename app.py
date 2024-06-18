@@ -222,7 +222,7 @@ class CrackBase(Tk):
 
         file = Menu(menu, tearoff=0) 
         # Ajouter un bouton Actualiser à la barre de menu
-        file.add_command(label="Actualiser", command=self.restart_application)
+        file.add_command(label="Redémarrer", command=self.restart_application)
         file.add_separator()
         file.add_command(label="Fermer", command=self.destroy)
         menu.add_cascade(label="File", menu=file)
