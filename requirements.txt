@@ -13,4 +13,5 @@ open_new
 datetime
 nbformat
 webbrowser
+math
 
