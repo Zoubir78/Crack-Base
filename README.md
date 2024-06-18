@@ -90,11 +90,11 @@ En suivant ces étapes, vous pouvez sauvegarder et recréer l'environnement de d
 ### Contribuer
 Instructions pour contribuer au projet.
 
-Forkez le projet.
-Créez votre branche de fonctionnalité (git checkout -b fonctionnalite/NewFeature).
-Commitez vos modifications (git commit -m 'Ajout d'une nouvelle fonctionnalité').
-Pushez vers la branche (git push origin fonctionnalite/NewFeature).
-Ouvrez une Pull Request.
+- Forkez le projet.
+- Créez votre branche de fonctionnalité (git checkout -b fonctionnalite/NewFeature).
+- Commitez vos modifications (git commit -m 'Ajout d'une nouvelle fonctionnalité').
+- Pushez vers la branche (git push origin fonctionnalite/NewFeature).
+- Ouvrez une Pull Request.
 
 ### Licence
 MIT License
