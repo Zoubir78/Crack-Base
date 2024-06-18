@@ -31,7 +31,7 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - `conda`
 
 ## Installation 🛠️
-Voici la façon dont vous pouvez instruire l'installation et la configuration de votre application.
+Instructions pour installer les dépendances et configurer le projet.
 
 ### Clonez le dépôt
 ```
@@ -42,6 +42,11 @@ git clone https://github.com/Zoubir78/Crack-Base.git
 python -m venv env
 source env/bin/activate  # Sur Windows, utilisez `env\Scripts\activate.bat`
 ```
+project/
+├── environment/
+│   ├── requirements.txt
+│   └── environment.yml
+
 ### Installez les dépendances Python 🤖
 ```
 cd Crack-Base
@@ -82,8 +87,17 @@ conda env create -f environment.yml
 ```
 En suivant ces étapes, vous pouvez sauvegarder et recréer l'environnement de développement de l'application facilement.
 
+### Contribuer
+Instructions pour contribuer au projet.
+
+Forkez le projet.
+Créez votre branche de fonctionnalité (git checkout -b fonctionnalite/NewFeature).
+Commitez vos modifications (git commit -m 'Ajout d'une nouvelle fonctionnalité').
+Pushez vers la branche (git push origin fonctionnalite/NewFeature).
+Ouvrez une Pull Request.
+
 ### Licence
-Distribué sans licence.
+MIT License
 
 ## Contact
 Zoubeir MAROUF - marouf.zoubeir@gmail.com

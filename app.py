@@ -352,8 +352,14 @@ class CrackBase(Tk):
         
         # Les threads sont utilisés pour charger simultanément les autres images en arrière-plan
         for x in ("LCMS", "2d", "fer apparent", "fissures", "equipements", "sites", "nouvelle_BDD", "a_propos", "view"):
-            thread = Thread(target=self.make_frame, args=(x,)) #Remember the args argument takes a tuple, hence the comma.
+            thread = Thread(target=self.make_frame, args=(x,)) 
             thread.start()
+
+    def toggle_sidebar(self):
+        if self.sidebar.winfo_viewable():
+            self.sidebar.pack_forget()
+        else:
+            self.sidebar.pack(side=LEFT, fill=Y)
 
     def toggle_side_button(self):
         if self.side_button_lcms.winfo_ismapped():
@@ -374,12 +380,6 @@ class CrackBase(Tk):
             self.side_button_fa.grid()  
             self.side_button_fes.grid() 
             self.side_button_NB1.grid()
-        
-    def toggle_sidebar(self):
-        if self.sidebar.winfo_viewable():
-            self.sidebar.pack_forget()
-        else:
-            self.sidebar.pack(side=LEFT, fill=Y)
 
     def make_frame(self, frame_name):
         frame = self.frames[frame_name]
