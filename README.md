@@ -30,6 +30,13 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - `Python 3.12`
 - `conda`
 
+## Arborescence du projet
+
+- project/
+  - preprocessing/
+    - preprocess_data.py
+    - normalize_data.py
+
 ## Installation 🛠️
 Instructions pour installer les dépendances et configurer le projet.
 
@@ -42,11 +49,6 @@ git clone https://github.com/Zoubir78/Crack-Base.git
 python -m venv env
 source env/bin/activate  # Sur Windows, utilisez `env\Scripts\activate.bat`
 ```
-project/
-├── environment/
-│   ├── requirements.txt
-│   └── environment.yml
-
 ### Installez les dépendances Python 🤖
 ```
 cd Crack-Base
