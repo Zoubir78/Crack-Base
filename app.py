@@ -1639,33 +1639,33 @@ class Frames8(Frame):
             logging.error('Erreur lors de la lecture du fichier: %s', e)
             return f"Une erreur s'est produite : {e}"
 
-class OpenGLWidget(QGLWidget):
-    def __init__(self, parent=None):
-        super(OpenGLWidget, self).__init__(parent)
-        self.width = self.size().width()
-        self.height = self.size().height()
-
-    def initializeGL(self):
-        glEnable(GL_DEPTH_TEST)
-
-    def resizeGL(self, width, height):
-        self.width = width
-        self.height = height
-        glViewport(0, 0, self.width, self.height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        #gluOrtho2D(0, self.width, 0, self.height)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-
-    def paintGL(self):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glBegin(GL_TRIANGLES)
-        glVertex2f(0, 0)
-        glVertex2f(self.width, 0)
-        glVertex2f(self.width / 2, self.height)
-        glEnd()
-        self.swapBuffers()
+#class OpenGLWidget(QGLWidget):
+#    def __init__(self, parent=None):
+#        super(OpenGLWidget, self).__init__(parent)
+#        self.width = self.size().width()
+#        self.height = self.size().height()
+#
+#    def initializeGL(self):
+#        glEnable(GL_DEPTH_TEST)
+#
+#    def resizeGL(self, width, height):
+#        self.width = width
+#        self.height = height
+#        glViewport(0, 0, self.width, self.height)
+#        glMatrixMode(GL_PROJECTION)
+#        glLoadIdentity()
+#        #gluOrtho2D(0, self.width, 0, self.height)
+#        glMatrixMode(GL_MODELVIEW)
+#        glLoadIdentity()
+#
+#    def paintGL(self):
+#        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+#        glBegin(GL_TRIANGLES)
+#        glVertex2f(0, 0)
+#        glVertex2f(self.width, 0)
+#        glVertex2f(self.width / 2, self.height)
+#        glEnd()
+#        self.swapBuffers()
 class View(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
@@ -1682,7 +1682,7 @@ class View(Frame):
 
         # Chargement de l'image du tunnel
         self.tunnel_image_path = 'images/tunnel.png'
-        self.tunnel_canvas = Canvas(self.image_frame, width=500, height=450)
+        self.tunnel_canvas = Canvas(self.image_frame, width=500, height=350)
         self.tunnel_canvas.pack()
         self.load_tunnel_image()
 
@@ -1690,17 +1690,27 @@ class View(Frame):
         control_frame = Frame(main_frame)
         control_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=5, pady=5)
 
-        # Cadre pour les boutons
+        # Cadre pour les boutons, placé par paires
         button_frame = Frame(control_frame)
         button_frame.pack(fill=tk.X)
 
-        # Boutons pour chaque commande
-        ttk.Button(button_frame, text="Voir le dossier des BDD", command=self.explorer).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir toutes les données", command=self.view_all_data).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir les données LCMS", command=self.view_lcms_data).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir les données Fers apparents", command=lambda: self.view_other_table_data("fer_apparents")).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_frame, text="Voir les données Fissures", command=lambda: self.view_other_table_data("fissures")).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_frame, text="Supprimer", width=20, command=self.delete_item).pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        # Cadre pour la première paire de boutons
+        button_pair1 = Frame(button_frame)
+        button_pair1.pack(fill=tk.X)
+        ttk.Button(button_pair1, text="Voir le dossier des BDD", width=40, command=self.explorer).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair1, text="Voir toutes les données", width=40, command=self.view_all_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+
+        # Cadre pour la deuxième paire de boutons
+        button_pair2 = Frame(button_frame)
+        button_pair2.pack(fill=tk.X)
+        ttk.Button(button_pair2, text="Données LCMS", width=40, command=self.view_lcms_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair2, text="Données Fers apparents", width=40, command=lambda: self.view_other_table_data("fer_apparents")).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+
+        # Cadre pour la troisième paire de boutons
+        button_pair3 = Frame(button_frame)
+        button_pair3.pack(fill=tk.X)
+        ttk.Button(button_pair3, text="Données Fissures", width=40, command=lambda: self.view_other_table_data("fissures")).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair3, text="Supprimer", width=40, command=self.delete_item).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
 
         # Cadre pour l'entrée de recherche et le bouton de recherche
         search_frame = Frame(control_frame)
@@ -1727,14 +1737,14 @@ class View(Frame):
         # Sélection de la base de données
         self.database_label = ttk.Label(select_frame, text="Base de données:")
         self.database_label.grid(row=0, column=0, padx=5, pady=5)
-        self.database_combobox = ttk.Combobox(select_frame, width=40)
+        self.database_combobox = ttk.Combobox(select_frame, width=30)
         self.database_combobox.grid(row=0, column=1, padx=5, pady=5)
         self.database_combobox.bind("<<ComboboxSelected>>", self.load_tables)
 
         # Sélection de la table
         self.table_label = ttk.Label(select_frame, text="Table:")
         self.table_label.grid(row=1, column=0, padx=5, pady=5)
-        self.table_combobox = ttk.Combobox(select_frame, width=40)
+        self.table_combobox = ttk.Combobox(select_frame, width=30)
         self.table_combobox.grid(row=1, column=1, padx=5, pady=5)
         self.table_combobox.bind("<<ComboboxSelected>>", self.display_selected_table)
 
@@ -1957,7 +1967,7 @@ class View(Frame):
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des données : {e}")
 
     def on_treeview_select(self, event):
-        # Get the selected row
+        # Récupère la ligne sélectionnée
         selected_item = self.tree.selection()
         if not selected_item:
             return
@@ -1965,7 +1975,7 @@ class View(Frame):
         item = self.tree.item(selected_item)
         values = item['values']
 
-        # Assuming the table columns contain 'sens' and 'angle', find their indices
+        # Trouver les indices des colonnes 'sens' et 'angle' 
         columns = self.tree["columns"]
         try:
             sens_index = columns.index('sens')
@@ -1976,53 +1986,54 @@ class View(Frame):
         sens = values[sens_index]
         angle = values[angle_index]
 
-        # Now, highlight the relevant sections in the tunnel diagram
         self.highlight_tunnel_section(sens, angle)
 
     def highlight_tunnel_section(self, sens, angle):
-        # Clear any previous highlights
+        # Effacer tous les highlights précédents  
         self.tunnel_canvas.delete("highlight")
 
-        # Center of the image
-        x0, y0 = self.tunnel_photo.width() // 2, self.tunnel_photo.height() // 2
-        length = 100  # Length of the line
+        # En bas au centre de l'image
+        x0 = self.tunnel_photo.width() // 2
+        y0 = self.tunnel_photo.height() - 15
+        length = 200 
 
-        # Adjust angle based on the 'sens'
-        if sens == 'D':  # Left side of the image
+        # Ajuster l'angle en fonction du 'sens'
+        if sens == 'D':  # Côté gauche de l'image
             if angle == 0:
                 adjusted_angle = 180
             elif angle == 30:
                 adjusted_angle = 150
             elif angle == 60:
-                adjusted_angle = 120
+                adjusted_angle = 125
             elif angle == 90:
-                adjusted_angle = 90
+                adjusted_angle = 100
             else:
-                return  # Invalid angle
-        elif sens == 'C':  # Right side of the image
+                return  
+        elif sens == 'C':  # Côté droit de l'image
             if angle == 0:
                 adjusted_angle = 0
             elif angle == 30:
                 adjusted_angle = 30
             elif angle == 60:
-                adjusted_angle = 60
+                adjusted_angle = 55
             elif angle == 90:
-                adjusted_angle = 90
+                adjusted_angle = 80
             else:
-                return  # Invalid angle
+                return  
         else:
-            return  # Invalid 'sens'
+            return  
 
-        # Calculate end point based on the adjusted angle
+        # Calculer le point final en fonction de l'angle ajusté
         x1 = x0 + length * math.cos(math.radians(adjusted_angle))
-        y1 = y0 - length * math.sin(math.radians(adjusted_angle))  # Inverted y-axis for tkinter
+        y1 = y0 - length * math.sin(math.radians(adjusted_angle))  
 
-        # Draw the arrow on the canvas
-        self.tunnel_canvas.create_line(x0, y0, x1, y1, fill="black", width=8, arrow=tk.LAST, tags="highlight")
+        # Dessiner la flèche sur le canvas
+        self.tunnel_canvas.create_line(x0, y0, x1, y1, fill="black", width=6, arrow=tk.LAST, tags="highlight")
+
 
         # Ajouter un footer
         footer = tk.Label(text="© Crack Base 2024 - ENDSUM", relief=tk.SUNKEN, anchor=tk.W, font=("Castellar", 12, "italic"), bg="black", fg="white")
-        footer.grid(row=6, column=0, sticky="ew")
+        footer.grid(row=0, column=0, sticky="ew")
 
 if __name__ == "__main__":
     app = CrackBase()
