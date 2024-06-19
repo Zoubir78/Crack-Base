@@ -38,8 +38,16 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - │ └── cocoviewer.py
 #### Databases
 - ├── DB/
+- │ ├── deepCrack.db
+- │ ├── grandMare.db
+- │ ├── lcms_database.db
+- │ └── rdg.db
 #### Export
 - ├── export/
+- │ ├── depth_data.json
+- │ ├── images_data.json
+- │ ├── images_data_deep.json
+- │ └── images_data_rdg.json
 #### Logs
 - ├── logs/
 - │ ├── equipements.log
@@ -77,6 +85,7 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - │ ├──├── 20240611_100830.log
 - │ ├──├── 20240611_100830.log.json
 - │ └──└── my_custom_config.py
+#### APP
 - ├── app.py
 - ├── annotation.py
 - ├── option-config.py
