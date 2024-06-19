@@ -35,8 +35,8 @@ import math
 #import nbformat
 #from nbconvert.preprocessors import ExecutePreprocessor
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, QPushButton, QLabel, QComboBox, QHBoxLayout, QFileDialog, QMessageBox
-from PyQt5.QtOpenGL import QGLWidget
+#from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, QPushButton, QLabel, QComboBox, QHBoxLayout, QFileDialog, QMessageBox
+#from PyQt5.QtOpenGL import QGLWidget
 #from OpenGL.GL import *
 #from OpenGL.GLUT import *
 
