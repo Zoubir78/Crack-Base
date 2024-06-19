@@ -70,6 +70,8 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - │ └──└── train.py
 - │ ├── choix-epoch.py
 - │ └── resultat.py
+- ├── models/
+- │ └── models_json.json
 #### SAM
 - ├── output/
 - ├── sam/
