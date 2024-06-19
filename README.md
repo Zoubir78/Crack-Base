@@ -33,20 +33,27 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 ## Arborescence du projet
 
 - Crack-Base/
+#### coco-viewer
 - ├── coco-viewer/
 - │ └── cocoviewer.py
+#### Databases
 - ├── DB/
+#### Export
 - ├── export/
+#### Logs
 - ├── logs/
 - │ ├── equipements.log
 - │ └── options_config.log
+#### mask2coco
 - ├── mask2coco/
 - │ ├── mask2coco.py
 - │ ├── dir_masks.py
 - │ ├── visualize_mask2points.py
 - │ └── analysis.py
+#### mat2img
 - ├── mat2img/
 - │ └── mat2img.py
+#### Pré-traitement
 - ├── mmdetection/
 - │ ├── configs/
 - │ └──└── my_custom/
@@ -55,13 +62,16 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - │ └──└── train.py
 - │ ├── choix-epoch.py
 - │ └── resultat.py
+#### SAM
 - ├── output/
 - ├── sam/
 - │ ├── annotator.py
 - │ └── categories.txt
+#### Datasets
 - ├── test/
 - ├── train/
 - ├── val/
+#### work_dirs
 - ├── work_dirs/
 - │ ├── my_custom_config/
 - │ ├──├── 20240611_100830.log
