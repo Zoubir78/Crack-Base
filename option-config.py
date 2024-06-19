@@ -38,7 +38,7 @@ def load_json(file_path):
     except json.JSONDecodeError as e:
         raise ValueError(f"Erreur de chargement du fichier JSON: {e}")
 
-file_path = r'C:\Users\z.marouf-araibi\Desktop\Crack-Base\models_menu\models_json.json'
+file_path = r'C:\Users\z.marouf-araibi\Desktop\Crack-Base\models\models_json.json'
 try:
     models_data = load_json(file_path)
     #print("Chargement réussi:", models_data)
