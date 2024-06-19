@@ -32,10 +32,14 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 
 ## Arborescence du projet
 
-- project/
-  - preprocessing/
-    - preprocess_data.py
-    - normalize_data.py
+project/
+├── config/
+│ ├── config.yaml
+│ ├── config.json
+│ └── config.ini
+├── preprocessing/
+│ ├── preprocess_data.py
+│ └── normalize_data.py
 
 ## Installation 🛠️
 Instructions pour installer les dépendances et configurer le projet.
