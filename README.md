@@ -70,7 +70,7 @@ python app.py
 ### Sauvegarde de l'environnement
 Pour sauvegarder l'environnement de développement :
 ```
-pip freeze > requirements.txt
+pip freeze requirements.txt
 ```
 
 ### Utilisation de conda (si vous utilisez Anaconda)
