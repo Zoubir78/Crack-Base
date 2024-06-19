@@ -33,14 +33,44 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 ## Arborescence du projet
 
 - Crack-Base/
-- ├── config/
-- │ ├── config.yaml
-- │ ├── config.json
-- │ └── config.ini
-- ├── preprocessing/
-- │ ├── preprocess_data.py
-- │ └── normalize_data.py
+- ├── coco-viewer/
+- │ └── cocoviewer.py
+- ├── DB/
+- ├── export/
+- ├── logs/
+- │ ├── equipements.log
+- │ └── options_config.log
+- ├── mask2coco/
+- │ ├── mask2coco.py
+- │ ├── dir_masks.py
+- │ ├── visualize_mask2points.py
+- │ └── analysis.py
+- ├── mat2img/
+- │ └── mat2img.py
+- ├── mmdetection/
+- │ ├── configs/
+- │ └──└── my_custom/
+- │ └──└──└── my_custom_config.py
+- │ ├── tools/
+- │ └──└── train.py
+- │ ├── choix-epoch.py
+- │ └── resultat.py
+- ├── output/
+- ├── sam/
+- │ ├── annotator.py
+- │ └── categories.txt
+- ├── test/
+- ├── train/
+- ├── val/
+- ├── work_dirs/
+- │ ├── my_custom_config/
+- │ ├──├── 20240611_100830.log
+- │ ├──├── 20240611_100830.log.json
+- │ └──└── my_custom_config.py
 - ├── app.py
+- ├── annotation.py
+- ├── option-config.py
+- ├── requirements.txt
 
 ## Installation 🛠️
 Instructions pour installer les dépendances et configurer le projet.
