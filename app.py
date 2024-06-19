@@ -19,8 +19,6 @@ from io import BytesIO
 from threading import Thread
 from webbrowser import open_new
 from datetime import datetime
-#import nbformat
-#from nbconvert.preprocessors import ExecutePreprocessor
 import shutil
 from lcms import *
 from benfeld import *
@@ -34,6 +32,8 @@ from newdb import *
 #from ttkthemes import ThemedTk
 import webbrowser
 import math
+#import nbformat
+#from nbconvert.preprocessors import ExecutePreprocessor
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, QPushButton, QLabel, QComboBox, QHBoxLayout, QFileDialog, QMessageBox
 from PyQt5.QtOpenGL import QGLWidget
@@ -52,16 +52,12 @@ class CrackBase(Tk):
     # Fonction pour exécuter le script d'annotation
     def executer(self):
         chemin_annotation = os.path.join(os.path.dirname(os.path.abspath(__file__)), "annotation.py")
-        subprocess.run(["python", "annotation.py"])
-
-        
+        subprocess.run(["python", "annotation.py"])    
     
     # Fonction pour exécuter SAM
     def executer2(self):
         chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sam\\annotator.py")
         subprocess.run(["python", "sam\\annotator.py"])
-
-       
 
     # Fonction pour exécuter Options
     #def executer6(self):
@@ -1461,7 +1457,7 @@ class Frames8(Frame):
 
     def open_log_files(self):
         logging.info('Ouverture des fichiers de logs')
-        root = theme="equilux"
+        root = ttk.Window(themename="flatly")
         root.title("Logs")
         root.geometry("1000x800")
 
