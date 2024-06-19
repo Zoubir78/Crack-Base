@@ -29,8 +29,7 @@ from deepCrack import *
 from grandMare import *
 from annotation import *
 from newdb import *
-#import ttkbootstrap as ttk
-#from ttkbootstrap.constants import *
+from ttkthemes import ThemedTk
 import webbrowser
 import math
 #import nbformat
@@ -1442,7 +1441,7 @@ class Frames8(Frame):
 
     def open_log_files(self):
         logging.info('Ouverture des fichiers de logs')
-        root = ttk.Window(themename="flatly")
+        root = ThemedTk(theme="breeze")
         root.title("Logs")
         root.geometry("1000x800")
 

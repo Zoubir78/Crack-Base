@@ -9,7 +9,7 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
+        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet18')),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -30,7 +30,7 @@ model = dict(
             target_stds=[1.0, 1.0, 1.0, 1.0]),
         loss_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
-        loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+        loss_bbox=dict(type='L1Loss', loss_weight=5.0)),
     roi_head=dict(
         type='StandardRoIHead',
         bbox_roi_extractor=dict(
@@ -43,15 +43,15 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=80,
+            num_classes=24,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0.0, 0.0, 0.0, 0.0],
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=3.0),
+            loss_bbox=dict(type='L1Loss', loss_weight=5.0)),
         mask_roi_extractor=dict(
             type='SingleRoIExtractor',
             roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
@@ -115,30 +115,71 @@ model = dict(
             score_thr=0.05,
             nms=dict(type='nms', iou_threshold=0.5),
             max_per_img=100,
-            mask_thr_binary=0.5)),
-    data_preprocessor=dict(
-        type='DetDataPreprocessor',
-        mean=[123.675, 116.28, 103.53],
-        std=[58.395, 57.12, 57.375],
-        bgr_to_rgb=True,
-        pad_mask=True,
-        pad_size_divisor=32))
+            mask_thr_binary=0.5)))
 dataset_type = 'CustomCocoDataset'
 data_root = 'data/coco/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
-    dict(type='LoadImageFromFile', backend_args=None),
-    dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', scale=(1333, 800), keep_ratio=True),
-    dict(type='RandomFlip', prob=0.5),
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Albu',
+        transforms=[
+            dict(
+                type='GaussNoise',
+                var_limit=(20.0, 60.0),
+                mean=0,
+                per_channel=False,
+                p=0.9),
+            dict(
+                type='RandomBrightnessContrast',
+                brightness_limit=[-0.2, 0.2],
+                contrast_limit=[-0.25, 0.25],
+                p=1.0),
+            dict(
+                type='OneOf',
+                transforms=[
+                    dict(type='Blur', blur_limit=(3, 5), p=1.0),
+                    dict(type='MedianBlur', blur_limit=(3, 5), p=1.0)
+                ],
+                p=0.3),
+            dict(
+                type='ShiftScaleRotate',
+                shift_limit=0.1,
+                scale_limit=(-0.3, 0.8),
+                rotate_limit=10,
+                interpolation=1,
+                border_mode=0,
+                value=0,
+                p=1),
+            dict(
+                type='ImageCompression',
+                quality_lower=30,
+                quality_upper=50,
+                p=0.95)
+        ],
+        bbox_params=dict(
+            type='BboxParams',
+            format='pascal_voc',
+            label_fields=['gt_labels'],
+            min_visibility=0.04,
+            filter_lost_elements=True),
+        keymap=dict(img='image', gt_masks='masks', gt_bboxes='bboxes'),
+        update_pad_shape=False,
+        skip_img_without_anno=True),
     dict(
         type='Normalize',
         mean=[123.675, 116.28, 103.53],
         std=[58.395, 57.12, 57.375],
         to_rgb=True),
     dict(type='Pad', size_divisor=32),
-    dict(type='PackDetInputs')
+    dict(type='DefaultFormatBundle'),
+    dict(
+        type='Collect',
+        keys=['img', 'jet', 'gt_bboxes', 'gt_labels', 'gt_masks'])
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -155,17 +196,19 @@ test_pipeline = [
                 std=[58.395, 57.12, 57.375],
                 to_rgb=True),
             dict(type='Pad', size_divisor=32),
-            dict(type='ImageToTensor', keys=['img']),
-            dict(type='Collect', keys=['img'])
+            dict(type='ImageToTensor', keys=['img', 'szp']),
+            dict(type='Collect', keys=['img', 'jet'])
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
+    samples_per_gpu=1,
+    workers_per_gpu=1,
     train=dict(
-        type='CocoDataset',
-        ann_file='data/coco/annotations/instances_train2017.json',
-        img_prefix='data/coco/train2017/',
+        type='CustomCocoDataset',
+        ann_file=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/DEP/annotation_lcms_train.json',
+        img_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
@@ -181,11 +224,23 @@ data = dict(
             dict(
                 type='Collect',
                 keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
-        ]),
+        ],
+        jet_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/DEP',
+        classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
+                 'camera', 'prisme_sos_telephone', 'bouche_incendie',
+                 'reflecteur', 'prisme_issue_en_face',
+                 'indication_issue_de_secours', 'plaque_numerotee',
+                 'issue_de_secours', 'plaque_anneau', 'indication_id_sos',
+                 'issue_sos_telephone', 'panneau_signalisation', 'coffrage',
+                 'boitier_elec', 'non_definie_1', 'non_definie_2',
+                 'non_definie_3', 'non_definie_4', 'non_definie_5')),
     val=dict(
-        type='CocoDataset',
-        ann_file='data/coco/annotations/instances_val2017.json',
-        img_prefix='data/coco/val2017/',
+        type='CustomCocoDataset',
+        ann_file=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/annotation_lcms_val.json',
+        img_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -204,11 +259,23 @@ data = dict(
                     dict(type='ImageToTensor', keys=['img']),
                     dict(type='Collect', keys=['img'])
                 ])
-        ]),
+        ],
+        jet_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/DEP',
+        classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
+                 'camera', 'prisme_sos_telephone', 'bouche_incendie',
+                 'reflecteur', 'prisme_issue_en_face',
+                 'indication_issue_de_secours', 'plaque_numerotee',
+                 'issue_de_secours', 'plaque_anneau', 'indication_id_sos',
+                 'issue_sos_telephone', 'panneau_signalisation', 'coffrage',
+                 'boitier_elec', 'non_definie_1', 'non_definie_2',
+                 'non_definie_3', 'non_definie_4', 'non_definie_5')),
     test=dict(
-        type='CocoDataset',
-        ann_file='data/coco/annotations/instances_val2017.json',
-        img_prefix='data/coco/val2017/',
+        type='CustomCocoDataset',
+        ann_file=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/annotation_lcms_test.json',
+        img_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -227,7 +294,17 @@ data = dict(
                     dict(type='ImageToTensor', keys=['img']),
                     dict(type='Collect', keys=['img'])
                 ])
-        ]))
+        ],
+        jet_prefix=
+        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/DEP',
+        classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
+                 'camera', 'prisme_sos_telephone', 'bouche_incendie',
+                 'reflecteur', 'prisme_issue_en_face',
+                 'indication_issue_de_secours', 'plaque_numerotee',
+                 'issue_de_secours', 'plaque_anneau', 'indication_id_sos',
+                 'issue_sos_telephone', 'panneau_signalisation', 'coffrage',
+                 'boitier_elec', 'non_definie_1', 'non_definie_2',
+                 'non_definie_3', 'non_definie_4', 'non_definie_5')))
 evaluation = dict(metric=['bbox', 'segm'])
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
@@ -243,10 +320,42 @@ log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = '../checkpoints/mask_rcnn_r50_fpn_1x_coco_20200205-d4b0c5d6.pth'
+load_from = 'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/checkpoints/resnet152-394f9c45.pth'
 resume_from = None
 workflow = [('train', 1)]
-backend_args = None
+albu_train_transforms = [
+    dict(
+        type='GaussNoise',
+        var_limit=(20.0, 60.0),
+        mean=0,
+        per_channel=False,
+        p=0.9),
+    dict(
+        type='RandomBrightnessContrast',
+        brightness_limit=[-0.2, 0.2],
+        contrast_limit=[-0.25, 0.25],
+        p=1.0),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(type='Blur', blur_limit=(3, 5), p=1.0),
+            dict(type='MedianBlur', blur_limit=(3, 5), p=1.0)
+        ],
+        p=0.3),
+    dict(
+        type='ShiftScaleRotate',
+        shift_limit=0.1,
+        scale_limit=(-0.3, 0.8),
+        rotate_limit=10,
+        interpolation=1,
+        border_mode=0,
+        value=0,
+        p=1),
+    dict(type='ImageCompression', quality_lower=30, quality_upper=50, p=0.95)
+]
+opencv_num_threads = 0
+mp_start_method = 'fork'
+auto_scale_lr = dict(enable=False, base_batch_size=16)
 classes = ('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint', 'camera',
            'prisme_sos_telephone', 'bouche_incendie', 'reflecteur',
            'prisme_issue_en_face', 'indication_issue_de_secours',
@@ -254,63 +363,6 @@ classes = ('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint', 'camera',
            'indication_id_sos', 'issue_sos_telephone', 'panneau_signalisation',
            'coffrage', 'boitier_elec', 'non_definie_1', 'non_definie_2',
            'non_definie_3', 'non_definie_4', 'non_definie_5')
-train_dataloader = dict(
-    batch_size=2,
-    num_workers=2,
-    persistent_workers=True,
-    dataset=dict(
-        type='CustomCocoDataset',
-        data_root='data/coco/',
-        ann_file=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection/configs/my_custom/grap/train/annotation_lcms_train.json',
-        data_prefix=dict(
-            img=
-            'C:/Users/z.marouf-araibi/Desktop/mmdetection/configs/my_custom/grap/train'
-        ),
-        pipeline=[
-            dict(type='LoadImageFromFile', backend_args=None),
-            dict(type='LoadAnnotations', with_bbox=True),
-            dict(type='Resize', scale=(1333, 800), keep_ratio=True),
-            dict(type='RandomFlip', prob=0.5),
-            dict(
-                type='Normalize',
-                mean=[123.675, 116.28, 103.53],
-                std=[58.395, 57.12, 57.375],
-                to_rgb=True),
-            dict(type='Pad', size_divisor=32),
-            dict(type='PackDetInputs')
-        ],
-        backend_args=None,
-        filter_cfg=dict(filter_empty_gt=False, min_size=32),
-        classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
-                 'camera', 'prisme_sos_telephone', 'bouche_incendie',
-                 'reflecteur', 'prisme_issue_en_face',
-                 'indication_issue_de_secours', 'plaque_numerotee',
-                 'issue_de_secours', 'plaque_anneau', 'indication_id_sos',
-                 'issue_sos_telephone', 'panneau_signalisation', 'coffrage',
-                 'boitier_elec', 'non_definie_1', 'non_definie_2',
-                 'non_definie_3', 'non_definie_4', 'non_definie_5')),
-    sampler=dict(type='DefaultSampler', shuffle=True),
-    batch_sampler=None)
-optim_wrapper = dict(
-    type='OptimWrapper',
-    optimizer=dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001),
-    clip_grad=None)
-param_scheduler = [
-    dict(
-        type='LinearLR', start_factor=0.001, by_epoch=False, begin=0, end=500),
-    dict(
-        type='MultiStepLR',
-        by_epoch=True,
-        begin=0,
-        end=12,
-        milestones=[8, 11],
-        gamma=0.1)
-]
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=1)
-opencv_num_threads = 0
-mp_start_method = 'fork'
-auto_scale_lr = dict(enable=False, base_batch_size=16)
 work_dir = './work_dirs/my_custom_config'
 auto_resume = False
 gpu_ids = [0]
