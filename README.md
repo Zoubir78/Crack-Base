@@ -32,7 +32,7 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 
 ## Arborescence du projet
 
-- project/
+- Crack-Base/
 - ├── config/
 - │ ├── config.yaml
 - │ ├── config.json
@@ -40,6 +40,7 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - ├── preprocessing/
 - │ ├── preprocess_data.py
 - │ └── normalize_data.py
+- ├── app.py
 
 ## Installation 🛠️
 Instructions pour installer les dépendances et configurer le projet.
