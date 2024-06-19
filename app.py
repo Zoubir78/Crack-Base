@@ -58,12 +58,7 @@ class CrackBase(Tk):
     # Fonction pour exécuter SAM
     def executer2(self):
         chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sam\\annotator.py")
-        subprocess.run(["python", "sam\\annotator.py"])
-
-    # Fonction pour exécuter Options
-    #def executer6(self):
-    #    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "labelme\\widgets\\ClassesWidget.py")
-    #    subprocess.run(["python", "labelme\\widgets\\ClassesWidget.py"])     
+        subprocess.run(["python", "sam\\annotator.py"])     
 
     # Fonction pour exécuter npz_img
     def run_npz_img(self):
@@ -79,17 +74,6 @@ class CrackBase(Tk):
     def run_mat2img(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mat2img\\mat2img.py")
         subprocess.run(["python", "mat2img\\mat2img.py"])
-
-    # Fonction pour exécuter DLTA_AI_app
-    #def run_dlta_ai(self):
-        # Obtient le chemin absolu du dossier où se trouve le fichier actuel
-    #    base_path = os.path.dirname(os.path.abspath(__file__))
-        # Crée le chemin complet du script à exécuter
-    #    script_path = os.path.join(base_path, "..", "dlta-ai", "DLTA_AI_app", "__main__.py")
-        # Exécute le script en utilisant le chemin absolu
-    #    subprocess.run(["python", script_path])
-
-    #    messagebox.showinfo("Script exécuté", "Le script a été exécuté avec succès.")
 
     # Fonctions pour exécuter les fichiers "coco-format"
     def execute_program2(self):
