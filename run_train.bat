@@ -6,6 +6,6 @@ set "PATH=%CONDA_PATH%;%CONDA_PATH%\Scripts;%CONDA_PATH%\Library\bin;%PATH%"
 REM Activer l'environnement Conda
 call %CONDA_PATH%\Scripts\activate.bat DLTA-AI
 REM Exécuter le script Python
-python C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\tools\train.py
+python C:\Users\z.marouf-araibi\Desktop\Crack-Base\mmdetection\tools\train.py
 pause
 

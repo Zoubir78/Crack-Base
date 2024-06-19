@@ -1,0 +1,101 @@
+# dataset settings
+dataset_type = 'CocoDataset'
+data_root = 'data/coco/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+albu_train_transforms = [
+    dict(
+        type='GaussNoise',
+        var_limit=(2e1, 6e1),
+        mean=0,
+        per_channel=False,
+        p=0.9
+    ),
+    dict(
+        type='RandomBrightnessContrast',
+        brightness_limit=[-0.20, 0.20],
+        contrast_limit=[-0.25, 0.25],
+        p=1.0),
+    #dict(type='ChannelShuffle', p=0.1),
+    dict(
+        type='OneOf',
+        transforms=[
+            dict(type='Blur', blur_limit=(3, 5), p=1.0),
+            dict(type='MedianBlur', blur_limit=(3, 5), p=1.0)
+        ],
+        p=0.3),
+    dict(
+        type='ShiftScaleRotate',
+        shift_limit=0.1,
+        scale_limit=(-0.3, 0.8),
+        rotate_limit=10,
+        interpolation=1,
+        border_mode=0,
+        value=0,
+        p=1),
+    dict(type='ImageCompression', quality_lower=30, quality_upper=50, p=0.95),
+]
+
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Albu',
+        transforms=albu_train_transforms,
+        bbox_params=dict(
+            type='BboxParams',
+            format='pascal_voc',
+            label_fields=['gt_labels'],
+            min_visibility=0.04,
+            filter_lost_elements=True),
+        keymap={
+            'img': 'image',
+            'gt_masks': 'masks',
+            'gt_bboxes': 'bboxes'
+        },
+        update_pad_shape=False,
+        skip_img_without_anno=True),
+    dict(type='Resize', img_scale=(850, 1000), keep_ratio=True),
+    dict(type='Normalize', **img_norm_cfg),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'jet', 'gt_bboxes', 'gt_labels', 'gt_masks']),
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(850, 1000),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(type='Normalize', **img_norm_cfg),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img','jet']),
+            dict(type='Collect', keys=['img','jet']),
+        ])
+]
+data = dict(
+    samples_per_gpu=2,
+    workers_per_gpu=2,
+    train=dict(
+        type='RepeatDataset',
+        times=3,
+        dataset=dict(
+            type=dataset_type,
+            ann_file=data_root + 'annotations/instances_train2017.json',
+            img_prefix=data_root + 'train2017/',
+            pipeline=train_pipeline)),
+    val=dict(
+        type=dataset_type,
+        ann_file=data_root + 'annotations/instances_val2017.json',
+        img_prefix=data_root + 'val2017/',
+        pipeline=test_pipeline),
+    test=dict(
+        type=dataset_type,
+        ann_file=data_root + 'annotations/instances_val2017.json',
+        img_prefix=data_root + 'val2017/',
+        pipeline=test_pipeline))
+

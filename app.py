@@ -19,8 +19,8 @@ from io import BytesIO
 from threading import Thread
 from webbrowser import open_new
 from datetime import datetime
-import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
+#import nbformat
+#from nbconvert.preprocessors import ExecutePreprocessor
 import shutil
 from lcms import *
 from benfeld import *
@@ -31,14 +31,14 @@ from deepCrack import *
 from grandMare import *
 from annotation import *
 from newdb import *
-from ttkthemes import ThemedTk
+#from ttkthemes import ThemedTk
 import webbrowser
 import math
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, QPushButton, QLabel, QComboBox, QHBoxLayout, QFileDialog, QMessageBox
 from PyQt5.QtOpenGL import QGLWidget
-from OpenGL.GL import *
-from OpenGL.GLUT import *
+#from OpenGL.GL import *
+#from OpenGL.GLUT import *
 
 buffer = io.StringIO()
 sys.stdout = sys.stderr = buffer 
@@ -54,74 +54,14 @@ class CrackBase(Tk):
         chemin_annotation = os.path.join(os.path.dirname(os.path.abspath(__file__)), "annotation.py")
         subprocess.run(["python", "annotation.py"])
 
-        # Créer le contenu du notebook
-        notebook_content = nbformat.v4.new_notebook()
-
-        code_cell_source = """
-        import os
-        import cv2
-        from tkinter import *
-        from tkinter import ttk, messagebox
-        from tkinter import simpledialog
-        from tkinter import filedialog
-        from PIL import Image, ImageTk
-        from io import BytesIO
-        from threading import Thread
-        from webbrowser import open_new
-        from datetime import datetime
-        from backend import *
-        from backend2 import *
-        from backend3 import *
-        from annotation import *
-        os.chdir('{os.path.dirname(os.path.abspath(__file__))}')
-        exec(open('annotation.py').read())
-        """
-
-        code_cell = nbformat.v4.new_code_cell(source=code_cell_source)
-        notebook_content['cells'] = [code_cell]
-
-        # Save the notebook content to a file or use it as needed
-        with open('notebook_annotation.ipynb', 'w') as f:
-            nbformat.write(notebook_content, f, version=nbformat.NO_CONVERT)
-
-            #messagebox.showinfo("Script exécuté", "Le script d'annotation a été exécuté avec succès.")
+        
     
     # Fonction pour exécuter SAM
     def executer2(self):
         chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sam\\annotator.py")
         subprocess.run(["python", "sam\\annotator.py"])
 
-        # Créer le contenu du notebook
-        notebook_content = nbformat.v4.new_notebook()
-
-        code_cell_source = """
-        import os
-        import cv2
-        from tkinter import *
-        from tkinter import ttk, messagebox
-        from tkinter import simpledialog
-        from tkinter import filedialog
-        from PIL import Image, ImageTk
-        from io import BytesIO
-        from threading import Thread
-        from webbrowser import open_new
-        from datetime import datetime
-        from backend import *
-        from backend2 import *
-        from backend3 import *
-        from annotation import *
-        os.chdir('{os.path.dirname(os.path.abspath(__file__))}')
-        exec(open('annotation.py').read())
-        """
-
-        code_cell = nbformat.v4.new_code_cell(source=code_cell_source)
-        notebook_content['cells'] = [code_cell]
-
-        # Save the notebook content to a file or use it as needed
-        with open('notebook_annotation.ipynb', 'w') as f:
-            nbformat.write(notebook_content, f, version=nbformat.NO_CONVERT)
-
-            #messagebox.showinfo("Script exécuté", "Le script SAM a été exécuté avec succès.")
+       
 
     # Fonction pour exécuter Options
     #def executer6(self):
@@ -1521,7 +1461,7 @@ class Frames8(Frame):
 
     def open_log_files(self):
         logging.info('Ouverture des fichiers de logs')
-        root = ThemedTk(theme="equilux")
+        root = theme="equilux"
         root.title("Logs")
         root.geometry("1000x800")
 
