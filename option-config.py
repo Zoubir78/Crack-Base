@@ -8,6 +8,8 @@ from tkinter import messagebox, ttk
 import re
 import logging
 import os
+import json
+import requests
 
 # Configuration du système de log
 log_directory = "logs"
@@ -24,6 +26,32 @@ file_handler.setFormatter(formatter)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
+
+# Charger les données JSON
+def load_json(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            if not data:
+                raise ValueError("Le fichier JSON est vide")
+            return data
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Erreur de chargement du fichier JSON: {e}")
+
+file_path = r'C:\Users\z.marouf-araibi\Desktop\Crack-Base\models_menu\models_json.json'
+try:
+    models_data = load_json(file_path)
+    #print("Chargement réussi:", models_data)
+except ValueError as e:
+    #print(e)
+    messagebox.showerror("Erreur", str(e))
+    exit(1)
+
+# Vérifiez si les données ont été chargées correctement
+if not models_data:
+    #print("Le fichier JSON est vide ou contient des données non valides.")
+    messagebox.showerror("Erreur", "Le fichier JSON est vide ou contient des données non valides.")
+    exit(1)
 
 class ConfigModifierApp:
     def __init__(self, root):
@@ -42,7 +70,8 @@ class ConfigModifierApp:
 
         # Entry pour le chemin du fichier de config
         self.config_path_entry = tk.Entry(root)
-        self.config_path_entry.insert(0, r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\configs\my_custom\my_custom_config.py")
+        self.config_path_entry.insert(0, r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\mmdetection\configs\my_custom\my_custom_config.py")
+        self.config_path_entry.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
         # Frame pour afficher les options et leurs valeurs
         self.options_frame = ttk.LabelFrame(root, text="Options à modifier")
@@ -53,12 +82,34 @@ class ConfigModifierApp:
         self.reset_button.grid(row=2, column=0, padx=5, pady=5, sticky="w")
 
         # Créer un bouton pour sauvegarder les modifications
-        self.save_button = tk.Button(root, text="Sauvegarder les modifications", command=self.save_changes)
+        self.save_button = tk.Button(root, text="Sauvegarder les modifications", command=self.apply_changes)
         self.save_button.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
         # Créer un label pour afficher les messages d'état
         self.status_label = tk.Label(root, text="", fg="green")
-        self.status_label.grid(row=3, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
+        self.status_label.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="nsew")
+
+        # Ajouter une liste déroulante pour sélectionner le modèle
+        label = tk.Label(root, text="Choisir un modèle:")
+        label.grid(row=4, column=0, padx=10, pady=10, sticky="w")
+
+        model_names = [model["Model Name"] for model in models_data]
+        self.combo = ttk.Combobox(root, values=model_names)
+        self.combo.grid(row=4, column=1, padx=10, pady=10, sticky="w")
+        self.combo.current(0)  # Sélectionne le premier élément par défaut
+
+        # Ajouter une barre de progression
+        self.progress_bar = ttk.Progressbar(root, orient="horizontal", length=300, mode="determinate")
+        self.progress_bar.grid(row=5, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+
+        # Ajouter un label pour le pourcentage
+        self.percentage = tk.StringVar()
+        self.percentage_label = tk.Label(root, textvariable=self.percentage)
+        self.percentage_label.grid(row=6, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
+
+        # Ajouter un bouton pour lancer le téléchargement
+        self.download_button = tk.Button(root, text="Télécharger", command=self.download_checkpoint)
+        self.download_button.grid(row=7, column=0, columnspan=3, padx=10, pady=20, sticky="nsew")
 
         # Configurer le système de grille pour redimensionner les colonnes et les lignes
         root.columnconfigure(1, weight=1)
@@ -135,7 +186,7 @@ class ConfigModifierApp:
         backbone_label = tk.Label(self.options_frame, text="Backbone Type")
         backbone_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         backbone_var = tk.StringVar(value=self.options["backbone_type"])
-        backbone_menu = ttk.Combobox(self.options_frame, textvariable=backbone_var, values=["ResNet", "ResNet-50", "MMBNet"])
+        backbone_menu = ttk.Combobox(self.options_frame, textvariable=backbone_var, values=["ResNet", "EfficientNet", "HRNet"])
         backbone_menu.grid(row=1, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["backbone_type"] = backbone_var
 
@@ -143,33 +194,33 @@ class ConfigModifierApp:
         checkpoint_label = tk.Label(self.options_frame, text="Checkpoint")
         checkpoint_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         checkpoint_var = tk.StringVar(value=self.options["checkpoint"])
-        checkpoint_menu = ttk.Combobox(self.options_frame, textvariable=checkpoint_var, values=["torchvision://resnet18", "torchvision://resnet50", "torchvision://resnet101"])
-        checkpoint_menu.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+        checkpoint_entry = tk.Entry(self.options_frame, textvariable=checkpoint_var)
+        checkpoint_entry.grid(row=2, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["checkpoint"] = checkpoint_var
+
+        # Loss class weight
+        loss_cls_weight_label = tk.Label(self.options_frame, text="Loss Class Weight")
+        loss_cls_weight_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
+        loss_cls_weight_var = tk.DoubleVar(value=self.options["loss_cls_weight"])
+        loss_cls_weight_spinbox = tk.Spinbox(self.options_frame, from_=0.0, to=10.0, increment=0.1, textvariable=loss_cls_weight_var)
+        loss_cls_weight_spinbox.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["loss_cls_weight"] = loss_cls_weight_var
+
+        # Loss bbox weight
+        loss_bbox_weight_label = tk.Label(self.options_frame, text="Loss BBox Weight")
+        loss_bbox_weight_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+        loss_bbox_weight_var = tk.DoubleVar(value=self.options["loss_bbox_weight"])
+        loss_bbox_weight_spinbox = tk.Spinbox(self.options_frame, from_=0.0, to=10.0, increment=0.1, textvariable=loss_bbox_weight_var)
+        loss_bbox_weight_spinbox.grid(row=4, column=1, padx=5, pady=5, sticky="w")
+        self.option_vars["loss_bbox_weight"] = loss_bbox_weight_var
 
         # Max epochs
         max_epochs_label = tk.Label(self.options_frame, text="Max Epochs")
-        max_epochs_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
+        max_epochs_label.grid(row=5, column=0, padx=5, pady=5, sticky="w")
         max_epochs_var = tk.IntVar(value=self.options["max_epochs"])
-        max_epochs_scale = tk.Scale(self.options_frame, variable=max_epochs_var, from_=1, to=150, orient=tk.HORIZONTAL)
-        max_epochs_scale.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+        max_epochs_spinbox = tk.Spinbox(self.options_frame, from_=1, to=150, textvariable=max_epochs_var)
+        max_epochs_spinbox.grid(row=5, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["max_epochs"] = max_epochs_var
-
-        # Loss cls weight
-        loss_cls_label = tk.Label(self.options_frame, text="Loss Class Weight")
-        loss_cls_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
-        loss_cls_var = tk.DoubleVar(value=self.options["loss_cls_weight"])
-        loss_cls_scale = tk.Scale(self.options_frame, variable=loss_cls_var, from_=1.0, to=150.0, orient=tk.HORIZONTAL)
-        loss_cls_scale.grid(row=4, column=1, padx=5, pady=5, sticky="w")
-        self.option_vars["loss_cls_weight"] = loss_cls_var
-
-        # Loss bbox weight
-        loss_bbox_label = tk.Label(self.options_frame, text="Loss BBox Weight")
-        loss_bbox_label.grid(row=5, column=0, padx=5, pady=5, sticky="w")
-        loss_bbox_var = tk.DoubleVar(value=self.options["loss_bbox_weight"])
-        loss_bbox_scale = tk.Scale(self.options_frame, variable=loss_bbox_var, from_=1.0, to=150.0, orient=tk.HORIZONTAL)
-        loss_bbox_scale.grid(row=5, column=1, padx=5, pady=5, sticky="w")
-        self.option_vars["loss_bbox_weight"] = loss_bbox_var
 
     def save_config(self, file_path):
         try:
@@ -225,16 +276,39 @@ class ConfigModifierApp:
         logger.info("Valeurs réinitialisées par défaut.")
         logger.info(f"Valeurs réinitialisées à : {default_values}")
 
-    def save_changes(self):
-        config_path = self.config_path_entry.get()
-        self.save_config(config_path)
-        logger.info("Modifications sauvegardées par l'utilisateur.")
-        logger.info(f"Valeurs sauvegardées : {self.options}")
+    def download_checkpoint(self):
+        selected_model = self.combo.get()
+        for model in models_data:
+            if model["Model Name"] == selected_model:
+                url = model["Checkpoint_link"]
+                filename = url.split("/")[-1]
+
+                try:
+                    response = requests.get(url, stream=True)
+                    response.raise_for_status()
+
+                    total_size = int(response.headers.get('content-length', 0))
+                    block_size = 1024  # 1 Kilobyte
+                    downloaded_size = 0  # initialize counter
+
+                    with open(filename, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=block_size):
+                            if chunk:
+                                f.write(chunk)
+                                downloaded_size += len(chunk)
+                                progress_value = (downloaded_size / total_size) * 100
+                                self.progress_bar["value"] = progress_value
+                                self.percentage.set(f"{progress_value:.0f}%")
+                                self.root.update_idletasks()
+
+                    self.status_label.config(text="Téléchargement terminé.", fg="green")
+                    logger.info("Le fichier de poids a été téléchargé avec succès.")
+                except Exception as e:
+                    self.status_label.config(text=f"Erreur lors du téléchargement : {e}", fg="red")
+                    logger.error(f"Erreur lors du téléchargement du fichier de poids : {e}")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = ConfigModifierApp(root)
     root.mainloop()
-
-
-

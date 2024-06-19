@@ -32,7 +32,7 @@ model = dict(
             target_stds=[1.0, 1.0, 1.0, 1.0]),
         loss_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
-        loss_bbox=dict(type='L1Loss', loss_weight = 5.0)),
+        loss_bbox=dict(type='L1Loss', loss_weight = 2.4)),
     roi_head=dict(
         type='StandardRoIHead',
         bbox_roi_extractor=dict(
@@ -51,8 +51,8 @@ model = dict(
                 target_means=[0.0, 0.0, 0.0, 0.0],
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
-            loss_cls=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight = 3.0), # Test Loss_cls "loss_weight = 3.0"
-            loss_bbox=dict(type='L1Loss', loss_weight = 5.0)), # Test Loss_bbox "loss_weight = 5.0"
+            loss_cls=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight = 2.0), # Test Loss_cls "loss_weight = 2.0"
+            loss_bbox=dict(type='L1Loss', loss_weight = 2.4)), # Test Loss_bbox "loss_weight = 2.4"
         mask_roi_extractor=dict(
             type='SingleRoIExtractor',
             roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
@@ -271,7 +271,7 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[8, 11])
-runner = dict(type='EpochBasedRunner', max_epochs = 12)
+runner = dict(type='EpochBasedRunner', max_epochs = 68)
 checkpoint_config = dict(interval=1)
 log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
