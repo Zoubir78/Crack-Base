@@ -51,7 +51,7 @@ model = dict(
                 target_means=[0.0, 0.0, 0.0, 0.0],
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
-            loss_cls=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight = 2.0), # Test Loss_cls "loss_weight = 2.0"
+            loss_cls=dict(type='CrossEntropyLoss', use_sigmoid=False, loss_weight = 1.8), # Test Loss_cls "loss_weight = 1.8"
             loss_bbox=dict(type='L1Loss', loss_weight = 2.4)), # Test Loss_bbox "loss_weight = 2.4"
         mask_roi_extractor=dict(
             type='SingleRoIExtractor',
@@ -271,13 +271,13 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[8, 11])
-runner = dict(type='EpochBasedRunner', max_epochs = 68)
+runner = dict(type='EpochBasedRunner', max_epochs = 32)
 checkpoint_config = dict(interval=1)
 log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = 'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/checkpoints/resnet152-394f9c45.pth'
+load_from = 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/resnet152-394f9c45.pth'
 resume_from = None
 workflow = [('train', 1)]
 opencv_num_threads = 0

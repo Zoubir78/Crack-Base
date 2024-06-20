@@ -34,3 +34,9 @@ vit_b.pth
 
 # Fichiers de train
 /work_dirs/
+
+# Fichiers de checkpoints
+/mmdetection/
+checkpoints/
+resnet152-394f9c45.pth
+

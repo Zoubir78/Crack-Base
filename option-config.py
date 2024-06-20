@@ -111,6 +111,13 @@ class ConfigModifierApp:
         self.download_button = tk.Button(root, text="Télécharger", command=self.download_checkpoint)
         self.download_button.grid(row=7, column=0, columnspan=3, padx=10, pady=20, sticky="nsew")
 
+        # Ajouter une liste déroulante pour les fichiers de checkpoint
+        #checkpoint_label = tk.Label(root, text="Choisir un checkpoint:")
+        #checkpoint_label.grid(row=8, column=0, padx=10, pady=10, sticky="w")
+
+        #self.checkpoint_combo = ttk.Combobox(root, values=self.get_checkpoints())
+        #self.checkpoint_combo.grid(row=8, column=1, padx=10, pady=10, sticky="w")
+
         # Configurer le système de grille pour redimensionner les colonnes et les lignes
         root.columnconfigure(1, weight=1)
         root.rowconfigure(1, weight=1)
@@ -119,11 +126,16 @@ class ConfigModifierApp:
         self.parse_config(self.config_path_entry.get())
         logger.info("Application démarrée et fichier de configuration analysé.")
 
+    def get_checkpoints(self):
+        checkpoint_dir = r'C:\Users\z.marouf-araibi\Desktop\Crack-Base\mmdetection\checkpoints'
+        checkpoints = [f for f in os.listdir(checkpoint_dir) if f.endswith('.pth') or f.endswith('.pt')]
+        return checkpoints
+
     def parse_config(self, file_path):
         self.options = {
             "model_type": "MaskRCNN",
             "backbone_type": "ResNet",
-            "checkpoint": "torchvision://resnet18",      
+            "checkpoint": "resnet152-394f9c45.pth",      
             "loss_cls_weight": 1.0,
             "loss_bbox_weight": 1.0,
             "max_epochs": 12
@@ -141,9 +153,9 @@ class ConfigModifierApp:
             if backbone_type_match:
                 self.options["backbone_type"] = backbone_type_match.group(1)
 
-            checkpoint_match = re.search(r"init_cfg\s*=\s*dict\s*\(.*checkpoint\s*=\s*'([\w:/]+)'", content, re.DOTALL)
-            if checkpoint_match:
-                self.options["checkpoint"] = checkpoint_match.group(1)
+            load_from_match = re.search(r"load_from\s*=\s*'([\w:/\\]+)'", content, re.DOTALL)
+            if load_from_match:
+                self.options["load_from"] = load_from_match.group(1)
 
             loss_cls_weight_match = re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", content, re.DOTALL)
             if loss_cls_weight_match:
@@ -194,7 +206,7 @@ class ConfigModifierApp:
         checkpoint_label = tk.Label(self.options_frame, text="Checkpoint")
         checkpoint_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         checkpoint_var = tk.StringVar(value=self.options["checkpoint"])
-        checkpoint_entry = tk.Entry(self.options_frame, textvariable=checkpoint_var)
+        checkpoint_entry = ttk.Combobox(self.options_frame, textvariable=checkpoint_var, values=self.get_checkpoints())
         checkpoint_entry.grid(row=2, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["checkpoint"] = checkpoint_var
 
@@ -224,25 +236,28 @@ class ConfigModifierApp:
 
     def save_config(self, file_path):
         try:
+            # Mise à jour des options avec les nouvelles valeurs des variables
             for key, var in self.option_vars.items():
                 self.options[key] = var.get()
 
+            # Lecture du contenu actuel du fichier de configuration
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
 
+            # Ouverture du fichier en mode écriture pour appliquer les modifications
             with open(file_path, 'w', encoding='utf-8') as f:
                 for line in lines:
-                    if re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
+                    if re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line, re.DOTALL):
                         line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.options['model_type']}'", line)
-                    elif re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line):
+                    elif re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line, re.DOTALL):
                         line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.options['backbone_type']}'", line)
-                    elif re.search(r"init_cfg\s*=\s*dict\s*\(.*checkpoint\s*=\s*'([\w:/]+)'", line):
-                        line = re.sub(r"checkpoint\s*=\s*'[\w:/]+'", f"checkpoint = '{self.options['checkpoint']}'", line)
-                    elif re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", line):
+                    elif re.search(r"load_from\s*=\s*'[\w:/\\]+'", line, re.DOTALL):
+                        line = re.sub(r"load_from\s*=\s*'[\w:/\\]+'", f"load_from = '{self.options['checkpoint']}'", line)
+                    elif re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", line, re.DOTALL):
                         line = re.sub(r"max_epochs\s*=\s*\d+", f"max_epochs = {self.options['max_epochs']}", line)
-                    elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
+                    elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line, re.DOTALL):
                         line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_cls_weight']}", line)
-                    elif re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line):
+                    elif re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line, re.DOTALL):
                         line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_bbox_weight']}", line)
 
                     f.write(line)
@@ -255,6 +270,7 @@ class ConfigModifierApp:
             logger.error(f"Une erreur s'est produite lors de l'application des modifications : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de l'application des modifications: {e}")
 
+
     def apply_changes(self):
         config_path = self.config_path_entry.get()
         self.save_config(config_path)
@@ -263,7 +279,7 @@ class ConfigModifierApp:
         default_values = {
             "model_type": "MaskRCNN",
             "backbone_type": "ResNet",
-            "checkpoint": "torchvision://resnet18",
+            "checkpoint": "resnet152-394f9c45.pth",
             "max_epochs": 12,
             "loss_cls_weight": 1.0,
             "loss_bbox_weight": 1.0
@@ -281,7 +297,12 @@ class ConfigModifierApp:
         for model in models_data:
             if model["Model Name"] == selected_model:
                 url = model["Checkpoint_link"]
+                # Définir le répertoire de destination
+                download_dir = r'C:\Users\z.marouf-araibi\Desktop\Crack-Base\mmdetection\checkpoints'
+                # Extraire le nom du fichier à partir de l'URL
                 filename = url.split("/")[-1]
+                # Créer le chemin complet pour le fichier de destination
+                file_path = os.path.join(download_dir, filename)
 
                 try:
                     response = requests.get(url, stream=True)
@@ -291,7 +312,7 @@ class ConfigModifierApp:
                     block_size = 1024  # 1 Kilobyte
                     downloaded_size = 0  # initialize counter
 
-                    with open(filename, 'wb') as f:
+                    with open(file_path, 'wb') as f:
                         for chunk in response.iter_content(chunk_size=block_size):
                             if chunk:
                                 f.write(chunk)
@@ -306,8 +327,7 @@ class ConfigModifierApp:
                 except Exception as e:
                     self.status_label.config(text=f"Erreur lors du téléchargement : {e}", fg="red")
                     logger.error(f"Erreur lors du téléchargement du fichier de poids : {e}")
-
-
+                    
 if __name__ == "__main__":
     root = tk.Tk()
     app = ConfigModifierApp(root)
