@@ -1680,12 +1680,40 @@ class View(Frame):
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.tree.yview)
 
+        # Pagination
+        pagination_frame = Frame(control_frame)
+        pagination_frame.pack(fill=tk.X, padx=5, pady=5)
+
+        self.previous_button = ttk.Button(pagination_frame, text="Précédent", command=self.previous_page)
+        self.previous_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.page_label = ttk.Label(pagination_frame, text="Page 1")
+        self.page_label.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.next_button = ttk.Button(pagination_frame, text="Suivant", command=self.next_page)
+        self.next_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.goto_page_var = tk.StringVar()
+        self.goto_page_entry = ttk.Entry(pagination_frame, textvariable=self.goto_page_var, width=5)
+        self.goto_page_entry.pack(side=tk.LEFT, padx=5, pady=5)
+        self.goto_page_entry.bind("<Return>", self.goto_page)
+
+        self.goto_page_button = ttk.Button(pagination_frame, text="Aller à la page", command=self.goto_page)
+        self.goto_page_button.pack(side=tk.LEFT, padx=5, pady=5)
+
         # Chargement des bases de données au démarrage
         self.db_directory = "DB"
         self.load_databases()
 
         # Binding de l'événement de sélection du TreeView
         self.tree.bind("<<TreeviewSelect>>", self.on_treeview_select)
+
+        # Variables de pagination
+        self.current_page = 1
+        self.items_per_page = 20
+        self.total_items = 0
+        self.total_pages = 1
+        self.data = []  # Contient les données à afficher
 
     def load_tunnel_image(self):
         self.tunnel_image = Image.open(self.tunnel_image_path)
@@ -1724,143 +1752,59 @@ class View(Frame):
         else:  # macOS ou Linux
             subprocess.run(["open", dossier_db], shell=True)
 
-    def search_box(self, event):
-        query = self.entryvar.get().strip()
-        if len(query) > 0:
-            search_results = self.search(query)
-            if search_results:
-                self.tree.delete(*self.tree.get_children())  # Effacer le contenu actuel du tableau
-                for result in search_results:
-                    self.tree.insert("", "end", values=result)
-                self.entryvar.set("")  # Effacer l'entrée de recherche
-            else:
-                messagebox.showinfo("Aucun résultat trouvé", "Désolé, vous n'avez pas trouvé ce que vous cherchiez.")
+    def display_data(self, title, columns, data):
+        self.tree['columns'] = columns
+        for col in columns:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=100)
+        self.data = data
+        self.total_items = len(data)
+        self.total_pages = math.ceil(self.total_items / self.items_per_page)
+        self.current_page = 1
+        self.update_page_label()
+        self.show_page_data()
 
-    def search(self, query):
-        results = []
-        db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
-        for db_file in db_files:
-            db_path = os.path.join(self.db_directory, db_file)
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
+    def show_page_data(self):
+        start_index = (self.current_page - 1) * self.items_per_page
+        end_index = start_index + self.items_per_page
+        page_data = self.data[start_index:end_index]
 
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-            tables = cursor.fetchall()
-            for table in tables:
-                table_name = table[0]
+        self.tree.delete(*self.tree.get_children())
+        for row in page_data:
+            self.tree.insert('', 'end', values=row)
 
-                cursor.execute(f"PRAGMA table_info({table_name});")
-                columns = cursor.fetchall()
-                column_names = ["Base de données", "Table"] + [column[1] for column in columns]
+    def update_page_label(self):
+        self.page_label.config(text=f"Page {self.current_page}/{self.total_pages}")
 
-                for column in column_names[2:]:  # Skip the first two columns
-                    try:
-                        cursor.execute(f"SELECT * FROM {table_name} WHERE {column} LIKE ?", ('%' + query + '%',))
-                        rows = cursor.fetchall()
-                        for row in rows:
-                            # Ajout des colonnes 'Base de données' et 'Table' au début
-                            results.append((db_file, table_name) + row)
-                    except sqlite3.OperationalError as e:
-                        # Gérer les erreurs, par exemple les colonnes blob qui ne peuvent pas être recherchées avec LIKE
-                        print(f"Erreur lors de la recherche dans {db_file}.{table_name}.{column}: {e}")
+    def previous_page(self):
+        if self.current_page > 1:
+            self.current_page -= 1
+            self.update_page_label()
+            self.show_page_data()
 
-            conn.close()
-        return results
+    def next_page(self):
+        if self.current_page < self.total_pages:
+            self.current_page += 1
+            self.update_page_label()
+            self.show_page_data()
 
-    def delete_item(self):
+    def goto_page(self, event=None):
         try:
-            selected_item = self.tree.selection()[0]  # Obtenir l'index de la ligne sélectionnée dans le tableau
-            self.tree.delete(selected_item)  # Supprimer la ligne sélectionnée
-        except IndexError:
-            pass
+            page = int(self.goto_page_var.get())
+            if 1 <= page <= self.total_pages:
+                self.current_page = page
+                self.update_page_label()
+                self.show_page_data()
+            else:
+                messagebox.showwarning("Avertissement", "Numéro de page invalide.")
+        except ValueError:
+            messagebox.showwarning("Avertissement", "Veuillez saisir un numéro de page valide.")
 
     def view_all_data(self):
-        try:
-            all_data = []
-            all_columns = []
-            db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
-
-            for db_file in db_files:
-                db_path = os.path.join(self.db_directory, db_file)
-                connection = sqlite3.connect(db_path)
-                cursor = connection.cursor()
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-                tables = cursor.fetchall()
-
-                for table in tables:
-                    table_name = table[0]
-                    cursor.execute(f"SELECT * FROM {table_name}")
-                    table_data = cursor.fetchall()
-                    if table_data:
-                        if not all_columns:
-                            cursor.execute(f"PRAGMA table_info({table_name})")
-                            columns = cursor.fetchall()
-                            all_columns = ["Base de données", "Table"] + [column[1] for column in columns]
-                        for row in table_data:
-                            all_data.append((db_file, table_name) + row)
-
-                connection.close()
-
-            if all_data:
-                self.tree["columns"] = all_columns
-                self.tree.delete(*self.tree.get_children())  # Effacer les données actuelles du tableau
-
-                for col in all_columns:
-                    self.tree.heading(col, text=col)
-                    self.tree.column(col, width=100)
-
-                for row in all_data:
-                    self.tree.insert("", "end", values=row)
-            else:
-                messagebox.showinfo("Info", "Aucune donnée trouvée dans les bases de données.")
-        except sqlite3.Error as e:
-            print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des données : {e}")
-
-    def view_lcms_data(self):
-        self.view_other_table_data("lcm")
-
-    def view_other_table_data(self, table_name):
-        try:
-            all_data = []
-            all_columns = []
-            db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
-
-            for db_file in db_files:
-                db_path = os.path.join(self.db_directory, db_file)
-                connection = sqlite3.connect(db_path)
-                cursor = connection.cursor()
-                cursor.execute(f"SELECT * FROM {table_name}")
-                table_data = cursor.fetchall()
-                if table_data:
-                    if not all_columns:
-                        cursor.execute(f"PRAGMA table_info({table_name})")
-                        columns = cursor.fetchall()
-                        all_columns = ["Base de données"] + [column[1] for column in columns]
-                    for row in table_data:
-                        all_data.append((db_file,) + row)
-                connection.close()
-
-            if all_data:
-                self.tree["columns"] = all_columns
-                self.tree.delete(*self.tree.get_children())  # Effacer les données actuelles du tableau
-
-                for col in all_columns:
-                    self.tree.heading(col, text=col)
-                    self.tree.column(col, width=100)
-
-                for row in all_data:
-                    self.tree.insert("", "end", values=row)
-            else:
-                messagebox.showinfo("Info", f"Aucune donnée trouvée dans la table '{table_name}'.")
-        except sqlite3.Error as e:
-            print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des données : {e}")
-
-    def display_selected_table(self, event):
         database_name = self.database_combobox.get()
         table_name = self.table_combobox.get()
         if not database_name or not table_name:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données et une table.")
             return
 
         db_path = os.path.join(self.db_directory, database_name)
@@ -1868,23 +1812,111 @@ class View(Frame):
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
             cursor.execute(f"SELECT * FROM {table_name}")
-            rows = cursor.fetchall()
+            data = cursor.fetchall()
             columns = [description[0] for description in cursor.description]
-
-            self.tree["columns"] = columns
-            self.tree.delete(*self.tree.get_children())  # Effacer les données actuelles du tableau
-
-            for col in columns:
-                self.tree.heading(col, text=col)
-                self.tree.column(col, width=100)
-
-            for row in rows:
-                self.tree.insert("", "end", values=row)
-
             connection.close()
+            self.display_data(f"Données de la table {table_name}", columns, data)
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la récupération des données : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+
+    def view_lcms_data(self):
+        database_name = self.database_combobox.get()
+        table_name = "lcms"
+        if not database_name:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données.")
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(f"SELECT * FROM {table_name}")
+            data = cursor.fetchall()
+            columns = [description[0] for description in cursor.description]
+            connection.close()
+            self.display_data("Données LCMS", columns, data)
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données LCMS : {e}")
+
+    def view_other_table_data(self, table_name):
+        database_name = self.database_combobox.get()
+        if not database_name:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données.")
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(f"SELECT * FROM {table_name}")
+            data = cursor.fetchall()
+            columns = [description[0] for description in cursor.description]
+            connection.close()
+            self.display_data(f"Données {table_name}", columns, data)
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données {table_name} : {e}")
+
+    def display_selected_table(self, event):
+        self.view_all_data()
+
+    def delete_item(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un élément à supprimer.")
+            return
+
+        item_values = self.tree.item(selected_item, 'values')
+        item_id = item_values[0]  # Supposons que le premier champ soit l'ID
+
+        database_name = self.database_combobox.get()
+        table_name = self.table_combobox.get()
+        if not database_name or not table_name:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données et une table.")
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(f"DELETE FROM {table_name} WHERE id=?", (item_id,))
+            connection.commit()
+            connection.close()
+
+            self.view_all_data()
+            messagebox.showinfo("Info", "L'élément a été supprimé avec succès.")
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la suppression de l'élément : {e}")
+
+    def search_box(self, event):
+        search_term = self.entryvar.get().strip()
+        if not search_term:
+            messagebox.showwarning("Avertissement", "Veuillez saisir un terme de recherche.")
+            return
+
+        database_name = self.database_combobox.get()
+        table_name = self.table_combobox.get()
+        if not database_name or not table_name:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données et une table.")
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            query = f"SELECT * FROM {table_name} WHERE "
+            query += " OR ".join([f"{col} LIKE ?" for col in self.tree['columns']])
+            cursor.execute(query, [f"%{search_term}%"] * len(self.tree['columns']))
+            data = cursor.fetchall()
+            connection.close()
+
+            self.display_data(f"Résultats de recherche pour '{search_term}'", self.tree['columns'], data)
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la recherche : {e}")
 
     def on_treeview_select(self, event):
         # Récupère la ligne sélectionnée
@@ -1916,6 +1948,8 @@ class View(Frame):
         x0 = self.tunnel_photo.width() // 2
         y0 = self.tunnel_photo.height() - 15
         length = 200 
+        arrow_width = 20
+        arrow_length = 30
 
         # Ajuster l'angle en fonction du 'sens'
         if sens == 'D':  # Côté gauche de l'image
@@ -1943,12 +1977,27 @@ class View(Frame):
         else:
             return  
 
-        # Calculer le point final en fonction de l'angle ajusté
+        # Calculer les points de la flèche en fonction de l'angle ajusté
         x1 = x0 + length * math.cos(math.radians(adjusted_angle))
         y1 = y0 - length * math.sin(math.radians(adjusted_angle))  
 
+        left_wing_angle = math.radians(adjusted_angle + 150)
+        right_wing_angle = math.radians(adjusted_angle - 150)
+
+        left_wing_x = x1 + arrow_length * math.cos(left_wing_angle)
+        left_wing_y = y1 - arrow_length * math.sin(left_wing_angle)
+
+        right_wing_x = x1 + arrow_length * math.cos(right_wing_angle)
+        right_wing_y = y1 - arrow_length * math.sin(right_wing_angle)
+
         # Dessiner la flèche sur le canvas
-        self.tunnel_canvas.create_line(x0, y0, x1, y1, fill="black", width=6, arrow=tk.LAST, tags="highlight")
+        self.tunnel_canvas.create_line(x0, y0, x1, y1, fill="black", width=6, tags="highlight")
+        self.tunnel_canvas.create_polygon(
+            x1, y1,
+            left_wing_x, left_wing_y,
+            right_wing_x, right_wing_y,
+            fill="black", tags="highlight"
+        )
 
 
         # Ajouter un footer
