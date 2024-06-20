@@ -63,6 +63,8 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - │ └── mat2img.py
 #### Pré-traitement
 - ├── mmdetection/
+- │ ├── checkpoints/
+- │ └──└── mask_rcnn_r50_fpn_1x_coco.py
 - │ ├── configs/
 - │ └──└── my_custom/
 - │ └──└──└── my_custom_config.py
