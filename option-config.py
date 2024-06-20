@@ -135,7 +135,8 @@ class ConfigModifierApp:
         self.options = {
             "model_type": "MaskRCNN",
             "backbone_type": "ResNet",
-            "checkpoint": "resnet152-394f9c45.pth",      
+            "checkpoint": "resnet152-394f9c45.pth",
+            "checkpoint_dir": 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/',
             "loss_cls_weight": 1.0,
             "loss_bbox_weight": 1.0,
             "max_epochs": 12
@@ -155,7 +156,9 @@ class ConfigModifierApp:
 
             load_from_match = re.search(r"load_from\s*=\s*'([\w:/\\]+)'", content, re.DOTALL)
             if load_from_match:
-                self.options["load_from"] = load_from_match.group(1)
+                checkpoint_path = load_from_match.group(1)
+                self.options["checkpoint"] = os.path.basename(checkpoint_path)
+                self.options["checkpoint_dir"] = os.path.dirname(checkpoint_path)
 
             loss_cls_weight_match = re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", content, re.DOTALL)
             if loss_cls_weight_match:
@@ -236,15 +239,20 @@ class ConfigModifierApp:
 
     def save_config(self, file_path):
         try:
-            # Mise à jour des options avec les nouvelles valeurs des variables
+            # Mettre à jour les options avec les nouvelles valeurs des variables
             for key, var in self.option_vars.items():
                 self.options[key] = var.get()
 
-            # Lecture du contenu actuel du fichier de configuration
+            # Construire le chemin complet du checkpoint
+            checkpoint_name = self.options['checkpoint']
+            checkpoint_dir = self.options.get('checkpoint_dir', 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/')
+            full_checkpoint_path = os.path.join(checkpoint_dir, checkpoint_name)
+
+            # Lire le contenu actuel du fichier de configuration
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
 
-            # Ouverture du fichier en mode écriture pour appliquer les modifications
+            # Ouvrir le fichier en mode écriture pour appliquer les modifications
             with open(file_path, 'w', encoding='utf-8') as f:
                 for line in lines:
                     if re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line, re.DOTALL):
@@ -252,7 +260,7 @@ class ConfigModifierApp:
                     elif re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line, re.DOTALL):
                         line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.options['backbone_type']}'", line)
                     elif re.search(r"load_from\s*=\s*'[\w:/\\]+'", line, re.DOTALL):
-                        line = re.sub(r"load_from\s*=\s*'[\w:/\\]+'", f"load_from = '{self.options['checkpoint']}'", line)
+                        line = re.sub(r"load_from\s*=\s*'[\w:/\\]+'", f"load_from = '{full_checkpoint_path}'", line)
                     elif re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", line, re.DOTALL):
                         line = re.sub(r"max_epochs\s*=\s*\d+", f"max_epochs = {self.options['max_epochs']}", line)
                     elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line, re.DOTALL):
@@ -269,7 +277,6 @@ class ConfigModifierApp:
         except Exception as e:
             logger.error(f"Une erreur s'est produite lors de l'application des modifications : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de l'application des modifications: {e}")
-
 
     def apply_changes(self):
         config_path = self.config_path_entry.get()
