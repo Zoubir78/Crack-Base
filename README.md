@@ -65,6 +65,7 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - ├── mmdetection/
 - │ ├── checkpoints/
 - │ └──└── mask_rcnn_r50_fpn_1x_coco.py
+- │ └──└── resnet152-394f9c45.pth
 - │ ├── configs/
 - │ └──└── my_custom/
 - │ └──└──└── my_custom_config.py
