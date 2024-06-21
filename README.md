@@ -76,6 +76,11 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - │ └── resultat.py
 - ├── models/
 - │ └── models_json.json
+- ├── work_dirs/
+- │ ├── my_custom_config/
+- │ ├──├── 20240611_100830.log
+- │ ├──├── 20240611_100830.log.json
+- │ └──└── my_custom_config.py
 #### SAM
 - ├── output/
 - ├── sam/
@@ -85,12 +90,6 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - ├── test/
 - ├── train/
 - ├── val/
-#### work_dirs
-- ├── work_dirs/
-- │ ├── my_custom_config/
-- │ ├──├── 20240611_100830.log
-- │ ├──├── 20240611_100830.log.json
-- │ └──└── my_custom_config.py
 #### APP
 - ├── app.py
 - ├── annotation.py
