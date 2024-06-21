@@ -68,7 +68,8 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - │ └──└── resnet152-394f9c45.pth
 - │ ├── configs/
 - │ └──└── my_custom/
-- │ └──└──└── my_custom_config.py
+- │ └──└──└── my_custom_config.py (Zoubeir)
+- │ └──└──└── my_custom_config_1.py (Nathan)
 - │ ├── tools/
 - │ └──└── train.py
 - │ ├── choix-epoch.py
