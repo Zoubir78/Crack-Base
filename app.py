@@ -1960,7 +1960,7 @@ class View(Frame):
             elif angle == 60:
                 adjusted_angle = 125
             elif angle == 90:
-                adjusted_angle = 100
+                adjusted_angle = 90
             else:
                 return  
         elif sens == 'C':  # Côté droit de l'image
@@ -1971,7 +1971,7 @@ class View(Frame):
             elif angle == 60:
                 adjusted_angle = 55
             elif angle == 90:
-                adjusted_angle = 80
+                adjusted_angle = 90
             else:
                 return  
         else:
