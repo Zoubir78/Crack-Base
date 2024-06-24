@@ -209,7 +209,7 @@ class ConfigModifierApp:
         checkpoint_label = tk.Label(self.options_frame, text="Checkpoint")
         checkpoint_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         checkpoint_var = tk.StringVar(value=self.options["checkpoint"])
-        checkpoint_entry = ttk.Combobox(self.options_frame, textvariable=checkpoint_var, values=self.get_checkpoints())
+        checkpoint_entry = ttk.Combobox(self.options_frame, width=35, textvariable=checkpoint_var, values=self.get_checkpoints())
         checkpoint_entry.grid(row=2, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["checkpoint"] = checkpoint_var
 
