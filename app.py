@@ -66,8 +66,8 @@ class CrackBase(Tk):
 
     # Fonction pour exécuter fusion_img
     def run_fusion_img(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fusion-img.py")
-        subprocess.run(["python", "fusion-img.py"])
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fusion.py")
+        subprocess.run(["python", "fusion.py"])
     
     # Fonction pour exécuter mat2img
     def run_mat2img(self):
@@ -156,7 +156,7 @@ class CrackBase(Tk):
         fusion_img = tk.Menu(menu, tearoff=0)
         fusion_img.add_command(label="Exécuter mat2img", command=self.run_mat2img)
         fusion_img.add_separator()
-        fusion_img.add_command(label="Exécuter fusion-img", command=self.run_fusion_img)
+        fusion_img.add_command(label="Exécuter fusion", command=self.run_fusion_img)
         menu.add_cascade(label="Fusion-img", menu=fusion_img)
 
         help_menu = Menu(self, tearoff=0)
@@ -243,7 +243,7 @@ class CrackBase(Tk):
         self.side_button_fes.grid(row=2, column=1, pady=(4, 4), padx=6)
         self.side_button_fes.grid_remove()  # Caché initialement
 
-        self.side_button_NB1 = Button(self.sidebar, text="+", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
+        self.side_button_NB1 = Button(self.sidebar, text="+", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_cat"), font=("FontAwesome", 9, "bold"))
         self.side_button_NB1.grid(row=2, column=1, pady=(70, 0), padx=6)
         self.side_button_NB1.grid_remove()  # Caché initialement
 
@@ -261,17 +261,18 @@ class CrackBase(Tk):
                         "2d": Frames2(body, "Images 2D", "images\\image-2d.jpg"),
                         "fer apparent": Frames3(body, "Fer apparent", image_paths2, mask_paths2),
                         "fissures": Frames4(body, "Fissures", image_paths1, mask_paths1), 
-                        "sites": Frames7(body, "Sites", "images\\VT.png"),
                         "nouvelle_BDD": Frames5(body, "Nouvelle BDD", "images\\database.png"),
-                        "equipements": Frames8(body, "Equipements", "images\\detect.png"),
                         "a_propos": Frames6(body, "A propos", "images\\VT.png"),
+                        "sites": Frames7(body, "Sites", "images\\VT.png"),
+                        "equipements": Frames8(body, "Equipements", "images\\detect.png"),
+                        "nouvelle_cat": Frames9(body, "Nouvelle CAT", "images\\database.png"),
                         "view": View(body)}
 
         self.make_frame("Accueil")
         self.show_page("Accueil")  # Augmente la page d'accueil vers le haut.
         
         # Les threads sont utilisés pour charger simultanément les autres images en arrière-plan
-        for x in ("LCMS", "2d", "fer apparent", "fissures", "equipements", "sites", "nouvelle_BDD", "a_propos", "view"):
+        for x in ("LCMS", "2d", "fer apparent", "fissures", "equipements", "sites", "nouvelle_BDD", "nouvelle_cat", "a_propos", "view"):
             thread = Thread(target=self.make_frame, args=(x,)) 
             thread.start()
 
@@ -1036,106 +1037,170 @@ mask_paths1 = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "
 
 import subprocess  # Ajoutez ceci en haut de votre fichier
 
-class Frames5(Frame):
+class DatabaseManager:
+    def __init__(self, db_path="DB"):
+        self.db_path = db_path
+        self.connection = self.connect()
+
+    def connect(self):
+        connection = sqlite3.connect(self.db_path)
+        print(f"Connecté à la base de données '{self.db_path}'")
+        cursor = connection.cursor()
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS images (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                site TEXT NOT NULL,
+                tube TEXT NOT NULL,
+                sens TEXT NOT NULL,
+                hauteur INTEGER NOT NULL,
+                angle INTEGER NOT NULL,
+                nom_image TEXT NOT NULL,
+                image_json TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        ''')
+        print("Table 'images' créée avec succès.")
+
+        connection.commit()
+        return connection
+
+    def create_new_db(self, new_db_path):
+        new_connection = sqlite3.connect(new_db_path)
+        new_cursor = new_connection.cursor()
+
+        new_cursor.execute('''
+            CREATE TABLE IF NOT EXISTS images (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                site TEXT NOT NULL,
+                tube TEXT NOT NULL,
+                sens TEXT NOT NULL,
+                hauteur INTEGER NOT NULL,
+                angle INTEGER NOT NULL,
+                nom_image TEXT NOT NULL,
+                image_json TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        ''')
+        print("Table 'images' dans la nouvelle base de données créée avec succès.")
+        new_connection.commit()
+        new_connection.close()
+
+    def insert_image_data(self, db_path, data, progress_callback=None):
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            placeholders = ", ".join(["?"] * len(data))
+            columns = ", ".join(data.keys())
+            cursor.execute(f'''
+                INSERT INTO images ({columns})
+                VALUES ({placeholders})
+            ''', list(data.values()))
+            connection.commit()
+            connection.close()
+            
+            if progress_callback:
+                progress_callback()
+
+        except sqlite3.Error as e:
+            print(e)
+
+    def close(self):
+        self.connection.close()
+        print("Connexion à la base de données fermée.")
+
+class Frames5(tk.Frame):
     def __init__(self, parent, category, image_path):
-        Frame.__init__(self, parent, bg="gray")
-        image = Image.open(image_path)
+        tk.Frame.__init__(self, parent, bg="gray")
         self.category = category
+        self.db_manager = None
+
+        image = Image.open(image_path)
         self.image = ImageTk.PhotoImage(image)
-        self.canvas = Canvas(self)
-        self.canvas.pack(fill=BOTH, expand=TRUE)
-        self.canvas_image = self.canvas.create_image(10, 50, image=self.image, anchor=NW)
+        self.canvas = tk.Canvas(self)
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+        self.canvas_image = self.canvas.create_image(10, 50, image=self.image, anchor=tk.NW)
         self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(900, 180,
-                                                    text=f"Pour créer une nouvelle base de données,\ncliquez sur le boutton "
-                                                         f"'{category.lower()}' ci-dessous.\nVous-pouvez aussi configurer la nouvelle table \nen cliquant sur 'Nouvelle Table'", font=("times new roman", 12, "normal"), fill="white")
-      
-        self.entry_var = StringVar()
+                                                    text=f"Pour créer une nouvelle catégorie d'images,\n cliquez sur le bouton 'Nouvelle BDD'\n ci-dessous.\n Vous pouvez également importer vos données\n dans cette nouvelle base de données\n en cliquant sur 'Ajouter des données'.", font=("times new roman", 12, "normal"), fill="white")
+
+        self.progress = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
+        self.canvas_progress = self.canvas.create_window(900, 380, window=self.progress)
 
         button5 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=self.nouvelle_bdd)
-        button6 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=self.table_nouvelle_bdd)
-        button7 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=self.donnees_nouvelle_bdd)
+        button6 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=self.ajouter_donnees)
 
-        self.canvas_button = self.canvas.create_window(900, 300, window=button5)
-        self.canvas_button = self.canvas.create_window(900, 340, window=button6)
-        self.canvas_button = self.canvas.create_window(900, 380, window=button7)
-    
+        self.canvas_button1 = self.canvas.create_window(900, 300, window=button5)
+        self.canvas_button2 = self.canvas.create_window(900, 340, window=button6)
+
     def nouvelle_bdd(self):
-        # Fonction pour créer une nouvelle base de données
         new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
         if new_db_name:
             new_db_path = filedialog.asksaveasfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
 
             if new_db_path:
-                # Créer une connexion à la nouvelle base de données
-                new_connection = sqlite3.connect(new_db_path)
-                new_cursor = new_connection.cursor()
+                self.db_manager = DatabaseManager(new_db_path)
+                self.db_manager.create_new_db(new_db_path)
+                messagebox.showinfo("Succès", "Nouvelle base de données créée avec succès!")
 
-                # Enregistrez les modifications et fermez la connexion à la nouvelle base de données
-                new_connection.commit()
-                new_connection.close()
+    def ajouter_donnees(self):
+        if not self.db_manager:
+            messagebox.showwarning("Attention", "Veuillez d'abord créer une nouvelle base de données.")
+            return
 
-    def table_nouvelle_bdd(self):
-        # Fonction pour créer une nouvelle table dans la base de données existante
         db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+        if not db_path:
+            return
 
-        if db_path:
-            # Créer une connexion à la base de données existante
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
+        category = simpledialog.askstring("Catégorie", "Entrez la catégorie:")
+        site = simpledialog.askstring("Site", "Entrez le nom du site:")
+        tube = simpledialog.askstring("Tube", "Entrez le tube:")
+        sens = simpledialog.askstring("Sens de prise", "Entrez le sens de prise:")
+        hauteur = simpledialog.askinteger("Hauteur", "Entrez la hauteur:")
+        angle = simpledialog.askinteger("Angle", "Entrez l'angle:")
 
-            # Demander le nom de la nouvelle table
-            table_name = simpledialog.askstring("Nom de la Table", "Entrez le nom de la nouvelle table:")
+        if None in [category, site, tube, sens, hauteur, angle]:
+            messagebox.showerror("Erreur", "Tous les champs sont requis.")
+            return
 
-            if table_name:
-                # Demander les champs de la nouvelle table
-                fields = simpledialog.askstring("Champs de la Table", "Entrez les champs de la nouvelle table (séparés par des virgules):")
+        folder_path = filedialog.askdirectory(title="Sélectionner un dossier d'images")
+        if not folder_path:
+            return
 
-                if fields:
-                    # Créer la nouvelle table
-                    create_table_query = f'''
-                        CREATE TABLE IF NOT EXISTS {table_name} (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            {fields}
-                        );
-                    '''
-                    cursor.execute(create_table_query)
+        image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
+        total_files = len(image_files)
+        self.progress["maximum"] = total_files
+        self.progress["value"] = 0
 
-                    # Enregistrez les modifications et fermez la connexion à la base de données
-                    connection.commit()
-                    connection.close()
+        def update_progress():
+            self.progress["value"] += 1
+            percent = int((self.progress["value"] / total_files) * 100)
+            self.canvas.itemconfigure(self.canvas_text2, text=f"Importation en cours... {percent}%")
+            self.update_idletasks()
 
-    def donnees_nouvelle_bdd(self):
-        # Fonction pour ajouter des données à la base de données
-        db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+        for image_file in image_files:
+            image_path = os.path.join(folder_path, image_file)
+            with open(image_path, 'rb') as file:
+                image_data = file.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
 
-        if db_path:
-            # Créer une connexion à la base de données existante
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
+            data = {
+                "category": category,
+                "site": site,
+                "tube": tube,
+                "sens": sens,
+                "hauteur": hauteur,
+                "angle": angle,
+                "nom_image": image_file,
+                "image_json": json.dumps({"image": image_base64}),
+                "created_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
 
-            # Demander à l'utilisateur les données à ajouter
-            data_to_add = simpledialog.askstring("Ajouter des Données", "Entrez les données à ajouter (séparées par des virgules):")
-
-            if data_to_add:
-                # Diviser les données en une liste
-                data_list = data_to_add.split(',')
-
-                # Créer une requête d'insertion en fonction du nombre de données fournies
-                placeholders = ', '.join(['?' for _ in data_list])
-                insert_query = f'INSERT INTO votre_table ({", ".join(data_list)}) VALUES ({placeholders})'
-
-                # Demander à l'utilisateur de confirmer l'ajout
-                confirmation = messagebox.askyesno("Confirmation", f"Voulez-vous vraiment ajouter les données suivantes ?\n{data_list}")
-
-                if confirmation:
-                    # Exécuter la requête d'insertion
-                    cursor.execute(insert_query, data_list)
-
-                    # Enregistrez les modifications et fermez la connexion à la base de données
-                    connection.commit()
-                    connection.close()
-
+            self.db_manager.insert_image_data(db_path, data, update_progress)
+        
+        messagebox.showinfo("Succès", "Données ajoutées avec succès!")
 
 class Frames6(Frame):
     def __init__(self, parent, category, image_path):
@@ -1558,6 +1623,144 @@ class Frames8(Frame):
         except Exception as e:
             logging.error('Erreur lors de la lecture du fichier: %s', e)
             return f"Une erreur s'est produite : {e}"
+        
+class DbManager:
+    def __init__(self, db_path="DB"):
+        self.db_path = db_path
+        self.connection = self.connect()
+
+    def connect(self):
+        connection = sqlite3.connect(self.db_path)
+        print(f"Connecté à la base de données '{self.db_path}'")
+        return connection
+
+    def create_new_db(self, new_db_path, disorder_type):
+        new_connection = sqlite3.connect(new_db_path)
+        new_cursor = new_connection.cursor()
+
+        create_table_query = f'''
+            CREATE TABLE IF NOT EXISTS {disorder_type} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                site TEXT NOT NULL,
+                nom_image TEXT NOT NULL,
+                image_json TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        '''
+        new_cursor.execute(create_table_query)
+        print(f"Table '{disorder_type}' dans la nouvelle base de données créée avec succès.")
+        new_connection.commit()
+        new_connection.close()
+
+    def insert_image_data(self, db_path, table_name, data, progress_callback=None):
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            placeholders = ", ".join(["?"] * 5)  # 5 placeholders for category, site, nom_image, image_json, created_at
+            columns = ", ".join(data.keys())
+            cursor.execute(f'''
+                INSERT INTO {table_name} (category, site, nom_image, image_json, created_at)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (data["category"], data["site"], data["nom_image"], data["image_json"], data["created_at"]))
+            connection.commit()
+            connection.close()
+            
+            if progress_callback:
+                progress_callback()
+
+        except sqlite3.Error as e:
+            print(e)
+
+    def close(self):
+        self.connection.close()
+        print("Connexion à la base de données fermée.")
+
+class Frames9(tk.Frame):
+    def __init__(self, parent, category, image_path):
+        tk.Frame.__init__(self, parent, bg="gray")
+        self.category = category
+        self.db_manager = None
+
+        image = Image.open(image_path)
+        self.image = ImageTk.PhotoImage(image)
+        self.canvas = tk.Canvas(self)
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+        self.canvas_image = self.canvas.create_image(10, 50, image=self.image, anchor=tk.NW)
+        self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(900, 180,
+                                                    text=f"Pour créer une nouvelle catégorie de désordre,\n cliquez sur le bouton 'Nouvelle BDD/Table'\n ci-dessous.\n Vous pouvez également importer vos données\n dans cette nouvelle base de données\n en cliquant sur 'Ajouter des données'.", font=("times new roman", 12, "normal"), fill="white")
+        
+        self.progress = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
+        self.canvas_progress = self.canvas.create_window(900, 380, window=self.progress)
+
+        button5 = ttk.Button(self, text=f"Nouvelle BDD/Table", width=40, command=self.nouvelle_bdd)
+        button6 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=self.ajouter_donnees)
+
+        self.canvas_button1 = self.canvas.create_window(900, 300, window=button5)
+        self.canvas_button2 = self.canvas.create_window(900, 340, window=button6)
+
+    def nouvelle_bdd(self):
+        new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
+        if new_db_name:
+            new_db_path = filedialog.asksaveasfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+            if new_db_path:
+                self.db_manager = DbManager(new_db_path)
+                disorder_type = simpledialog.askstring("Type de Désordre", "Entrez le type de désordre:")
+                if disorder_type:
+                    self.db_manager.create_new_db(new_db_path, disorder_type.replace(" ", "_").lower())
+                    messagebox.showinfo("Succès", "Nouvelle base de données créée avec succès!")
+
+    def ajouter_donnees(self):
+        if not self.db_manager:
+            messagebox.showwarning("Attention", "Veuillez d'abord créer une nouvelle base de données.")
+            return
+
+        db_path = filedialog.askopenfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+        if not db_path:
+            return
+
+        category = simpledialog.askstring("Nouvelle Catégorie", "Entrez le nom de la nouvelle catégorie:")
+        site = simpledialog.askstring("Nouveau site", "Entrez le nom du nouveau site:")
+        disorder_type = simpledialog.askstring("Type de Désordre", "Entrez le type de désordre:")
+
+        if not category or not disorder_type:
+            messagebox.showerror("Erreur", "La catégorie et le type de désordre sont requis.")
+            return
+
+        table_name = disorder_type.replace(" ", "_").lower()
+        folder_path = filedialog.askdirectory(title="Sélectionner un dossier d'images")
+        if not folder_path:
+            return
+
+        image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
+        total_files = len(image_files)
+        self.progress["maximum"] = total_files
+        self.progress["value"] = 0
+
+        def update_progress():
+            self.progress["value"] += 1
+            percent = int((self.progress["value"] / total_files) * 100)
+            self.canvas.itemconfigure(self.canvas_text2, text=f"Importation en cours... {percent}%")
+            self.update_idletasks()
+
+        for image_file in image_files:
+            image_path = os.path.join(folder_path, image_file)
+            with open(image_path, 'rb') as file:
+                image_data = file.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
+
+            data = {
+                "category": category,
+                "site": site,
+                "nom_image": image_file,
+                "image_json": json.dumps({"image": image_base64}),
+                "created_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+            self.db_manager.insert_image_data(db_path, table_name, data, update_progress)
+        
+        messagebox.showinfo("Succès", "Données ajoutées avec succès!")
 
 #class OpenGLWidget(QGLWidget):
 #    def __init__(self, parent=None):
