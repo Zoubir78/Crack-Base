@@ -282,7 +282,7 @@ resume_from = None
 workflow = [('train', 1)]
 opencv_num_threads = 0
 mp_start_method = 'fork'
-auto_scale_lr = dict(enable=False, base_batch_size=16)
+auto_scale_lr = dict(enable=True, base_batch_size=16)
 classes = ('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint', 'camera',
            'prisme_sos_telephone', 'bouche_incendie', 'reflecteur',
            'prisme_issue_en_face', 'indication_issue_de_secours',
