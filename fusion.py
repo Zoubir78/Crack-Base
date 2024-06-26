@@ -71,7 +71,7 @@ for root, dirs, files in os.walk(chemin_extract):
     for f in files:
         print('{}{}'.format(subindent, f))
 
-for numim in range(351, 352):  # (len(os.listdir(Path1))-1)
+for numim in range(914, 915):  # (len(os.listdir(Path1))-1)
     nomfic1 = f'LcmsData_{numim+1:06d}'
     nomfic2 = f'LcmsData_{numim:06d}'
     
