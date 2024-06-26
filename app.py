@@ -79,13 +79,13 @@ class CrackBase(Tk):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\mask2coco.py")
         subprocess.run(["python", "mask2coco\\mask2coco.py"])
 
-    def execute_program3(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\visualize_mask2points.py")
-        subprocess.run(["python", "mask2coco\\visualize_mask2points.py"])
+    #def execute_program3(self):
+    #    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\visualize_mask2points.py")
+    #    subprocess.run(["python", "mask2coco\\visualize_mask2points.py"])
 
-    def execute_program4(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\analysis.py")
-        subprocess.run(["python", "mask2coco\\analysis.py"])
+    #def execute_program4(self):
+    #    chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\analysis.py")
+    #    subprocess.run(["python", "mask2coco\\analysis.py"])
 
     def execute_program5(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mask2coco\\dir_masks.py")
@@ -147,17 +147,21 @@ class CrackBase(Tk):
         file.add_command(label="Fermer", command=self.destroy)
         menu.add_cascade(label="File", menu=file)
 
-        npz_img = Menu(menu, tearoff=0) 
-        npz_img = tk.Menu(menu, tearoff=0)
-        npz_img.add_command(label="Exécuter", command=self.run_npz_img)
-        menu.add_cascade(label="Npz-png", menu=npz_img)
+        convert = Menu(menu, tearoff=0) 
+        convert = tk.Menu(menu, tearoff=0)
+        convert.add_command(label="Mask2COCO", command=self.execute_program2)
+        convert.add_separator()
+        convert.add_command(label="Copie les masques", command=self.execute_program5)
+        convert.add_separator()
+        convert.add_command(label="Npz2png", command=self.run_npz_img)
+        menu.add_cascade(label="Converter", menu=convert)
 
         fusion_img = Menu(menu, tearoff=0) 
         fusion_img = tk.Menu(menu, tearoff=0)
-        fusion_img.add_command(label="Exécuter mat2img", command=self.run_mat2img)
+        fusion_img.add_command(label="fusion capteurs", command=self.run_fusion_img)
         fusion_img.add_separator()
-        fusion_img.add_command(label="Exécuter fusion", command=self.run_fusion_img)
-        menu.add_cascade(label="Fusion-img", menu=fusion_img)
+        fusion_img.add_command(label="mat2img", command=self.run_mat2img)
+        menu.add_cascade(label="Fusion", menu=fusion_img)
 
         help_menu = Menu(self, tearoff=0)
         contact = Menu(self, tearoff=0)
@@ -177,19 +181,6 @@ class CrackBase(Tk):
         sam = tk.Menu(menu, tearoff=0)
         sam.add_command(label="Exécuter SAM", command=self.executer2)
         menu.add_cascade(label="SAM", menu=sam)
-
-        #options = Menu(menu, tearoff=0) 
-        #menu.add_cascade(label="Options", command=self.executer6)
-
-        coco = Menu(menu, tearoff=0) 
-        coco.add_command(label="Copie les masques", command=self.execute_program5)
-        coco.add_separator()
-        coco.add_command(label="Convertir en COCO", command=self.execute_program2)
-        coco.add_separator()
-        coco.add_command(label="Visualiser les masques", command=self.execute_program3)
-        coco.add_separator()
-        coco.add_command(label="Analyser", command=self.execute_program4)
-        menu.add_cascade(label="COCO", menu=coco)
 
         contact.add_command(label="Github", command=lambda: open_new("https://github.com/Zoubir78/Crack-Base/tree/master"))
         contact.add_separator()
