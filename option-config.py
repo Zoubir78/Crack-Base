@@ -193,7 +193,8 @@ class ConfigModifierApp:
         model_label = tk.Label(self.options_frame, text="Model Type")
         model_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         model_var = tk.StringVar(value=self.options["model_type"])
-        model_menu = ttk.Combobox(self.options_frame, textvariable=model_var, values=["MaskRCNN", "cascade_MaskRCNN", "FasterRCNN"])
+        model_names = [model["Model Name"] for model in models_data]  # Obtenez les noms de modèles depuis models_data
+        model_menu = ttk.Combobox(self.options_frame, textvariable=model_var, values=model_names)
         model_menu.grid(row=0, column=1, padx=5, pady=5, sticky="w")
         self.option_vars["model_type"] = model_var
 
@@ -244,7 +245,7 @@ class ConfigModifierApp:
                 self.options[key] = var.get()
 
             # Construire le chemin complet du checkpoint
-            checkpoint_name = self.options['checkpoint']
+            checkpoint_name = self.options["checkpoint"]
             checkpoint_dir = self.options.get('checkpoint_dir', 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/')
             full_checkpoint_path = os.path.join(checkpoint_dir, checkpoint_name)
 

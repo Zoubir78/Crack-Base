@@ -227,7 +227,7 @@
     {
         "id": 15,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "R-50-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "4.4",
@@ -242,7 +242,7 @@
     {
         "id": 16,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "R-50-FPN (FP16)",
         "Lr schd": "1x",
         "Memory (GB)": "3.6",
@@ -257,7 +257,7 @@
     {
         "id": 17,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "R-50-FPN",
         "Lr schd": "2x",
         "Memory (GB)": "-",
@@ -272,7 +272,7 @@
     {
         "id": 18,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "R-101-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "6.4",
@@ -287,7 +287,7 @@
     {
         "id": 19,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "R-101-FPN",
         "Lr schd": "2x",
         "Memory (GB)": "-",
@@ -302,7 +302,7 @@
     {
         "id": 20,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "X-101-32x4d-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "7.6",
@@ -317,7 +317,7 @@
     {
         "id": 21,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "X-101-32x4d-FPN",
         "Lr schd": "2x",
         "Memory (GB)": "-",
@@ -332,7 +332,7 @@
     {
         "id": 22,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "X-101-64x4d-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "10.7",
@@ -347,7 +347,7 @@
     {
         "id": 23,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "X-101-64x4d-FPN",
         "Lr schd": "2x",
         "Memory (GB)": "-",
@@ -362,7 +362,7 @@
     {
         "id": 24,
         "Model": "Mask R-CNN",
-        "Model Name": "Mask R-CNN",
+        "Model Name": "MaskRCNN",
         "Backbone": "X-101-32x8d-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "10.6",
@@ -377,7 +377,7 @@
     {
         "id": 25,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "R-50-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "6.0",
@@ -392,7 +392,7 @@
     {
         "id": 26,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "R-50-FPN",
         "Lr schd": "20e",
         "Memory (GB)": "-",
@@ -407,7 +407,7 @@
     {
         "id": 27,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "R-101-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "7.9",
@@ -422,7 +422,7 @@
     {
         "id": 28,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "R-101-FPN",
         "Lr schd": "20e",
         "Memory (GB)": "-",
@@ -437,7 +437,7 @@
     {
         "id": 29,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "X-101-32x4d-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "9.2",
@@ -452,7 +452,7 @@
     {
         "id": 30,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "X-101-32x4d-FPN",
         "Lr schd": "20e",
         "Memory (GB)": "9.2",
@@ -467,7 +467,7 @@
     {
         "id": 31,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "X-101-64x4d-FPN",
         "Lr schd": "1x",
         "Memory (GB)": "12.2",
@@ -482,7 +482,7 @@
     {
         "id": 32,
         "Model": "Cascade Mask R-CNN",
-        "Model Name": "Cascade Mask R-CNN",
+        "Model Name": "Cascade_MaskRCNN",
         "Backbone": "X-101-64x4d-FPN",
         "Lr schd": "20e",
         "Memory (GB)": "12.2",
