@@ -20,8 +20,8 @@ def Corel(im1, im2):
     Image2 = im2 * f
 
     # Calcul de la corrélation dans Fourier
-    I1 = fft2(Image1)
-    I2 = np.conj(fft2(Image2))
+    I1 = fft2(im1)
+    I2 = np.conj(fft2(im2))
     R = (I1 * I2) / np.abs(I1 * I2)
     correl = np.real(ifft2(R))
 
@@ -71,7 +71,7 @@ for root, dirs, files in os.walk(chemin_extract):
     for f in files:
         print('{}{}'.format(subindent, f))
 
-for numim in range(26, 27):  # (len(os.listdir(Path1))-1)
+for numim in range(8, 9):  # (len(os.listdir(Path1))-1)
     nomfic1 = f'LcmsData_{numim+1:06d}'
     nomfic2 = f'LcmsData_{numim:06d}'
     
