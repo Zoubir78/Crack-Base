@@ -2,7 +2,7 @@
     {
         "id": 0,
         "Model": "YOLOv10",
-        "Model Name": "YOLOv10x-seg",
+        "Model Name": "YOLOv10b",
         "Backbone": "-",
         "Lr schd": "-",
         "Memory (GB)": "-",
@@ -10,8 +10,8 @@
         "box AP": "60.0",
         "mask AP": "49.5",
         "Config": "-",
-        "Checkpoint_link": "https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov10x-seg.pt",
-        "Checkpoint": "mmdetection/checkpoints/yolov10x-seg.pt",
+        "Checkpoint_link": "https://github.com/THU-MIG/yolov10/releases/download/v1.1/yolov10b.pt",
+        "Checkpoint": "mmdetection/checkpoints/yolov10b.pt",
         "Checkpoint Size (MB)": 150.0
     },
     {

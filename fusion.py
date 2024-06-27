@@ -71,7 +71,7 @@ for root, dirs, files in os.walk(chemin_extract):
     for f in files:
         print('{}{}'.format(subindent, f))
 
-for numim in range(914, 915):  # (len(os.listdir(Path1))-1)
+for numim in range(26, 27):  # (len(os.listdir(Path1))-1)
     nomfic1 = f'LcmsData_{numim+1:06d}'
     nomfic2 = f'LcmsData_{numim:06d}'
     
@@ -113,6 +113,7 @@ for numim in range(914, 915):  # (len(os.listdir(Path1))-1)
     
     # Calcul de la corrélation par FFT
     l, c, r = Corel(sampleB1, sampleA2)
+    print(l, c, r)
     
     # Affichage des données de chaque capteur
     fig, axs = plt.subplots(1, 2, num=20)
@@ -127,15 +128,17 @@ for numim in range(914, 915):  # (len(os.listdir(Path1))-1)
     plt.show()
 
     # Création d'une image blanche
-    Finalimage = 255 * np.ones((nc + 2 * c, 2 * nr))
-    Finalimage2 = 255 * np.ones((nc + 2 * c, 2 * nr))
+    Finalimage = 255 * np.ones((nc + 2 * abs(c), 2 * nr))  # Utilisation de abs(c)
+    Finalimage2 = 255 * np.ones((nc + 2 * abs(c), 2 * nr))  # Utilisation de abs(c)
+    print(Finalimage.shape)
+    print(Finalimage2.shape)
 
     # Remplissage de l'image blanche avec les données des deux capteurs
-    Finalimage[c:c+nc, nr:2*nr] = B1.T
-    Finalimage[2*c:2*c+nc, s+l:s+l+nr] = A2_flip.T
+    Finalimage[abs(c):abs(c)+nc, nr:2*nr] = B1.T
+    Finalimage[2*abs(c):2*abs(c)+nc, s+l:s+l+nr] = A2_flip.T
 
-    Finalimage2[2*c:2*c+nc, s+l:s+l+nr] = A2_flip.T
-    Finalimage2[c:c+nc, nr:2*nr] = B1.T
+    Finalimage2[2*abs(c):2*abs(c)+nc, s+l:s+l+nr] = A2_flip.T
+    Finalimage2[abs(c):abs(c)+nc, nr:2*nr] = B1.T
 
     # Fusion des deux images en prenant le maximum
     final = np.maximum(Finalimage2, Finalimage)
