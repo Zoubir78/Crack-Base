@@ -35,57 +35,57 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - Crack-Base/
 #### coco-viewer
 - ├── coco-viewer/
-- │ └── cocoviewer.py
+-   └── cocoviewer.py
 #### Databases
 - ├── DB/
-- │ ├── deepCrack.db
-- │ ├── grandMare.db
-- │ ├── lcms_database.db
-- │ └── rdg.db
+-   ├── deepCrack.db
+-   ├── grandMare.db
+-   ├── lcms_database.db
+-   └── rdg.db
 #### Export
 - ├── export/
-- │ ├── depth_data.json
-- │ ├── images_data.json
-- │ ├── images_data_deep.json
-- │ └── images_data_rdg.json
+-   ├── depth_data.json
+-   ├── images_data.json
+-   ├── images_data_deep.json
+-   └── images_data_rdg.json
 #### Logs
 - ├── logs/
-- │ ├── equipements.log
-- │ └── options_config.log
+-   ├── equipements.log
+-   └── options_config.log
 #### mask2coco
 - ├── mask2coco/
-- │ ├── mask2coco.py
-- │ ├── dir_masks.py
-- │ ├── visualize_mask2points.py
-- │ └── analysis.py
+-   ├── mask2coco.py
+-   ├── dir_masks.py
+-   ├── visualize_mask2points.py
+-   └── analysis.py
 #### mat2img
 - ├── mat2img/
-- │ └── mat2img.py
+-   └── mat2img.py
 #### Pré-traitement
 - ├── mmdetection/
-- │ ├── checkpoints/
-- │ └──└── mask_rcnn_r50_fpn_1x_coco.py
-- │ └──└── resnet152-394f9c45.pth
-- │ ├── configs/
-- │ └──└── my_custom/
-- │ └──└──└── my_custom_config.py (Zoubeir)
-- │ └──└──└── my_custom_config_1.py (Nathan)
-- │ ├── tools/
-- │ └──└── train.py
-- │ ├── choix-epoch.py
-- │ └── resultat.py
+-   ├── checkpoints/
+-      ├── mask_rcnn_r50_fpn_1x_coco.py
+-      └── resnet152-394f9c45.pth
+-   ├── configs/
+-      └── my_custom/
+-         ├── my_custom_config.py (Zoubeir)
+-         └── my_custom_config_1.py (Nathan)
+-   ├── tools/
+-      └── train.py
+-   ├── choix-epoch.py
+-   └── resultat.py
 - ├── models/
-- │ └── models_json.json
+-   └── models_json.json
 - ├── work_dirs/
-- │ ├── my_custom_config/
-- │ ├──├── 20240611_100830.log
-- │ ├──├── 20240611_100830.log.json
-- │ └──└── my_custom_config.py
+-   ├── my_custom_config/
+-      ├── 20240611_100830.log
+-      ├── 20240611_100830.log.json
+-      └── my_custom_config.py
 #### SAM
 - ├── output/
 - ├── sam/
-- │ ├── annotator.py
-- │ └── categories.txt
+-   ├── annotator.py
+-   └── categories.txt
 #### Datasets
 - ├── test/
 - ├── train/
