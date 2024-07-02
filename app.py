@@ -1818,12 +1818,12 @@ class View(Frame):
         button_pair2 = Frame(button_frame)
         button_pair2.pack(fill=tk.X)
         ttk.Button(button_pair2, text="Données LCMS", width=40, command=self.view_lcms_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_pair2, text="Données Fers apparents", width=40, command=lambda: self.view_fers_apparents_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair2, text="Données Fers apparents", width=40, command=self.view_fers_apparents_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
 
         # Cadre pour la troisième paire de boutons
         button_pair3 = Frame(button_frame)
         button_pair3.pack(fill=tk.X)
-        ttk.Button(button_pair3, text="Données Fissures", width=40, command=lambda: self.view_fissures_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair3, text="Données Fissures", width=40, command=self.view_fissures_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
         ttk.Button(button_pair3, text="Supprimer", width=40, command=self.delete_item).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
 
         # Cadre pour l'entrée de recherche et le bouton de recherche
