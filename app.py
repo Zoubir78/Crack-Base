@@ -1778,11 +1778,20 @@ class View(Frame):
         self.image_frame = Frame(main_frame)
         self.image_frame.pack(side=tk.LEFT, anchor=tk.NW, padx=5, pady=5)
 
-        # Chargement de l'image du tunnel
-        self.tunnel_image_path = 'images/tunnel.png'
+        # Dictionnaire pour les images du tunnel
+        self.tunnel_images = {
+            '00': 'images/tunnel.png',
+            '0C': 'images/tunnel-0C.png',
+            '0D': 'images/tunnel-0D.png',
+            '30C': 'images/tunnel-30C.png',
+            '30D': 'images/tunnel-30D.png',
+            '60C': 'images/tunnel-60C.png',
+            '60D': 'images/tunnel-60D.png',
+            '90C': 'images/tunnel-90C.png',
+            '90D': 'images/tunnel-90D.png'
+        }
         self.tunnel_canvas = Canvas(self.image_frame, width=500, height=350)
         self.tunnel_canvas.pack()
-        self.load_tunnel_image()
 
         # Cadre pour les contrôles (boutons, champ de recherche)
         control_frame = Frame(main_frame)
@@ -1893,8 +1902,11 @@ class View(Frame):
         self.total_pages = 1
         self.data = []  # Contient les données à afficher
 
-    def load_tunnel_image(self):
-        self.tunnel_image = Image.open(self.tunnel_image_path)
+        # Charger l'image initiale
+        self.load_tunnel_image(self.tunnel_images['00'])
+
+    def load_tunnel_image(self, image_path):
+        self.tunnel_image = Image.open(image_path)
         self.tunnel_photo = ImageTk.PhotoImage(self.tunnel_image)
         self.tunnel_canvas.create_image(0, 0, anchor=tk.NW, image=self.tunnel_photo)
 
@@ -2158,85 +2170,21 @@ class View(Frame):
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la recherche : {e}")
 
     def on_treeview_select(self, event):
-        # Récupère la ligne sélectionnée
-        selected_item = self.tree.selection()
-        if not selected_item:
-            return
+        selected_item = self.tree.focus()
+        values = self.tree.item(selected_item, "values")
+        if values:
+            # Supposons que les colonnes 'sens' et 'angle' sont respectivement à l'index 4 et 6
+            sens_index = 4
+            angle_index = 6
 
-        item = self.tree.item(selected_item)
-        values = item['values']
+            if len(values) > max(sens_index, angle_index):
+                sens = values[sens_index]
+                angle = values[angle_index]
 
-        # Trouver les indices des colonnes 'sens' et 'angle' 
-        columns = self.tree["columns"]
-        try:
-            sens_index = columns.index('sens')
-            angle_index = columns.index('angle')
-        except ValueError:
-            return
-
-        sens = values[sens_index]
-        angle = values[angle_index]
-
-        self.highlight_tunnel_section(sens, angle)
-
-    def highlight_tunnel_section(self, sens, angle):
-        # Effacer tous les highlights précédents  
-        self.tunnel_canvas.delete("highlight")
-
-        # En bas au centre de l'image
-        x0 = self.tunnel_photo.width() // 2
-        y0 = self.tunnel_photo.height() - 15
-        length = 200 
-        arrow_width = 20
-        arrow_length = 30
-
-        # Ajuster l'angle en fonction du 'sens'
-        if sens == 'D':  # Côté gauche de l'image
-            if angle == 0:
-                adjusted_angle = 180
-            elif angle == 30:
-                adjusted_angle = 150
-            elif angle == 60:
-                adjusted_angle = 125
-            elif angle == 90:
-                adjusted_angle = 90
-            else:
-                return  
-        elif sens == 'C':  # Côté droit de l'image
-            if angle == 0:
-                adjusted_angle = 0
-            elif angle == 30:
-                adjusted_angle = 30
-            elif angle == 60:
-                adjusted_angle = 55
-            elif angle == 90:
-                adjusted_angle = 90
-            else:
-                return  
-        else:
-            return  
-
-        # Calculer les points de la flèche en fonction de l'angle ajusté
-        x1 = x0 + length * math.cos(math.radians(adjusted_angle))
-        y1 = y0 - length * math.sin(math.radians(adjusted_angle))  
-
-        left_wing_angle = math.radians(adjusted_angle + 150)
-        right_wing_angle = math.radians(adjusted_angle - 150)
-
-        left_wing_x = x1 + arrow_length * math.cos(left_wing_angle)
-        left_wing_y = y1 - arrow_length * math.sin(left_wing_angle)
-
-        right_wing_x = x1 + arrow_length * math.cos(right_wing_angle)
-        right_wing_y = y1 - arrow_length * math.sin(right_wing_angle)
-
-        # Dessiner la flèche sur le canvas
-        self.tunnel_canvas.create_line(x0, y0, x1, y1, fill="black", width=6, tags="highlight")
-        self.tunnel_canvas.create_polygon(
-            x1, y1,
-            left_wing_x, left_wing_y,
-            right_wing_x, right_wing_y,
-            fill="black", tags="highlight"
-        )
+                # Générer la clé pour chercher l'image correspondante
+                image_key = f"{angle}{sens}"
+                image_path = self.tunnel_images.get(image_key, self.tunnel_images['00'])
+                self.load_tunnel_image(image_path)
 
 
         # Ajouter un footer
