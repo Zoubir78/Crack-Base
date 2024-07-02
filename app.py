@@ -1818,12 +1818,12 @@ class View(Frame):
         button_pair2 = Frame(button_frame)
         button_pair2.pack(fill=tk.X)
         ttk.Button(button_pair2, text="Données LCMS", width=40, command=self.view_lcms_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_pair2, text="Données Fers apparents", width=40, command=lambda: self.view_other_table_data("fer_apparents")).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair2, text="Données Fers apparents", width=40, command=lambda: self.view_fers_apparents_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
 
         # Cadre pour la troisième paire de boutons
         button_pair3 = Frame(button_frame)
         button_pair3.pack(fill=tk.X)
-        ttk.Button(button_pair3, text="Données Fissures", width=40, command=lambda: self.view_other_table_data("fissures")).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair3, text="Données Fissures", width=40, command=lambda: self.view_fissures_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
         ttk.Button(button_pair3, text="Supprimer", width=40, command=self.delete_item).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
 
         # Cadre pour l'entrée de recherche et le bouton de recherche
@@ -2016,7 +2016,7 @@ class View(Frame):
 
     def view_lcms_data(self):
         database_name = self.database_combobox.get()
-        table_name = "lcms"
+        table_names = ["images", "profondeur"]  # Liste des tables à afficher
         if not database_name:
             messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données.")
             return
@@ -2025,17 +2025,21 @@ class View(Frame):
         try:
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM {table_name}")
-            data = cursor.fetchall()
-            columns = [description[0] for description in cursor.description]
+            
+            for table_name in table_names:
+                cursor.execute(f"SELECT * FROM {table_name}")
+                data = cursor.fetchall()
+                columns = [description[0] for description in cursor.description]
+                self.display_data(f"Données LCMS - {table_name}", columns, data)
+            
             connection.close()
-            self.display_data("Données LCMS", columns, data)
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données LCMS : {e}")
 
-    def view_other_table_data(self, table_name):
+    def view_fers_apparents_data(self):
         database_name = self.database_combobox.get()
+        table_names = ["images_rdg", "images_benfeld", "images_codebrim", "images_ufr"]  # Liste des tables à afficher
         if not database_name:
             messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données.")
             return
@@ -2044,14 +2048,40 @@ class View(Frame):
         try:
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM {table_name}")
-            data = cursor.fetchall()
-            columns = [description[0] for description in cursor.description]
+            
+            for table_name in table_names:
+                cursor.execute(f"SELECT * FROM {table_name}")
+                data = cursor.fetchall()
+                columns = [description[0] for description in cursor.description]
+                self.display_data(f"Données Fers apparents - {table_name}", columns, data)
+            
             connection.close()
-            self.display_data(f"Données {table_name}", columns, data)
         except sqlite3.Error as e:
             print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données {table_name} : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données Fers apparents : {e}")
+
+    def view_fissures_data(self):
+        database_name = self.database_combobox.get()
+        table_names = ["images_deep", "images_grand"]  # Liste des tables à afficher
+        if not database_name:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données.")
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            
+            for table_name in table_names:
+                cursor.execute(f"SELECT * FROM {table_name}")
+                data = cursor.fetchall()
+                columns = [description[0] for description in cursor.description]
+                self.display_data(f"Données Fissures - {table_name}", columns, data)
+            
+            connection.close()
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données Fissures : {e}")
 
     def display_selected_table(self, event):
         self.view_all_data()
@@ -2101,9 +2131,40 @@ class View(Frame):
         try:
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
-            query = f"SELECT * FROM {table_name} WHERE "
-            query += " OR ".join([f"{col} LIKE ?" for col in self.tree['columns']])
-            cursor.execute(query, [f"%{search_term}%"] * len(self.tree['columns']))
+
+            # Parsing the search term
+            if '=' in search_term:
+                column, value = search_term.split('=', 1)
+                column = column.strip()
+                value = value.strip()
+                
+                # Handle specific cases for 'sens' and 'angle'
+                if column.lower() == 'sens':
+                    query = f"SELECT * FROM {table_name} WHERE {column} = ?"
+                    params = (value,)
+                elif column.lower() == 'angle':
+                    try:
+                        angle_value = int(value)
+                        if 0 <= angle_value <= 90:
+                            query = f"SELECT * FROM {table_name} WHERE {column} = ?"
+                            params = (angle_value,)
+                        else:
+                            messagebox.showwarning("Avertissement", "L'angle doit être compris entre 0 et 90.")
+                            connection.close()
+                            return
+                    except ValueError:
+                        messagebox.showwarning("Avertissement", "L'angle doit être un nombre entier.")
+                        connection.close()
+                        return
+                else:
+                    query = f"SELECT * FROM {table_name} WHERE {column} LIKE ?"
+                    params = (f"%{value}%",)
+            else:
+                # General search for all columns if no specific column is mentioned
+                query = f"SELECT * FROM {table_name} WHERE " + " OR ".join([f"{col} LIKE ?" for col in self.tree['columns']])
+                params = [f"%{search_term}%"] * len(self.tree['columns'])
+
+            cursor.execute(query, params)
             data = cursor.fetchall()
             connection.close()
 
