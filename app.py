@@ -1547,31 +1547,15 @@ class Frames8(Frame):
 
     #def run_cocoviewer(self):
     #    logging.info('Exécution de COCO Viewer')
-    #    images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
-    #    if not images_dir:
-    #        logging.warning('Aucun répertoire d\'images sélectionné')
-    #        return
-    #    annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
-    #    if not annotations_file:
-    #        logging.warning('Aucun fichier d\'annotations sélectionné')
-    #        return
     #    chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
-    #    logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s', images_dir, annotations_file)
-    #    subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
+    #    logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s')
+    #    subprocess.run(["python", chemin_script]) 
 
     def run_cocoviewer(self):
         logging.info('Exécution de COCO Viewer')
-        images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
-        if not images_dir:
-            logging.warning('Aucun répertoire d\'images sélectionné')
-            return
-        annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
-        if not annotations_file:
-            logging.warning('Aucun fichier d\'annotations sélectionné')
-            return
         chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "coco-view.py")
-        logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s', images_dir, annotations_file)
-        subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
+        logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s')
+        subprocess.run(["python", chemin_script]) 
 
     def executer3(self):
         chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
