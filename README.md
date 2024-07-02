@@ -2,7 +2,7 @@
 
 ## À propos du projet 🚀
 
-![carck-base](https://github.com/Zoubir78/Crack-Base/blob/master/carck-base.png)
+![carck-base](https://github.com/Zoubir78/Crack-Base/blob/master/crack-base.png)
 
 Cette solution a été spécialement élaborée pour répondre aux exigences uniques du laboratoire ENDSUM. Toutefois, il est important de noter qu'aucun modèle ne peut s'adapter parfaitement à tous les projets étant donné la diversité des besoins. C'est pourquoi nous restons ouverts à l'évolution et à l'ajout de fonctionnalités supplémentaires pour mieux répondre à vos besoins spécifiques dans un futur proche.
 
