@@ -30,7 +30,7 @@ model = dict(
             target_stds=[1.0, 1.0, 1.0, 1.0]),
         loss_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
-        loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+        loss_bbox=dict(type='L1Loss', loss_weight=1.5)),
     roi_head=dict(
         type='StandardRoIHead',
         bbox_roi_extractor=dict(
@@ -50,8 +50,8 @@ model = dict(
                 target_stds=[0.1, 0.1, 0.2, 0.2]),
             reg_class_agnostic=False,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.4),
+            loss_bbox=dict(type='L1Loss', loss_weight=1.5)),
         mask_roi_extractor=dict(
             type='SingleRoIExtractor',
             roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
@@ -206,9 +206,9 @@ data = dict(
     train=dict(
         type='CustomCocoDataset',
         ann_file=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/DEP/annotation_lcms_train.json',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train/DEP/annotation_lcms_train.json',
         img_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
@@ -226,7 +226,7 @@ data = dict(
                 keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
         ],
         jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/DEP',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -238,9 +238,9 @@ data = dict(
     val=dict(
         type='CustomCocoDataset',
         ann_file=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/annotation_lcms_val.json',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/val/annotation_lcms_val.json',
         img_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/val/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -261,7 +261,7 @@ data = dict(
                 ])
         ],
         jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/val/DEP',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/val/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -273,9 +273,9 @@ data = dict(
     test=dict(
         type='CustomCocoDataset',
         ann_file=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/annotation_lcms_test.json',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/test/annotation_lcms_test.json',
         img_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/test/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -296,7 +296,7 @@ data = dict(
                 ])
         ],
         jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/test/DEP',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/test/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -320,7 +320,7 @@ log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = 'C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/checkpoints/resnet152-394f9c45.pth'
+load_from = 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/resnet152-394f9c45.pth'
 resume_from = None
 workflow = [('train', 1)]
 albu_train_transforms = [

@@ -70,7 +70,7 @@ class ConfigModifierApp:
 
         # Entry pour le chemin du fichier de config
         self.config_path_entry = tk.Entry(root)
-        self.config_path_entry.insert(0, r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\mmdetection\configs\my_custom\my_custom_config.py")
+        self.config_path_entry.insert(0, r"C:\Users\z.marouf-araibi\Desktop\mmdetection2\configs\my_custom\my_custom_config.py")
         self.config_path_entry.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
         # Frame pour afficher les options et leurs valeurs
@@ -146,11 +146,11 @@ class ConfigModifierApp:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            model_type_match = re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
+            model_type_match = re.search(r"type\s*=\s*'(\w+)'", content)
             if model_type_match:
                 self.options["model_type"] = model_type_match.group(1)
 
-            backbone_type_match = re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", content, re.DOTALL)
+            backbone_type_match = re.search(r"backbone\s*=\s*dict\s*\(\s*type\s*=\s*'(\w+)'", content)
             if backbone_type_match:
                 self.options["backbone_type"] = backbone_type_match.group(1)
 
@@ -240,34 +240,34 @@ class ConfigModifierApp:
 
     def save_config(self, file_path):
         try:
-            # Mettre à jour les options avec les nouvelles valeurs des variables
+            # Update options with new values from variables
             for key, var in self.option_vars.items():
                 self.options[key] = var.get()
 
-            # Construire le chemin complet du checkpoint
+            # Build the full checkpoint path
             checkpoint_name = self.options["checkpoint"]
             checkpoint_dir = self.options.get('checkpoint_dir', 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/')
             full_checkpoint_path = os.path.join(checkpoint_dir, checkpoint_name)
 
-            # Lire le contenu actuel du fichier de configuration
+            # Read the current content of the config file
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
 
-            # Ouvrir le fichier en mode écriture pour appliquer les modifications
+            # Open the file in write mode to apply modifications
             with open(file_path, 'w', encoding='utf-8') as f:
                 for line in lines:
-                    if re.search(r"model\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line, re.DOTALL):
-                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.options['model_type']}'", line)
-                    elif re.search(r"backbone\s*=\s*dict\s*\(.*type\s*=\s*'(\w+)'", line, re.DOTALL):
-                        line = re.sub(r"type\s*=\s*'\w+'", f"type = '{self.options['backbone_type']}'", line)
-                    elif re.search(r"load_from\s*=\s*'[\w:/\\]+'", line, re.DOTALL):
-                        line = re.sub(r"load_from\s*=\s*'[\w:/\\]+'", f"load_from = '{full_checkpoint_path}'", line)
-                    elif re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*(\d+)", line, re.DOTALL):
-                        line = re.sub(r"max_epochs\s*=\s*\d+", f"max_epochs = {self.options['max_epochs']}", line)
-                    elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line, re.DOTALL):
-                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_cls_weight']}", line)
-                    elif re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*([\d.]+)", line, re.DOTALL):
-                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_bbox_weight']}", line)
+                    if re.search(r"model\s*=\s*dict\s*\(\s*type\s*=\s*'.*?'", line):
+                        line = re.sub(r"type\s*=\s*'.*?'", f"type = '{self.options['model_type']}'", line)
+                    elif re.search(r"backbone\s*=\s*dict\s*\(\s*type\s*=\s*'.*?'", line):
+                        line = re.sub(r"type\s*=\s*'.*?'", f"type = '{self.options['backbone_type']}'", line)
+                    elif re.search(r"load_from\s*=\s*'[^']*'", line):
+                        line = re.sub(r"load_from\s*=\s*'[^']*'", f"load_from = '{full_checkpoint_path}'", line)
+                    elif re.search(r"runner\s*=\s*dict\s*\(.*max_epochs\s*=\s*\d+", line, re.DOTALL):
+                        line = re.sub(r"max_epochs\s*=\s*\d+", f"max_epochs = {self.options['max_epochs']}", line, flags=re.DOTALL)
+                    elif re.search(r"loss_cls\s*=\s*dict\s*\(.*loss_weight\s*=\s*[\d.]+", line, re.DOTALL):
+                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_cls_weight']}", line, flags=re.DOTALL)
+                    elif re.search(r"loss_bbox\s*=\s*dict\s*\(.*loss_weight\s*=\s*[\d.]+", line, re.DOTALL):
+                        line = re.sub(r"loss_weight\s*=\s*[\d.]+", f"loss_weight = {self.options['loss_bbox_weight']}", line, flags=re.DOTALL)
 
                     f.write(line)
 

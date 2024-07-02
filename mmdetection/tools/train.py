@@ -32,7 +32,7 @@ class CustomCocoDataset(CocoDataset):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('config', nargs='?', default='..\\dlta-ai\\DLTA_AI_app\\mmdetection\\configs\\my_custom\\my_custom_config.py', help='train config file path')
+    parser.add_argument('config', nargs='?', default='..\\mmdetection2\\configs\\my_custom\\my_custom_config.py', help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')

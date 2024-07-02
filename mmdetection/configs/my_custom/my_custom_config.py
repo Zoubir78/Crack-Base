@@ -10,7 +10,7 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        init_cfg=dict(type='Pretrained', checkpoint = 'torchvision://resnet18')
+        init_cfg=dict(type='Pretrained', checkpoint = 'torchvision://resnet50')
     ),
     neck=dict(
         type='FPN',
@@ -277,7 +277,7 @@ log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
 custom_hooks = [dict(type='NumClassCheckHook')]
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-load_from = 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/resnet152-394f9c45.pth'
+load_from = 'C:/Users/z.marouf-araibi/Desktop/Crack-Base/mmdetection/checkpoints/mask_rcnn_r50_fpn_1x_coco_20200205-d4b0c5d6.pth'
 resume_from = None
 workflow = [('train', 1)]
 opencv_num_threads = 0
