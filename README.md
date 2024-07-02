@@ -123,8 +123,7 @@ python app.py
 ```
 
 - N'oubliez pas de créer deux dossiers, un pour les bases de données 'DB' et un autre pour les exports 'export'.
-- Pour plus d'infos sur les modèles d'entrainement et le fichier de configuration, veuillez vous référer à la documentation de MMDetection. 🪄
-[MMDetection] (https://mmdetection.readthedocs.io/en/3.x/get_started.html)
+- Pour plus d'infos sur les modèles d'entrainement et le fichier de configuration, veuillez vous référer à la documentation de MMDetection. 🪄 (https://mmdetection.readthedocs.io/en/v2.25.1/get_started.html)
 
 ### Sauvegarde de l'environnement
 Pour sauvegarder l'environnement de développement :
