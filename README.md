@@ -86,6 +86,10 @@ Voici les éléments dont vous avez besoin pour utiliser le logiciel et comment 
 - ├── sam/
 - │ ├── annotator.py
 - │ └── categories.txt
+#### Datasets
+- ├── test/
+- ├── train/
+- ├── val/
 #### APP
 - ├── app.py
 - ├── annotation.py
