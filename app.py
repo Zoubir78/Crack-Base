@@ -140,51 +140,46 @@ class CrackBase(Tk):
         # Ajouter le bouton du menu burger à la barre de menu
         menu.add_command(label="Menu", command=self.toggle_sidebar)
 
-        file = Menu(menu, tearoff=0) 
-        # Ajouter un bouton Actualiser à la barre de menu
-        file.add_command(label="Redémarrer", command=self.restart_application)
+        file = Menu(menu, tearoff=0)
+        self.add_menu_item(file, label="Redémarrer", command=self.restart_application)
         file.add_separator()
-        file.add_command(label="Fermer", command=self.destroy)
+        self.add_menu_item(file, label="Fermer", command=self.destroy)
         menu.add_cascade(label="File", menu=file)
 
-        convert = Menu(menu, tearoff=0) 
-        convert = tk.Menu(menu, tearoff=0)
-        convert.add_command(label="Mask2COCO", command=self.execute_program2)
+        convert = Menu(menu, tearoff=0)
+        self.add_menu_item(convert, label="Mask2COCO", command=self.execute_program2)
         convert.add_separator()
-        convert.add_command(label="Copie les masques", command=self.execute_program5)
+        self.add_menu_item(convert, label="Copie les masques", command=self.execute_program5)
         convert.add_separator()
-        convert.add_command(label="Npz2png", command=self.run_npz_img)
+        self.add_menu_item(convert, label="Npz2png", command=self.run_npz_img)
         menu.add_cascade(label="Converter", menu=convert)
 
-        fusion_img = Menu(menu, tearoff=0) 
-        fusion_img = tk.Menu(menu, tearoff=0)
-        fusion_img.add_command(label="fusion capteurs", command=self.run_fusion_img)
+        fusion_img = Menu(menu, tearoff=0)
+        self.add_menu_item(fusion_img, label="fusion capteurs", command=self.run_fusion_img)
         fusion_img.add_separator()
-        fusion_img.add_command(label="mat2img", command=self.run_mat2img)
+        self.add_menu_item(fusion_img, label="mat2img", command=self.run_mat2img)
         menu.add_cascade(label="Fusion", menu=fusion_img)
 
         help_menu = Menu(self, tearoff=0)
         contact = Menu(self, tearoff=0)
 
-        label = Menu(menu, tearoff=0) 
-        exe_menu = tk.Menu(label, tearoff=0)
-        exe_menu.add_command(label="Exécuter le script", command=self.executer)
+        label = Menu(menu, tearoff=0)
+        exe_menu = Menu(label, tearoff=0)
+        self.add_menu_item(exe_menu, label="Exécuter le script", command=self.executer)
         label.add_cascade(label="Annoter les images", menu=exe_menu)
         label.add_separator()
-        label.add_command(label="Afficher le fichier JSON", command=self.afficher_fichier_genere)
-        export_menu = tk.Menu(label, tearoff=0)
-        export_menu.add_command(label="Exporter JSON", command=self.exporter_json)
+        self.add_menu_item(label, label="Afficher le fichier JSON", command=self.afficher_fichier_genere)
+        export_menu = Menu(label, tearoff=0)
+        self.add_menu_item(export_menu, label="Exporter JSON", command=self.exporter_json)
         label.add_cascade(label="Exporter", menu=export_menu)
         menu.add_cascade(label="Label", menu=label)
 
-        sam = Menu(menu, tearoff=0) 
-        sam = tk.Menu(menu, tearoff=0)
-        sam.add_command(label="Exécuter SAM", command=self.executer2)
-        menu.add_cascade(label="SAM", menu=sam)
+        sam = Menu(menu, tearoff=0)
+        menu.add_cascade(label="SAM", command=self.executer2)
 
-        contact.add_command(label="Github", command=lambda: open_new("https://github.com/Zoubir78/Crack-Base/tree/master"))
+        self.add_menu_item(contact, label="Github", command=lambda: open_new("https://github.com/Zoubir78/Crack-Base/tree/master"))
         contact.add_separator()
-        contact.add_command(label="Questions", command=lambda: open_new("https://stackoverflow.com/questions"))
+        self.add_menu_item(contact, label="Questions", command=lambda: open_new("https://stackoverflow.com/questions"))
         help_menu.add_cascade(label="Contact", menu=contact)
         menu.add_cascade(label="Help", menu=help_menu)
 
@@ -266,6 +261,18 @@ class CrackBase(Tk):
         for x in ("LCMS", "2d", "fer apparent", "fissures", "equipements", "sites", "nouvelle_BDD", "nouvelle_cat", "a_propos", "view"):
             thread = Thread(target=self.make_frame, args=(x,)) 
             thread.start()
+
+    def add_menu_item(self, menu, label, command):
+        menu.add_command(label=label, command=command)
+        menu.entryconfig(menu.index(label), background="SystemMenu", foreground="SystemMenuText")
+        menu.bind("<Enter>", lambda e, m=menu, l=label: self.on_enter(m, l))
+        menu.bind("<Leave>", lambda e, m=menu, l=label: self.on_leave(m, l))
+
+    def on_enter(self, menu, label):
+        menu.entryconfig(menu.index(label), background='black', foreground='white')
+
+    def on_leave(self, menu, label):
+        menu.entryconfig(menu.index(label), background='SystemMenu', foreground='SystemMenuText')
 
     def toggle_sidebar(self):
         if self.sidebar.winfo_viewable():
