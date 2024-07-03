@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+'''
+Created on 21 juin 2024
+@author: Zoubeir Marouf
+'''
 import os
 import numpy as np
 import scipy.io
