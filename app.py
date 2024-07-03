@@ -2128,37 +2128,47 @@ class View(Frame):
             connection = sqlite3.connect(db_path)
             cursor = connection.cursor()
 
-            # Parsing the search term
-            if '=' in search_term:
-                column, value = search_term.split('=', 1)
-                column = column.strip()
-                value = value.strip()
-                
-                # Handle specific cases for 'sens' and 'angle'
-                if column.lower() == 'sens':
-                    query = f"SELECT * FROM {table_name} WHERE {column} = ?"
-                    params = (value,)
-                elif column.lower() == 'angle':
-                    try:
-                        angle_value = int(value)
-                        if 0 <= angle_value <= 90:
-                            query = f"SELECT * FROM {table_name} WHERE {column} = ?"
-                            params = (angle_value,)
-                        else:
-                            messagebox.showwarning("Avertissement", "L'angle doit être compris entre 0 et 90.")
+            # Parsing the search terms
+            conditions = []
+            params = []
+
+            terms = search_term.split(',')
+            for term in terms:
+                if '=' in term:
+                    column, value = term.split('=', 1)
+                    column = column.strip()
+                    value = value.strip()
+
+                    # Handle specific cases for 'sens' and 'angle'
+                    if column.lower() == 'sens':
+                        conditions.append(f"{column} = ?")
+                        params.append(value)
+                    elif column.lower() == 'angle':
+                        try:
+                            angle_value = int(value)
+                            if 0 <= angle_value <= 90:
+                                conditions.append(f"{column} = ?")
+                                params.append(angle_value)
+                            else:
+                                messagebox.showwarning("Avertissement", "L'angle doit être compris entre 0 et 90.")
+                                connection.close()
+                                return
+                        except ValueError:
+                            messagebox.showwarning("Avertissement", "L'angle doit être un nombre entier.")
                             connection.close()
                             return
-                    except ValueError:
-                        messagebox.showwarning("Avertissement", "L'angle doit être un nombre entier.")
-                        connection.close()
-                        return
+                    else:
+                        conditions.append(f"{column} LIKE ?")
+                        params.append(f"%{value}%")
                 else:
-                    query = f"SELECT * FROM {table_name} WHERE {column} LIKE ?"
-                    params = (f"%{value}%",)
+                    messagebox.showwarning("Avertissement", "Le terme de recherche doit être de la forme 'colonne=valeur'.")
+                    connection.close()
+                    return
+
+            if conditions:
+                query = f"SELECT * FROM {table_name} WHERE {' AND '.join(conditions)}"
             else:
-                # General search for all columns if no specific column is mentioned
-                query = f"SELECT * FROM {table_name} WHERE " + " OR ".join([f"{col} LIKE ?" for col in self.tree['columns']])
-                params = [f"%{search_term}%"] * len(self.tree['columns'])
+                query = f"SELECT * FROM {table_name}"
 
             cursor.execute(query, params)
             data = cursor.fetchall()
@@ -2173,7 +2183,7 @@ class View(Frame):
         selected_item = self.tree.focus()
         values = self.tree.item(selected_item, "values")
         if values:
-            # Supposons que les colonnes 'sens' et 'angle' sont respectivement à l'index 4 et 6
+            # Les colonnes 'sens' et 'angle' sont respectivement à l'index 4 et 6
             sens_index = 4
             angle_index = 6
 
