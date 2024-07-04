@@ -1775,19 +1775,13 @@ class Frames9(tk.Frame):
     def nouvelle_bdd(self):
         new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
         if new_db_name:
-            folder_path = filedialog.askdirectory(title="Sélectionner le dossier de la base de données SQLite")
-            if not folder_path:
-                return
-            
-            new_db_path = os.path.join(folder_path, f"{new_db_name}.db")
-            try:
+            new_db_path = filedialog.asksaveasfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
+            if new_db_path:
                 self.db_manager = DbManager(new_db_path)
                 disorder_type = simpledialog.askstring("Type de Désordre", "Entrez le type de désordre:")
                 if disorder_type:
                     self.db_manager.create_new_db(new_db_path, disorder_type.replace(" ", "_").lower())
                     messagebox.showinfo("Succès", "Nouvelle base de données créée avec succès!")
-            except Exception as e:
-                messagebox.showerror("Erreur", f"Erreur lors de la création de la base de données : {str(e)}")
 
     def ajouter_donnees(self):
         if not self.db_manager:
