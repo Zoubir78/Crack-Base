@@ -213,7 +213,7 @@ class CrackBase(Tk):
         self.side_button_2d.grid(row=1, column=1, pady=(4, 4), padx=6)
         self.side_button_2d.grid_remove()  # Caché initialement
 
-        self.side_button_NB = Button(self.sidebar, text="+", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
+        self.side_button_NB = Button(self.sidebar, text="\uf067", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
         self.side_button_NB.grid(row=1, column=1, pady=(70, 0), padx=6)
         self.side_button_NB.grid_remove()  # Caché initialement
 
@@ -229,12 +229,25 @@ class CrackBase(Tk):
         self.side_button_fes.grid(row=2, column=1, pady=(4, 4), padx=6)
         self.side_button_fes.grid_remove()  # Caché initialement
 
-        self.side_button_NB1 = Button(self.sidebar, text="+", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_cat"), font=("FontAwesome", 9, "bold"))
+        self.side_button_NB1 = Button(self.sidebar, text="\uf067", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_cat"), font=("FontAwesome", 9, "bold"))
         self.side_button_NB1.grid(row=2, column=1, pady=(70, 0), padx=6)
         self.side_button_NB1.grid_remove()  # Caché initialement
 
-        sidebutton4 = Button(self.sidebar, text="Equipements", bg="#525659", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("equipements"), font=("Arial", 9, "bold"))
+        sidebutton4 = Button(self.sidebar, text="Détections", bg="#525659", relief=SUNKEN, width=15, height=7, command=self.toggle_side_button3, font=("Arial", 9, "bold"))
         sidebutton4.grid(row=3, pady=2, padx=5)
+        
+        # Sous-boutons
+        self.side_button_equ = Button(self.sidebar, text="Equipements", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("equipements"), font=("FontAwesome", 9, "bold"))
+        self.side_button_equ.grid(row=3, column=1, pady=(0, 70), padx=6)
+        self.side_button_equ.grid_remove()  # Caché initialement
+
+        self.side_button_fiss = Button(self.sidebar, text="Fissures", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("fissures"), font=("FontAwesome", 9, "bold"))
+        self.side_button_fiss.grid(row=3, column=1, pady=(4, 4), padx=6)
+        self.side_button_fiss.grid_remove()  # Caché initialement
+
+        self.side_button_NB2 = Button(self.sidebar, text="\uf067", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("nouvelle_BDD"), font=("FontAwesome", 9, "bold"))
+        self.side_button_NB2.grid(row=3, column=1, pady=(70, 0), padx=6)
+        self.side_button_NB2.grid_remove()  # Caché initialement
 
         sidebutton3 = Button(self.sidebar, text="Sites", bg="#525659", relief=SUNKEN, width=15, height=7, command=lambda: self.show_page("sites"), font=("Arial", 9, "bold"))
         sidebutton3.grid(row=4, pady=2, padx=5)
@@ -299,6 +312,16 @@ class CrackBase(Tk):
             self.side_button_fa.grid()  
             self.side_button_fes.grid() 
             self.side_button_NB1.grid()
+
+    def toggle_side_button3(self):
+        if self.side_button_equ.winfo_ismapped():
+            self.side_button_equ.grid_remove()
+            self.side_button_fiss.grid_remove()
+            self.side_button_NB2.grid_remove()
+        else:
+            self.side_button_equ.grid()
+            self.side_button_fiss.grid()
+            self.side_button_NB2.grid()
 
     def make_frame(self, frame_name):
         frame = self.frames[frame_name]
