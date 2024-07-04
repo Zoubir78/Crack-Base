@@ -339,8 +339,8 @@ class Home(Frame):
         self.canvas.pack(fill=BOTH, expand=True)
 
         # Ajout du texte de bienvenue
-        self.canvas_text1 = self.canvas.create_text(580, 30, text="""Bienvenue sur Crack Base - ENDSUM""", 
-                                                    font=("Castellar", 20, "italic", "bold"), fill="white")
+        self.canvas_text1 = self.canvas.create_text(580, 30, text="""Bienvenue sur Crack Base - ENDSUM""", font=("Castellar", 20, "italic", "bold"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(580, 695, text="© Crack Base 2024 - ENDSUM", font=("Castellar", 9, "normal"), fill="white")
 
         self.load_images()
         self.create_image_grid()
@@ -1249,22 +1249,25 @@ class Frames7(Frame):
         self.sites = []  # Attribut pour stocker la liste des sites
 
         button5 = ttk.Button(self, text=f"Nouveau site", width=40, command=self.add_new_site)
+        button10 = ttk.Button(self, text=f"Liste des sites", width=40, command=self.show_sites_list)
+        button11 = ttk.Button(self, text=f"Modifier/Supprimer un site", width=40, command=self.modify_or_delete_site)
         button4 = ttk.Button(self, text=f"Choisir une BDD", width=40, command=self.choose_database_for_site)
         button6 = ttk.Button(self, text=f"BDD existante", width=40, command=self.add_site_to_existing_database)
         button7 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=self.nouvelle_bdd)
         button8 = ttk.Button(self, text=f"Nouvelle Table", width=40, command=self.table_nouvelle_bdd)
         button9 = ttk.Button(self, text=f"Ajouter des données", width=40, command=self.donnees_nouvelle_bdd)
-        button10 = ttk.Button(self, text=f"Liste des sites", width=40, command=self.show_sites_list)
-        button11 = ttk.Button(self, text=f"Modifier/Supprimer un site", width=40, command=self.modify_or_delete_site)
+        
 
         self.canvas_button = self.canvas.create_window(900, 50, window=button5)
-        self.canvas_button = self.canvas.create_window(900, 90, window=button4)
-        self.canvas_button = self.canvas.create_window(900, 130, window=button6)
-        self.canvas_button = self.canvas.create_window(900, 170, window=button7)
-        self.canvas_button = self.canvas.create_window(900, 210, window=button8)
-        self.canvas_button = self.canvas.create_window(900, 250, window=button9)
-        self.canvas_button = self.canvas.create_window(900, 290, window=button10)
-        self.canvas_button = self.canvas.create_window(900, 330, window=button11)
+        self.canvas_button = self.canvas.create_window(900, 90, window=button10)
+        self.canvas_button = self.canvas.create_window(900, 130, window=button11)
+        self.canvas_button = self.canvas.create_window(900, 170, window=button4)
+        self.canvas_button = self.canvas.create_window(900, 210, window=button6)
+        self.canvas_button = self.canvas.create_window(900, 250, window=button7)
+        self.canvas_button = self.canvas.create_window(900, 290, window=button8)
+        self.canvas_button = self.canvas.create_window(900, 330, window=button9)
+
+        self.sites = ["Rouen"]
 
     def add_new_site(self):
         site_name = simpledialog.askstring("Nouveau site", "Entrez le nom du nouveau site:")
@@ -1275,7 +1278,7 @@ class Frames7(Frame):
 
     def show_sites_list(self):
         sites_str = "\n".join(self.sites)
-        messagebox.showinfo("Liste des sites", f"Sites existants:\n{sites_str}")
+        messagebox.showinfo("Liste des sites", f"Sites existants : \n {sites_str}")
 
     def add_site_to_existing_database(self):
         site_name = simpledialog.askstring("Nouveau site", "Entrez le nom du nouveau site:")
@@ -2204,14 +2207,10 @@ class View(Frame):
                 self.load_tunnel_image(image_path)
 
 
-        # Ajouter un footer
-        footer = tk.Label(text="© Crack Base 2024 - ENDSUM", relief=tk.SUNKEN, anchor=tk.W, font=("Castellar", 12, "italic"), bg="black", fg="white")
-        footer.grid(row=0, column=0, sticky="ew")
-
 if __name__ == "__main__":
     app = CrackBase()
     app.title("Crack Base 2.0 - ENDSUM")
-    app.iconbitmap("images/app.ico")
+    app.iconbitmap("images/cb.ico")
     app.maxsize(1300,800)
     app.minsize(1300,800)
     app.mainloop()
