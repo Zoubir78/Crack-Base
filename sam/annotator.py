@@ -187,10 +187,10 @@ class MainWindow(QMainWindow, tk.Tk):
         self.button_proposal3 = QPushButton('Proposition 3', self)
         self.button_proposal3.clicked.connect(self.choose_proposal3)
         self.button_proposal3.setShortcut('3')
-        self.button_proposal4 = QPushButton('Proposition 4', self)
-        self.button_proposal4.clicked.connect(self.choose_proposal4)
-        self.button_proposal4.setShortcut('4')
-        self.button_proposal_list = [self.button_proposal1, self.button_proposal2, self.button_proposal3, self.button_proposal4]
+        #self.button_proposal4 = QPushButton('Proposition 4', self)
+        #self.button_proposal4.clicked.connect(self.choose_proposal4)
+        #self.button_proposal4.setShortcut('4')
+        self.button_proposal_list = [self.button_proposal1, self.button_proposal2, self.button_proposal3]
         
         self.class_on_flag = True
         self.class_on_text = QLabel("Classe : On", self)
@@ -215,8 +215,8 @@ class MainWindow(QMainWindow, tk.Tk):
         self.button_proposal2.move(int(0.50 * global_w), int(0.8 * global_h))
         self.button_proposal3.resize(int(0.17 * global_w),int(0.14 * global_h))
         self.button_proposal3.move(int(0.67 * global_w), int(0.8 * global_h))
-        self.button_proposal4.resize(int(0.17 * global_w),int(0.14 * global_h))
-        self.button_proposal4.move(int(0.84 * global_w), int(0.8 * global_h))
+        #self.button_proposal4.resize(int(0.17 * global_w),int(0.14 * global_h))
+        #self.button_proposal4.move(int(0.84 * global_w), int(0.8 * global_h))
         
         
         
