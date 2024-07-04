@@ -1105,6 +1105,12 @@ class DatabaseManager:
         except sqlite3.Error as e:
             print(e)
 
+    def list_tables(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        return [table[0] for table in tables]
+
     def close(self):
         self.connection.close()
         print("Connexion à la base de données fermée.")
@@ -1119,19 +1125,23 @@ class Frames5(tk.Frame):
         self.image = ImageTk.PhotoImage(image)
         self.canvas = tk.Canvas(self)
         self.canvas.pack(fill=tk.BOTH, expand=True)
-        self.canvas_image = self.canvas.create_image(10, 50, image=self.image, anchor=tk.NW)
-        self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
-        self.canvas_text2 = self.canvas.create_text(900, 180,
+        self.canvas_image = self.canvas.create_image(10, 10, image=self.image, anchor=tk.NW)
+        self.canvas_text1 = self.canvas.create_text(900, 50, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(900, 150,
                                                     text=f"Pour créer une nouvelle catégorie d'images,\n cliquez sur le bouton 'Nouvelle BDD'\n ci-dessous.\n Vous pouvez également importer vos données\n dans cette nouvelle base de données\n en cliquant sur 'Ajouter des données'.", font=("times new roman", 12, "normal"), fill="white")
 
         self.progress = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
-        self.canvas_progress = self.canvas.create_window(900, 380, window=self.progress)
+        self.canvas_progress = self.canvas.create_window(900, 340, window=self.progress)
 
         button5 = ttk.Button(self, text=f"Nouvelle BDD", width=40, command=self.nouvelle_bdd)
         button6 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=self.ajouter_donnees)
+        button7 = ttk.Button(self, text=f"Choisir une BDD", width=40, command=self.choisir_bdd)
+        button8 = ttk.Button(self, text=f"Choisir une Table et ajouter des données", width=40, command=self.ajouter_donnees_table)
 
-        self.canvas_button1 = self.canvas.create_window(900, 300, window=button5)
-        self.canvas_button2 = self.canvas.create_window(900, 340, window=button6)
+        self.canvas_button1 = self.canvas.create_window(900, 260, window=button5)
+        self.canvas_button2 = self.canvas.create_window(900, 300, window=button6)
+        self.canvas_button3 = self.canvas.create_window(900, 380, window=button7)
+        self.canvas_button4 = self.canvas.create_window(900, 420, window=button8)
 
     def nouvelle_bdd(self):
         new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
@@ -1197,6 +1207,73 @@ class Frames5(tk.Frame):
             }
 
             self.db_manager.insert_image_data(db_path, data, update_progress)
+        
+        messagebox.showinfo("Succès", "Données ajoutées avec succès!")
+
+    def choisir_bdd(self):
+        db_files = filedialog.askopenfilenames(title="Sélectionner une base de données", filetypes=[("SQLite Database Files", "*.db")])
+        if db_files:
+            db_file = db_files[0]
+            self.db_manager = DbManager(db_file)
+            self.db_files = db_files
+            self.show_db_selection(db_files)
+
+    def show_db_selection(self, db_files):
+        self.db_combobox = ttk.Combobox(self, values=db_files, width=40)
+        self.db_combobox.pack()
+        self.db_combobox.bind("<<ComboboxSelected>>", self.on_db_selected)
+
+    def on_db_selected(self, event):
+        selected_db = self.db_combobox.get()
+        self.db_manager = DbManager(selected_db)
+        messagebox.showinfo("Succès", f"Base de données {os.path.basename(selected_db)} sélectionnée avec succès!")
+
+    def ajouter_donnees_table(self):
+        if not self.db_manager:
+            messagebox.showwarning("Attention", "Veuillez d'abord choisir une base de données.")
+            return
+
+        tables = self.db_manager.list_tables()
+        if not tables:
+            messagebox.showwarning("Attention", "Aucune table trouvée dans la base de données.")
+            return
+
+        self.table_combobox = ttk.Combobox(self, values=tables, width=40)
+        self.table_combobox.pack()
+        self.table_combobox.bind("<<ComboboxSelected>>", self.on_table_selected)
+
+    def on_table_selected(self, event):
+        selected_table = self.table_combobox.get()
+        folder_path = filedialog.askdirectory(title="Sélectionner un dossier d'images")
+        if not folder_path:
+            return
+
+        image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
+        total_files = len(image_files)
+        self.progress["maximum"] = total_files
+        self.progress["value"] = 0
+
+        def update_progress():
+            self.progress["value"] += 1
+            percent = int((self.progress["value"] / total_files) * 100)
+            self.canvas.itemconfigure(self.canvas_text2, text=f"Importation en cours... {percent}%")
+            self.update_idletasks()
+
+        for image_file in image_files:
+            image_path = os.path.join(folder_path, image_file)
+            with open(image_path, 'rb') as file:
+                image_data = file.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
+
+            data = {
+                "category": "some_category",
+                "site": "some_site",
+                "nom_image": image_file,
+                "image_json": json.dumps({"image": image_base64}),
+                "created_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+            self.db_manager.insert_image_data(self.db_manager.db_path, selected_table, data, update_progress)
         
         messagebox.showinfo("Succès", "Données ajoutées avec succès!")
 
@@ -1657,6 +1734,12 @@ class DbManager:
         except sqlite3.Error as e:
             print(e)
 
+    def list_tables(self):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        return [table[0] for table in tables]
+
     def close(self):
         self.connection.close()
         print("Connexion à la base de données fermée.")
@@ -1671,30 +1754,40 @@ class Frames9(tk.Frame):
         self.image = ImageTk.PhotoImage(image)
         self.canvas = tk.Canvas(self)
         self.canvas.pack(fill=tk.BOTH, expand=True)
-        self.canvas_image = self.canvas.create_image(10, 50, image=self.image, anchor=tk.NW)
-        self.canvas_text1 = self.canvas.create_text(900, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
-        self.canvas_text2 = self.canvas.create_text(900, 180,
+        self.canvas_image = self.canvas.create_image(10, 10, image=self.image, anchor=tk.NW)
+        self.canvas_text1 = self.canvas.create_text(900, 50, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(900, 150,
                                                     text=f"Pour créer une nouvelle catégorie de désordre,\n cliquez sur le bouton 'Nouvelle BDD/Table'\n ci-dessous.\n Vous pouvez également importer vos données\n dans cette nouvelle base de données\n en cliquant sur 'Ajouter des données'.", font=("times new roman", 12, "normal"), fill="white")
         
         self.progress = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
-        self.canvas_progress = self.canvas.create_window(900, 380, window=self.progress)
+        self.canvas_progress = self.canvas.create_window(900, 340, window=self.progress)
 
         button5 = ttk.Button(self, text=f"Nouvelle BDD/Table", width=40, command=self.nouvelle_bdd)
         button6 = ttk.Button(self, text=f"Ajouter des Données", width=40, command=self.ajouter_donnees)
+        button7 = ttk.Button(self, text=f"Choisir une BDD", width=40, command=self.choisir_bdd)
+        button8 = ttk.Button(self, text=f"Choisir une Table et ajouter des données", width=40, command=self.ajouter_donnees_table)
 
-        self.canvas_button1 = self.canvas.create_window(900, 300, window=button5)
-        self.canvas_button2 = self.canvas.create_window(900, 340, window=button6)
+        self.canvas_button1 = self.canvas.create_window(900, 260, window=button5)
+        self.canvas_button2 = self.canvas.create_window(900, 300, window=button6)
+        self.canvas_button3 = self.canvas.create_window(900, 380, window=button7)
+        self.canvas_button4 = self.canvas.create_window(900, 420, window=button8)
 
     def nouvelle_bdd(self):
         new_db_name = simpledialog.askstring("Nom de la Nouvelle Base de Données", "Entrez le nom de la nouvelle base de données:")
         if new_db_name:
-            new_db_path = filedialog.asksaveasfilename(defaultextension=".db", filetypes=[("SQLite Database Files", "*.db")])
-            if new_db_path:
+            folder_path = filedialog.askdirectory(title="Sélectionner le dossier de la base de données SQLite")
+            if not folder_path:
+                return
+            
+            new_db_path = os.path.join(folder_path, f"{new_db_name}.db")
+            try:
                 self.db_manager = DbManager(new_db_path)
                 disorder_type = simpledialog.askstring("Type de Désordre", "Entrez le type de désordre:")
                 if disorder_type:
                     self.db_manager.create_new_db(new_db_path, disorder_type.replace(" ", "_").lower())
                     messagebox.showinfo("Succès", "Nouvelle base de données créée avec succès!")
+            except Exception as e:
+                messagebox.showerror("Erreur", f"Erreur lors de la création de la base de données : {str(e)}")
 
     def ajouter_donnees(self):
         if not self.db_manager:
@@ -1744,6 +1837,73 @@ class Frames9(tk.Frame):
             }
 
             self.db_manager.insert_image_data(db_path, table_name, data, update_progress)
+        
+        messagebox.showinfo("Succès", "Données ajoutées avec succès!")
+
+    def choisir_bdd(self):
+        db_files = filedialog.askopenfilenames(title="Sélectionner une base de données", filetypes=[("SQLite Database Files", "*.db")])
+        if db_files:
+            db_file = db_files[0]
+            self.db_manager = DbManager(db_file)
+            self.db_files = db_files
+            self.show_db_selection(db_files)
+
+    def show_db_selection(self, db_files):
+        self.db_combobox = ttk.Combobox(self, values=db_files, width=40)
+        self.db_combobox.pack()
+        self.db_combobox.bind("<<ComboboxSelected>>", self.on_db_selected)
+
+    def on_db_selected(self, event):
+        selected_db = self.db_combobox.get()
+        self.db_manager = DbManager(selected_db)
+        messagebox.showinfo("Succès", f"Base de données {os.path.basename(selected_db)} sélectionnée avec succès!")
+
+    def ajouter_donnees_table(self):
+        if not self.db_manager:
+            messagebox.showwarning("Attention", "Veuillez d'abord choisir une base de données.")
+            return
+
+        tables = self.db_manager.list_tables()
+        if not tables:
+            messagebox.showwarning("Attention", "Aucune table trouvée dans la base de données.")
+            return
+
+        self.table_combobox = ttk.Combobox(self, values=tables, width=40)
+        self.table_combobox.pack()
+        self.table_combobox.bind("<<ComboboxSelected>>", self.on_table_selected)
+
+    def on_table_selected(self, event):
+        selected_table = self.table_combobox.get()
+        folder_path = filedialog.askdirectory(title="Sélectionner un dossier d'images")
+        if not folder_path:
+            return
+
+        image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png'))]
+        total_files = len(image_files)
+        self.progress["maximum"] = total_files
+        self.progress["value"] = 0
+
+        def update_progress():
+            self.progress["value"] += 1
+            percent = int((self.progress["value"] / total_files) * 100)
+            self.canvas.itemconfigure(self.canvas_text2, text=f"Importation en cours... {percent}%")
+            self.update_idletasks()
+
+        for image_file in image_files:
+            image_path = os.path.join(folder_path, image_file)
+            with open(image_path, 'rb') as file:
+                image_data = file.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
+
+            data = {
+                "category": "some_category",
+                "site": "some_site",
+                "nom_image": image_file,
+                "image_json": json.dumps({"image": image_base64}),
+                "created_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+            self.db_manager.insert_image_data(self.db_manager.db_path, selected_table, data, update_progress)
         
         messagebox.showinfo("Succès", "Données ajoutées avec succès!")
 
