@@ -1787,7 +1787,7 @@ class View(Frame):
 
         # Dictionnaire pour les images du tunnel
         self.tunnel_images = {
-            '00': 'images/tunnel.png',
+            '00': 'images/tunnel-2.png',
             '0C': 'images/tunnel-0C.png',
             '0D': 'images/tunnel-0D.png',
             '30C': 'images/tunnel-30C.png',
