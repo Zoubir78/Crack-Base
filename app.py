@@ -363,7 +363,7 @@ class Home(Frame):
 
         # Ajout du texte de bienvenue
         self.canvas_text1 = self.canvas.create_text(580, 30, text="""Bienvenue sur Crack Base - ENDSUM""", font=("Castellar", 20, "italic", "bold"), fill="white")
-        self.canvas_text2 = self.canvas.create_text(580, 695, text="© Crack Base 2024 - ENDSUM", font=("Castellar", 9, "normal"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(580, 698, text="© Crack Base 2024 - ENDSUM", font=("Castellar", 8, "normal"), fill="white")
 
         self.load_images()
         self.create_image_grid()
@@ -376,12 +376,17 @@ class Home(Frame):
             self.mask_objects.append(ImageTk.PhotoImage(mask))
 
     def create_image_grid(self):
+        max_x, max_y = 0, 0
         for i, (img_obj, mask_obj) in enumerate(zip(self.image_objects, self.mask_objects)):
             x = (i % 5) * 210 + 60  # Calculer la position x pour la grille (5 images par ligne, espacement de 210 pixels)
             y = (i // 5) * 210 + 60  # Calculer la position y pour la grille (espacement de 210 pixels)
             image_id = self.canvas.create_image(x, y, image=img_obj, anchor=NW)
+            max_x, max_y = max(max_x, x), max(max_y, y)
             self.canvas.tag_bind(image_id, "<Enter>", lambda e, mask=mask_obj, img_id=image_id: self.on_hover(mask, img_id))
             self.canvas.tag_bind(image_id, "<Leave>", lambda e, img=img_obj, img_id=image_id: self.on_leave(img, img_id))
+
+        # Ajouter une bordure blanche autour de toute la grille d'images
+        self.canvas.create_rectangle(50, 50, max_x + 209 + 1, max_y + 209 + 1, outline="white", width=2)
 
     def on_hover(self, mask_image, image_id):
         self.canvas.itemconfig(image_id, image=mask_image)
@@ -392,7 +397,6 @@ class Home(Frame):
 # Chemins des images et des masques
 image_paths = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg", "images/11215-2.jpg", "images/11215-3.jpg", "images/11215-4.jpg", "images/11215-5.jpg", "images/11215-6.jpg", "images/11215-7.jpg", "images/11215-8.jpg", "images/11215-9.jpg", "images/11215-10.jpg"]
 mask_paths = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png", "images/11215-2.png", "images/11215-3.png", "images/11215-4.png", "images/11215-5.png", "images/11215-6.png", "images/11215-7.png", "images/11215-8.png", "images/11215-9.png", "images/11215-10.png"]
-
 
 class Frames(Frame):
     def __init__(self, parent, category, image_path):
