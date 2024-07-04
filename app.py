@@ -1309,7 +1309,7 @@ class Frames7(Frame):
             confirm_button.pack(pady=10)
         else:
             messagebox.showinfo("Aucune Base de Données", "Aucune base de données existante n'a été trouvée. Création d'une nouvelle base de données.")
-            self.create_new_database_and_add_site(site_name)
+            self.nouvelle_bdd(site_name)
 
     def get_existing_databases(self):
         # Cette fonction retourne une liste de bases de données existantes
