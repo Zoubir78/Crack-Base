@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Chemins vers les fichiers JSON des différentes configurations
-json_logs_intensite = [r"C:\Users\z.marouf-araibi\Desktop\dlta-ai\DLTA_AI_app\mmdetection\tools\work_dirs\my_custom_config\20220627_160712.log.json"]  # Intensite
+json_logs_intensite = [r"C:\Users\z.marouf-araibi\Desktop\mmdetection2\tools\work_dirs\my_custom_config\20220627_160712.log.json"]  # Intensite
 json_logs_profondeur = [r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\work_dirs\my_custom_config\\20220307_161221.log.json"]  # Profondeur
 json_logs_fusion = [r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\work_dirs\my_custom_config\20230717_094425.log.json"]  # Fusion
 
@@ -65,6 +65,8 @@ def plot_metrics(ax, x, y1, y2, label1, label2, title):
     ax.plot(x, y1, label=label1)
     ax.plot(x, y2, label=label2)
     ax.set_title(title)
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("mAP")
     ax.legend()
 
 fig, axs = plt.subplots(3, 2, figsize=(16, 16))
@@ -98,11 +100,13 @@ def plot_loss(ax, loss, loss_cls, loss_bbox, loss_mask, title):
     ax.plot(x, y_loss_bbox, label='Loss_bbox')
     ax.plot(x, y_loss_mask, label='Loss_mask')
     ax.set_title(title)
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Loss")
     ax.legend()
 
 plot_loss(axs[1, 1], loss_intensite, loss_cls_intensite, loss_bbox_intensite, loss_mask_intensite, "Intensité Losses")
 plot_loss(axs[2, 0], loss_profondeur, loss_cls_profondeur, loss_bbox_profondeur, loss_mask_profondeur, "Profondeur Losses")
 plot_loss(axs[2, 1], loss_fusion, loss_cls_fusion, loss_bbox_fusion, loss_mask_fusion, "Fusion Losses")
 
-plt.tight_layout(pad=4.0)  # Ajouter des marges
+plt.tight_layout(pad=6.0)  # Ajouter des marges
 plt.show()

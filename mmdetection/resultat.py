@@ -132,10 +132,10 @@ def resultat(model, config, prefix, filename):
 
 
 # Configuration des chemins et initialisation du modèle
-chem = r"C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train"
-nom_annot = r"C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/grap/train/annotation_lcms_train.json"
-config_path = r"C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/configs/my_custom/my_custom_config.py"
-model_path = r"C:/Users/z.marouf-araibi/Desktop/dlta-ai/DLTA_AI_app/mmdetection/tools/work_dirs/my_custom_config/epoch_1.pth"
+chem = r"C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train"
+nom_annot = r"C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train/annotation_lcms_train.json"
+config_path = r"C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/my_custom_config.py"
+model_path = r"C:/Users/z.marouf-araibi/Desktop/mmdetection2/tools/work_dirs/my_custom_config/epoch_1.pth"
 
 config = mmcv.Config.fromfile(config_path)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -148,7 +148,7 @@ list_im = [i['file_name'] for i in data_dict['images']]
 
 seuil_iou = 0.1
 nbclass = [[i + 1, 0, 0, 0] for i in range(24)]
-seuil = 0.3
+seuil = []
 fin = []
 
 nom_classes = ['non_classee', 'cable', 'passe_cable', 'lumiere', 'joint', 'camera',
