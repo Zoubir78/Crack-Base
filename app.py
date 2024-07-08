@@ -1584,19 +1584,20 @@ class Frames8(Frame):
                                                     text=f"La première étape consiste à modifier le fichier de configuration du modèle de détection. \nCe fichier contient tous les paramètres nécessaires à l'entraînement du modèle, \ntels que la structure du réseau neuronal, les hyperparamètres de l'entraînement, \nles chemins des jeux de données, et les prétraitements des images. \nPour notre projet, nous avons adapté ce fichier pour inclure des informations spécifiques \nsur les types d'équipements à détecter et les annotations correspondantes. \nCela permet au modèle d'apprendre à distinguer entre différents équipements \navec une grande précision.", font=("times new roman", 13, "italic"), fill="white")
       
         self.entry_var = StringVar()
-        button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.run_cocoviewer)
+        button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.choose_cocoviewer)
         button6 = ttk.Button(self, text=f"Options Config", width=30, command=self.execute_program)
         button7 = ttk.Button(self, text=f"Voir les logs", width=30, command=self.open_log_files) 
         button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
         button9 = ttk.Button(self, text=f"Afficher le résultat", width=30, command=self.executer2)
         button10 = ttk.Button(self, text=f"Choix Epoch", width=30, command=self.executer1)
       
-        self.canvas_button = self.canvas.create_window(860, 490, window=button5)
+        self.canvas_button = self.canvas.create_window(860, 490, window=button5)     
         self.canvas_button = self.canvas.create_window(860, 525, window=button6)
         self.canvas_button = self.canvas.create_window(860, 560, window=button7)
         self.canvas_button = self.canvas.create_window(860, 595, window=button8)
         self.canvas_button = self.canvas.create_window(860, 630, window=button9)
         self.canvas_button = self.canvas.create_window(860, 665, window=button10)
+        
 
     def execute_program(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "option-config.py")
@@ -1653,17 +1654,36 @@ class Frames8(Frame):
 
         root.mainloop()
 
-    #def run_cocoviewer(self):
-    #    logging.info('Exécution de COCO Viewer')
-    #    chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
-    #    logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s')
-    #    subprocess.run(["python", chemin_script]) 
-
     def run_cocoviewer(self):
-        logging.info('Exécution de COCO Viewer')
         chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "coco-view.py")
-        logging.info('Lancement du script COCO Viewer avec images_dir: %s et annotations_file: %s')
+        logging.info('Lancement du script COCO Viewer sans paramètres spécifiques')
         subprocess.run(["python", chemin_script]) 
+
+    def run_cocoviewer2(self):
+        # Demander à l'utilisateur de sélectionner le répertoire des images
+        images_dir = filedialog.askdirectory(title="Sélectionner le répertoire des images")
+        if not images_dir:  # L'utilisateur a annulé la sélection
+            return
+
+        # Demander à l'utilisateur de sélectionner le fichier d'annotations
+        annotations_file = filedialog.askopenfilename(title="Sélectionner le fichier d'annotations", filetypes=[("Fichiers JSON", "*.json")])
+        if not annotations_file:  # L'utilisateur a annulé la sélection
+            return
+        
+        chemin_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coco-viewer", "cocoviewer.py")
+        subprocess.run(["python", chemin_script, "-i", images_dir, "-a", annotations_file]) 
+
+    def choose_cocoviewer(self):
+        # Créer deux sous-boutons pour choisir entre les deux programmes COCO Viewer
+        top = Toplevel()
+        top.title("Choisir COCO Viewer")
+        top.geometry("300x100")
+        
+        button1 = ttk.Button(top, text="COCO Viewer sans paramètres", command=self.run_cocoviewer)
+        button1.pack(pady=5)
+        
+        button2 = ttk.Button(top, text="COCO Viewer avec paramètres", command=self.run_cocoviewer2)
+        button2.pack(pady=5)
 
     def executer3(self):
         chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
