@@ -412,8 +412,8 @@ class Frames(Frame):
                                                     font=("times new roman", 12, "italic", "normal"), fill="white")
 
         self.canvas_text4 = self.canvas.create_text(780, 350,
-                                                    text=f"Nomenclature d'un dossier de données LCMS :\n - Un dossier par séquence\n "
-                                                    "- Nom de dossier : “TE_D_18062_H1870_A0” \n TE : Tube Est (TE) ou Tube Ouest (TO) \n "
+                                                    text=f"Nomenclature d'un dossier de données LCMS :\n "
+                                                    "- Exemple : TE_D_18062_H1870_A0 \n TE : Tube Est (TE) ou Tube Ouest (TO) \n "
                                                     "D (ou C) : sens de prise (sens décroissant ou croissant) \n 18062 : numéro séquence (incrémental) \n "
                                                     "H (hauteur à partir du sol en mm) \n A (angle en degrés des capteurs , 0 = à l’horizontal)",
                                                     font=("times new roman", 12, "normal"), fill="white")
