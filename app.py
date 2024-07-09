@@ -241,7 +241,7 @@ class CrackBase(Tk):
         self.side_button_equ.grid(row=3, column=1, pady=(0, 50), padx=6)
         self.side_button_equ.grid_remove()  # Caché initialement
 
-        self.side_button_fiss = Button(self.sidebar, text="Fissures", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("fissures"), font=("FontAwesome", 9, "bold"))
+        self.side_button_fiss = Button(self.sidebar, text="Fissures", bg="black", relief=tk.SUNKEN, width=10, height=2, command=lambda: self.show_page("det_fissures"), font=("FontAwesome", 9, "bold"))
         self.side_button_fiss.grid(row=3, column=1, pady=(50, 0), padx=6)
         self.side_button_fiss.grid_remove()  # Caché initialement
 
@@ -261,13 +261,14 @@ class CrackBase(Tk):
                         "sites": Frames7(body, "Sites", "images\\VT.png"),
                         "equipements": Frames8(body, "Equipements", "images\\detect.png"),
                         "nouvelle_cat": Frames9(body, "Nouvelle CAT", "images\\database.png"),
+                        "det_fissures": Frames10(body, "Fissures", image_paths1, mask_paths1),
                         "view": View(body)}
 
         self.make_frame("Accueil")
         self.show_page("Accueil")  # Augmente la page d'accueil vers le haut.
         
         # Les threads sont utilisés pour charger simultanément les autres images en arrière-plan
-        for x in ("LCMS", "2d", "fer apparent", "fissures", "equipements", "sites", "nouvelle_BDD", "nouvelle_cat", "a_propos", "view"):
+        for x in ("LCMS", "2d", "fer apparent", "fissures", "equipements", "det_fissures", "sites", "nouvelle_BDD", "nouvelle_cat", "a_propos", "view"):
             thread = Thread(target=self.make_frame, args=(x,)) 
             thread.start()
 
@@ -1941,6 +1942,157 @@ class Frames9(tk.Frame):
             self.db_manager.insert_image_data(self.db_manager.db_path, selected_table, data, update_progress)
         
         messagebox.showinfo("Succès", "Données ajoutées avec succès!")
+
+class Frames10(Frame):
+    def __init__(self, parent, category, image_paths1, mask_paths1):
+        Frame.__init__(self, parent, bg="gray")
+        self.image_paths1 = image_paths1
+        self.mask_paths1 = mask_paths1
+        self.image_objects1 = []
+        self.mask_objects1 = []
+        self.category = category
+        self.canvas = Canvas(self, width=1050, height=800)
+        self.canvas.pack(fill=BOTH, expand=True)
+        self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
+        #self.canvas_text2 = self.canvas.create_text(800, 180,
+        #                                            text=f"Pour afficher vos données enregistrées '{category.lower()}',\ncliquez sur le menu View "
+        #                                                 f"de la barre de menu \net sélectionnez 'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
+
+        self.load_images1()
+        self.create_image_grid1()
+
+        self.progress001 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
+        self.progress002 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
+
+        export_button00 = ttk.Button(self, text=f"Exporter", command=self.export_images_data00)
+        export_button11 = ttk.Button(self, text=f"Exporter", command=self.export_masques_data01)
+        export_button22 = ttk.Button(self, text=f"Exporter", command=self.export_images_data02)
+        export_button33 = ttk.Button(self, text=f"Exporter", command=self.export_masques_data03)
+
+        button3 = ttk.Button(self, text=f"Ajouter des données Images à la base 'deepCrack'", width=45, command=lambda: upload_images_deep(self, category))
+        button3.pack(pady=10)
+
+        button4 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=45, command=lambda: upload_masques_deep(self, category))
+        button4.pack(pady=10)
+
+        button5 = ttk.Button(self, text=f"Ajouter des données Images à la base 'grandMare'", width=45, command=lambda: upload_images_grand(self, category))
+        button5.pack(pady=10)
+
+        button6 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=45, command=lambda: upload_masques_grand(self, category))
+        button6.pack(pady=10)
+
+        self.canvas_button = self.canvas.create_window(760, 160, window=button3)
+        self.canvas_export_button00 = self.canvas.create_window(980, 160, window=export_button00)
+        self.canvas_button = self.canvas.create_window(760, 200, window=button4)
+        self.canvas_export_button11 = self.canvas.create_window(980, 200, window=export_button11)
+        self.canvas_progress001 = self.canvas.create_window(760, 240, window=self.progress001)
+        self.canvas_button = self.canvas.create_window(760, 280, window=button5)
+        self.canvas_export_button22 = self.canvas.create_window(980, 280, window=export_button22)
+        self.canvas_button = self.canvas.create_window(760, 320, window=button6)
+        self.canvas_export_button33 = self.canvas.create_window(980, 320, window=export_button33)
+        self.canvas_progress002 = self.canvas.create_window(760, 360, window=self.progress002)
+
+        self.entry_var = StringVar()
+
+    def load_images1(self):
+        for img_path, mask_path in zip(self.image_paths1, self.mask_paths1):
+            img = Image.open(img_path).resize((200, 200))  # Redimensionner les images pour qu'elles s'adaptent à la grille
+            mask = Image.open(mask_path).resize((200, 200))
+            self.image_objects1.append(ImageTk.PhotoImage(img))
+            self.mask_objects1.append(ImageTk.PhotoImage(mask))
+
+    def create_image_grid1(self):
+        for i, (img_obj, mask_obj) in enumerate(zip(self.image_objects1, self.mask_objects1)):
+            x = (i % 2) * 210 + 60  # Calculer la position x pour la grille (2 images par ligne, espacement de 210 pixels)
+            y = (i // 2) * 210 + 60  # Calculer la position y pour la grille (espacement de 210 pixels)
+            image_id = self.canvas.create_image(x, y, image=img_obj, anchor=NW)
+            self.canvas.tag_bind(image_id, "<Enter>", lambda e, mask=mask_obj, img_id=image_id: self.on_hover(mask, img_id))
+            self.canvas.tag_bind(image_id, "<Leave>", lambda e, img=img_obj, img_id=image_id: self.on_leave(img, img_id))
+
+    def on_hover(self, mask_image, image_id):
+        self.canvas.itemconfig(image_id, image=mask_image)
+
+    def on_leave(self, original_image, image_id):
+        self.canvas.itemconfig(image_id, image=original_image)
+    
+    def add(self, event):
+        entry = self.entry_var.get()  # Obtient le contenu de la zone d'entrée saisie par l'utilisateur.
+        if len(entry.strip()) > 2:
+            messagebox.showinfo("Ajouté avec succès", f"{entry.title().strip()} a été ajouté avec succès")
+            insert(entry.title().strip(), self.category)
+        elif len(entry.strip()) < 1:
+            pass
+        else :
+            messagebox.showinfo("Doit contenir plus de 2 caractères","Les caractères saisis sont trop courts.")
+        self.entry_var.set("")
+
+    def export_data0(self, table_name, json_filename):
+        conn = sqlite3.connect('DB\\deepCrack.db')
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
+        rows = cursor.fetchall()
+        
+        data = []
+        for row in rows:
+            data.append({
+                "id": row[0],
+                #"category": row[1],
+                #"site": row[2],
+                #"type": row[3],
+                "nom_image": row[1]
+                #"image_json": row[5]
+            })
+        
+        os.makedirs('export', exist_ok=True)
+        file_path = os.path.join('export', json_filename)
+        with open(file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=4)
+        
+        conn.close()
+        messagebox.showinfo("Exportation réussie", f"Les données de la table '{table_name}' ont été exportées avec succès dans {file_path}.")
+
+    def export_data1(self, table_name, json_filename):
+        conn = sqlite3.connect('DB\\grandMare.db')
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
+        rows = cursor.fetchall()
+        
+        data = []
+        for row in rows:
+            data.append({
+                "id": row[0],
+                #"category": row[1],
+                #"site": row[2],
+                #"tube": row[3],
+                "nom_image": row[1]
+                #"image_json": row[5]
+            })
+        
+        os.makedirs('export', exist_ok=True)
+        file_path = os.path.join('export', json_filename)
+        with open(file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=4)
+        
+        conn.close()
+        messagebox.showinfo("Exportation réussie", f"Les données de la table '{table_name}' ont été exportées avec succès dans {file_path}.")
+
+    def export_images_data00(self):
+        self.export_data0('images_deep', 'images_data_deep.json')
+
+    def export_masques_data01(self):
+        self.export_data0('masques_deep', 'masques_data_deep.json')
+
+    def export_images_data02(self):
+        self.export_data1('images_grand', 'images_data_grand.json')
+
+    def export_masques_data03(self):
+        self.export_data1('masques_grand', 'masques_data_grand.json')
+
+# Chemins des images et des masques
+image_paths1 = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg"]
+mask_paths1 = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png"]
+
+import subprocess  # Ajoutez ceci en haut de votre fichier
 
 #class OpenGLWidget(QGLWidget):
 #    def __init__(self, parent=None):

@@ -206,9 +206,9 @@ data = dict(
     train=dict(
         type='CustomCocoDataset',
         ann_file=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/train/DEP/annotations.json',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train/DEP/annotations.json',
         img_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/train',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
@@ -226,7 +226,7 @@ data = dict(
                 keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
         ],
         jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/train/DEP',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/train/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -238,9 +238,9 @@ data = dict(
     val=dict(
         type='CustomCocoDataset',
         ann_file=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/val/annotations.json',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/val/annotations.json',
         img_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/val/',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/val/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -261,7 +261,7 @@ data = dict(
                 ])
         ],
         jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/val/DEP',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/val/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
@@ -273,9 +273,9 @@ data = dict(
     test=dict(
         type='CustomCocoDataset',
         ann_file=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/test/annotations.json',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/test/annotations.json',
         img_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/test/',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/test/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -296,7 +296,7 @@ data = dict(
                 ])
         ],
         jet_prefix=
-        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap2/test/DEP',
+        'C:/Users/z.marouf-araibi/Desktop/mmdetection2/configs/my_custom/grap/test/DEP',
         classes=('non_classee', 'cable', 'passe_cable', 'lumiere', 'joint',
                  'camera', 'prisme_sos_telephone', 'bouche_incendie',
                  'reflecteur', 'prisme_issue_en_face',
