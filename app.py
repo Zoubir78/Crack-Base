@@ -798,19 +798,17 @@ class Frames2(Frame):
             export_data = []
             for row in rows:
                 data = {
-                    "site": row[1],
-                    "capteur": row[2],
-                    "nom_image": row[3],
-                    "image_json": json.loads(row[4]),
-                    "created_at": row[5]
+                    "id": row[0],
+                    "nom_image": row[1]
                 }
                 export_data.append(data)
 
             export_filename = f"{table_name}_export.json"
-            export_path = os.path.join("DB", export_filename)
 
-            with open(export_path, 'w', encoding='utf-8') as f:
-                json.dump(export_data, f, ensure_ascii=False, indent=4)
+            os.makedirs('export', exist_ok=True)
+            file_path = os.path.join('export', export_filename)
+            with open(file_path, 'w') as json_file:
+                json.dump(data, json_file, indent=4)
 
             messagebox.showinfo("Exportation terminée", f"Les données ont été exportées avec succès dans '{export_filename}'.")
 
@@ -2828,7 +2826,7 @@ class View(Frame):
 if __name__ == "__main__":
     app = CrackBase()
     app.title("Crack Base 2.0 - ENDSUM")
-    app.iconbitmap("images/cb.ico")
+    #app.iconbitmap("images/cb.ico")
     app.maxsize(1300,800)
     app.minsize(1300,800)
     app.mainloop()
