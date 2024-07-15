@@ -32,6 +32,7 @@ from newdb import *
 from ttkthemes import ThemedTk
 import webbrowser
 import math
+import base64
 #import nbformat
 #from nbconvert.preprocessors import ExecutePreprocessor
 
@@ -608,6 +609,235 @@ class Frames2(Frame):
         self.entry_var = StringVar()
         self.check_var = BooleanVar()
         self.check_var.set(True)
+        
+        # Bouton "+" pour ajouter une nouvelle base de données
+        add_db_button = ttk.Button(self, text="\uf067", command=self.open_create_database_window)
+        add_db_button.pack(pady=10)
+        self.canvas_db_button = self.canvas.create_window(280, 680, window=add_db_button)
+
+    def open_create_database_window(self):
+        self.create_db_window = tk.Toplevel(self)
+        self.create_db_window.title("Créer une nouvelle base de données")
+
+        self.new_db_name_label = tk.Label(self.create_db_window, text="Nom de la nouvelle base de données:")
+        self.new_db_name_label.pack()
+        self.new_db_name_entry = tk.Entry(self.create_db_window)
+        self.new_db_name_entry.pack()
+
+        self.table_name_label = tk.Label(self.create_db_window, text="Nom de la table:")
+        self.table_name_label.pack()
+        self.table_name_entry = tk.Entry(self.create_db_window)
+        self.table_name_entry.pack()
+
+        self.add_table_button = ttk.Button(self.create_db_window, text="Ajouter une table", command=self.add_table)
+        self.add_table_button.pack(pady=10)
+
+        self.tables_frame = ttk.Frame(self.create_db_window)
+        self.tables_frame.pack(pady=10)
+
+    def add_table(self):
+        table_name = self.table_name_entry.get().strip()
+        if not table_name:
+            messagebox.showerror("Erreur", "Veuillez saisir un nom pour la table.")
+            return
+
+        table_frame = ttk.Frame(self.tables_frame)
+        table_frame.pack(pady=10, padx=10, fill=tk.X)
+
+        table_name_label = ttk.Label(table_frame, text=f"Table : {table_name}")
+        table_name_label.pack()
+
+        self.columns_frame = ttk.Frame(table_frame)
+        self.columns_frame.pack(pady=10)
+
+        self.column_name_entries = []
+
+        ttk.Label(self.columns_frame, text="Nom de la colonne:").grid(row=0, column=0, padx=5, pady=5)
+        self.column_name_entry = ttk.Entry(self.columns_frame)
+        self.column_name_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        self.add_column_button = ttk.Button(self.columns_frame, text="Ajouter une colonne", command=self.add_column)
+        self.add_column_button.grid(row=1, column=0, columnspan=2, pady=10)
+
+        self.save_columns_button = ttk.Button(self.columns_frame, text="Sauvegarder", command=self.save_columns)
+        self.save_columns_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+    def add_column(self):
+        column_name = self.column_name_entry.get().strip()
+        if not column_name:
+            messagebox.showerror("Erreur", "Veuillez saisir un nom pour la colonne.")
+            return
+
+        self.column_name_entries.append(column_name)
+
+        new_column_label = ttk.Label(self.columns_frame, text=f"{column_name}")
+        new_column_label.grid(row=len(self.column_name_entries) + 1, column=0, padx=5, pady=5)
+
+        self.column_name_entry.delete(0, tk.END)
+
+    def save_columns(self):
+        self.add_column_button.config(state=tk.DISABLED)
+        self.save_columns_button.config(state=tk.DISABLED)
+
+        # Créer la table et les colonnes dans la base de données
+        db_filename = os.path.join("DB", f"{self.new_db_name_entry.get().strip()}.db")
+        conn = sqlite3.connect(db_filename)
+        self.create_table(conn, self.table_name_entry.get().strip(), self.column_name_entries)
+        conn.close()
+
+        self.add_data_button = ttk.Button(self.create_db_window, text="Ajouter des données", command=self.add_data)
+        self.add_data_button.pack(pady=10)
+        self.export_data_button = ttk.Button(self.create_db_window, text="Exporter les données (JSON)", command=self.export_data)
+        self.export_data_button.pack(pady=10)
+
+    def create_table(self, conn, table_name, column_names):
+        try:
+            cursor = conn.cursor()
+            columns = ", ".join([f"{col} TEXT" for col in column_names])
+            cursor.execute(f'''
+                CREATE TABLE IF NOT EXISTS {table_name} (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    {columns},
+                    nom_image TEXT,
+                    image_json TEXT,
+                    created_at TEXT
+                )
+            ''')
+            conn.commit()
+        except sqlite3.Error as e:
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la création de la table : {e}")
+
+    def add_data(self):
+        # Demander les valeurs pour chaque colonne définie par l'utilisateur
+        column_values = self.select_site_details()
+
+        folder_path = self.select_directory()
+        if folder_path:
+            files = [folder for folder in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, folder))]
+            num_files = len(files)
+
+            progress_window = tk.Toplevel(self.create_db_window)
+            progress_window.title("Importation en cours")
+
+            progress_bar = ttk.Progressbar(progress_window, orient="horizontal", length=300, mode="determinate")
+            progress_bar.pack(pady=20)
+            progress_bar["maximum"] = num_files
+
+            progress_label = ttk.Label(progress_window, text="0%")
+            progress_label.pack()
+
+            db_filename = os.path.join("DB", f"{self.new_db_name_entry.get().strip()}.db")
+            conn = sqlite3.connect(db_filename)
+
+            for i, folder in enumerate(files):
+                input_image_path = os.path.join(folder_path, folder, 'input.png')
+                if os.path.isfile(input_image_path):
+                    with open(input_image_path, 'rb') as image_file:
+                        image_bytes = image_file.read()
+                    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+                    image_json = {
+                        "nom_image": 'input.png',
+                        "image_base64": image_base64
+                    }
+
+                    self.insert_data(conn, self.table_name_entry.get().strip(), self.column_name_entries, column_values, 'input.png', json.dumps(image_json))
+
+                    progress_bar["value"] = i + 1
+                    progress_label.config(text=f"{int(((i + 1) / num_files) * 100)}%")
+                    progress_window.update()
+
+            conn.close()
+            progress_window.destroy()
+            messagebox.showinfo("Importation terminée", "Données importées avec succès!")
+
+    def select_site_details(self):
+        column_values = []
+        top = tk.Toplevel(self.create_db_window)
+        top.title("Saisir les détails du site")
+
+        for column in self.column_name_entries:
+            ttk.Label(top, text=f"Veuillez entrer la valeur pour {column} :").pack(pady=5)
+            value_var = tk.StringVar()
+            value_entry = ttk.Entry(top, textvariable=value_var)
+            value_entry.pack(pady=5)
+            column_values.append(value_var)
+
+        def confirm():
+            if all(var.get() for var in column_values):
+                top.destroy()
+
+        confirm_button = ttk.Button(top, text="Confirmer", command=confirm)
+        confirm_button.pack(pady=10)
+
+        top.wait_window()
+
+        return [var.get() for var in column_values]
+
+    def select_directory(self):
+        folder_path = filedialog.askdirectory(title="Sélectionner un dossier avec des images")
+        return folder_path
+
+    def export_data(self):
+        table_name = self.new_db_name_entry.get().strip()
+        db_filename = os.path.join("DB", f"{table_name}.db")
+
+        if not os.path.exists(db_filename):
+            messagebox.showerror("Erreur", f"La base de données '{table_name}' n'existe pas.")
+            return
+
+        try:
+            conn = sqlite3.connect(db_filename)
+            cursor = conn.cursor()
+            cursor.execute(f"SELECT * FROM {self.table_name_entry.get().strip()}")
+            rows = cursor.fetchall()
+
+            if not rows:
+                messagebox.showwarning("Avertissement", "Aucune donnée à exporter.")
+                return
+
+            export_data = []
+            for row in rows:
+                data = {
+                    "site": row[1],
+                    "capteur": row[2],
+                    "nom_image": row[3],
+                    "image_json": json.loads(row[4]),
+                    "created_at": row[5]
+                }
+                export_data.append(data)
+
+            export_filename = f"{table_name}_export.json"
+            export_path = os.path.join("DB", export_filename)
+
+            with open(export_path, 'w', encoding='utf-8') as f:
+                json.dump(export_data, f, ensure_ascii=False, indent=4)
+
+            messagebox.showinfo("Exportation terminée", f"Les données ont été exportées avec succès dans '{export_filename}'.")
+
+        except sqlite3.Error as e:
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de l'exportation des données : {e}")
+
+        finally:
+            if conn:
+                conn.close()
+
+    def insert_data(self, conn, table_name, column_names, column_values, nom_image, image_json):
+        try:
+            created_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cursor = conn.cursor()
+
+            insert_columns = column_names + ['nom_image', 'image_json', 'created_at']
+            placeholders = ', '.join(['?' for _ in insert_columns])
+            insert_values = column_values + [nom_image, image_json, created_at]
+            
+            cursor.execute(f'''
+                INSERT INTO {table_name} ({', '.join(insert_columns)})
+                VALUES ({placeholders})
+            ''', insert_values)
+            
+            conn.commit()
+        except sqlite3.Error as e:
+            print(e)
 
     def add(self, event=None):
         entry = self.entry_var.get()
@@ -1609,7 +1839,7 @@ class Frames8(Frame):
         logging.info('Ouverture des fichiers de logs')
         root = ThemedTk(theme="breeze")
         root.title("Logs")
-        root.geometry("1000x800")
+        root.geometry("1200x800")
 
         # Récupérer la liste des fichiers logs dans le premier dossier
         log_files1 = [f for f in os.listdir(log_directory) if os.path.isfile(os.path.join(log_directory, f))]
@@ -1617,6 +1847,7 @@ class Frames8(Frame):
         # Récupérer la liste des fichiers logs dans le deuxième dossier et filtrer les fichiers .log
         log_directory2 = r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\work_dirs\my_custom_config"
         log_files2 = [f for f in os.listdir(log_directory2) if os.path.isfile(os.path.join(log_directory2, f)) and f.endswith(".log")]
+        log_files3 = [f for f in os.listdir(log_directory2) if os.path.isfile(os.path.join(log_directory2, f)) and f.endswith(".json")]
 
         # Fonction pour afficher le contenu du fichier log correspondant au fichier sélectionné dans la liste déroulante
         def show_selected_log(event, log_combobox):
@@ -1636,7 +1867,7 @@ class Frames8(Frame):
         label1.pack(side="left", padx=10)
 
         # Créer une liste déroulante pour sélectionner les fichiers de log du premier répertoire
-        log_combobox1 = ttk.Combobox(combobox_frame, values=log_files1, width=50)
+        log_combobox1 = ttk.Combobox(combobox_frame, values=log_files1, width=30)
         log_combobox1.pack(side="left", padx=10)
         log_combobox1.bind("<<ComboboxSelected>>", lambda event: show_selected_log(event, log_combobox1))  # Passer log_combobox1 comme argument
 
@@ -1645,9 +1876,18 @@ class Frames8(Frame):
         label2.pack(side="left", padx=10)
 
         # Créer une liste déroulante pour sélectionner les fichiers de log filtrés du deuxième répertoire
-        log_combobox2 = ttk.Combobox(combobox_frame, values=log_files2, width=50)
+        log_combobox2 = ttk.Combobox(combobox_frame, values=log_files2, width=30)
         log_combobox2.pack(side="left", padx=10)
         log_combobox2.bind("<<ComboboxSelected>>", lambda event: show_selected_log(event, log_combobox2))  # Passer log_combobox2 comme argument
+
+        # Ajouter une étiquette pour le deuxième répertoire
+        label3 = tk.Label(combobox_frame, text="Cls logs")
+        label3.pack(side="left", padx=10)
+
+        # Créer une liste déroulante pour sélectionner les fichiers de log filtrés du deuxième répertoire
+        log_combobox3 = ttk.Combobox(combobox_frame, values=log_files3, width=30)
+        log_combobox3.pack(side="left", padx=10)
+        log_combobox3.bind("<<ComboboxSelected>>", lambda event: show_selected_log(event, log_combobox3))  # Passer log_combobox2 comme argument
 
         # Ajoutez un widget Text pour afficher le contenu du fichier log sélectionné
         log_text = tk.Text(root, wrap="word", bg="black", fg="white", font=("Arial", 10))
@@ -2121,6 +2361,34 @@ import subprocess  # Ajoutez ceci en haut de votre fichier
 #        glVertex2f(self.width / 2, self.height)
 #        glEnd()
 #        self.swapBuffers()
+class TreeViewWindow(tk.Toplevel):
+    def __init__(self, parent, db_directory):
+        super().__init__(parent)
+        self.title("Arborescence des BDD et tables")
+        self.db_directory = db_directory
+        self.treeview = ttk.Treeview(self)
+        self.treeview.pack(fill=tk.BOTH, expand=True)
+        self.view_all_data()
+
+    def view_all_data(self):
+        self.treeview.delete(*self.treeview.get_children())
+        db_files = [f for f in os.listdir(self.db_directory) if f.endswith('.db')]
+
+        for db_file in db_files:
+            db_path = os.path.join(self.db_directory, db_file)
+            db_id = self.treeview.insert('', 'end', text=db_file, open=False)
+            try:
+                connection = sqlite3.connect(db_path)
+                cursor = connection.cursor()
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+                tables = cursor.fetchall()
+                for table in tables:
+                    self.treeview.insert(db_id, 'end', text=table[0], open=False)
+            except sqlite3.Error as e:
+                messagebox.showerror("Erreur", f"Erreur lors du chargement des tables: {e}")
+            finally:
+                if connection:
+                    connection.close()
 class View(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
@@ -2162,7 +2430,7 @@ class View(Frame):
         button_pair1 = Frame(button_frame)
         button_pair1.pack(fill=tk.X)
         ttk.Button(button_pair1, text="Voir le dossier des BDD", width=40, command=self.explorer).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
-        ttk.Button(button_pair1, text="Voir toutes les données", width=40, command=self.view_all_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
+        ttk.Button(button_pair1, text="Voir l'arborescence des BDD", width=40, command=self.view_all_data).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5)
 
         # Cadre pour la deuxième paire de boutons
         button_pair2 = Frame(button_frame)
@@ -2348,24 +2616,7 @@ class View(Frame):
             messagebox.showwarning("Avertissement", "Veuillez saisir un numéro de page valide.")
 
     def view_all_data(self):
-        database_name = self.database_combobox.get()
-        table_name = self.table_combobox.get()
-        if not database_name or not table_name:
-            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données et une table.")
-            return
-
-        db_path = os.path.join(self.db_directory, database_name)
-        try:
-            connection = sqlite3.connect(db_path)
-            cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM {table_name}")
-            data = cursor.fetchall()
-            columns = [description[0] for description in cursor.description]
-            connection.close()
-            self.display_data(f"Données de la table {table_name}", columns, data)
-        except sqlite3.Error as e:
-            print(f"Une erreur s'est produite : {e}")
-            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+        TreeViewWindow(self, self.db_directory)
 
     def view_lcms_data(self):
         database_name = self.database_combobox.get()
@@ -2436,8 +2687,28 @@ class View(Frame):
             print(f"Une erreur s'est produite : {e}")
             messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données Fissures : {e}")
 
+    def view_data(self):
+        database_name = self.database_combobox.get()
+        table_name = self.table_combobox.get()
+        if not database_name or not table_name:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner une base de données et une table.")
+            return
+
+        db_path = os.path.join(self.db_directory, database_name)
+        try:
+            connection = sqlite3.connect(db_path)
+            cursor = connection.cursor()
+            cursor.execute(f"SELECT * FROM {table_name}")
+            data = cursor.fetchall()
+            columns = [description[0] for description in cursor.description]
+            connection.close()
+            self.display_data(f"Données de la table {table_name}", columns, data)
+        except sqlite3.Error as e:
+            print(f"Une erreur s'est produite : {e}")
+            messagebox.showerror("Erreur", f"Une erreur s'est produite lors de la visualisation des données : {e}")
+
     def display_selected_table(self, event):
-        self.view_all_data()
+        self.view_data()
 
     def delete_item(self):
         selected_item = self.tree.selection()
