@@ -1545,7 +1545,11 @@ class Frames6(Frame):
 
         self.canvas_text4 = self.canvas.create_text(400, 580,
                                                     text=f"Que vous soyez un développeur cherchant à gérer des données volumineuses, un analyste de données \nexplorant des tendances complexes ou un étudiant apprenant les bases de la gestion de bases de données, \nCrack Base est l'outil idéal pour vos besoins.", font=("times new roman", 13, "italic"), fill="white")
-      
+        
+        # Créer le bouton "Voir PDF"
+        self.pdf_button = Button(self, text="Voir PDF", command=self.open_pdf)
+        self.pdf_button.pack(pady=20)  # Ajoute un espace entre le bouton et les autres éléments
+
         self.entry_var = StringVar()
     
     def add(self, event):
@@ -1555,9 +1559,14 @@ class Frames6(Frame):
             insert(entry.title().strip(), self.category)
         elif len(entry.strip()) < 1:
             pass
-        else :
-            messagebox.showinfo("Doit contenir plus de 2 caractères","Les caractères saisis sont trop courts.")
+        else:
+            messagebox.showinfo("Doit contenir plus de 2 caractères", "Les caractères saisis sont trop courts.")
         self.entry_var.set("")
+
+    def open_pdf(self):
+        # Chemin du fichier PDF à ouvrir
+        pdf_path = "crack-base.pdf"
+        webbrowser.open_new(pdf_path)
 
 class Frames7(Frame):
     def __init__(self, parent, category, image_path):
