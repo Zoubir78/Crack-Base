@@ -58,7 +58,15 @@ class CrackBase(Tk):
     # Fonction pour exécuter SAM
     def executer2(self):
         chemin_annotator = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sam\\annotator.py")
-        subprocess.run(["python", "sam\\annotator.py"])     
+        subprocess.run(["python", "sam\\annotator.py"])   
+
+    # Fonction pour exécuter Anylabeling
+    def run_anylabeling(self):
+        # Définir le chemin du répertoire racine où se trouve 'anylabeling'
+        chemin_racine = os.path.join(os.path.dirname(os.path.abspath(__file__)), "anylabeling", "anylabeling")
+        
+        # Exécuter la commande 'anylabeling' dans ce répertoire
+        subprocess.run(["anylabeling"], cwd=chemin_racine)
 
     # Fonction pour exécuter npz_img
     def run_npz_img(self):
@@ -176,7 +184,10 @@ class CrackBase(Tk):
         menu.add_cascade(label="Label", menu=label)
 
         sam = Menu(menu, tearoff=0)
-        menu.add_cascade(label="SAM", command=self.executer2)
+        self.add_menu_item(sam, label="SAM", command=self.executer2)
+        sam.add_separator()
+        self.add_menu_item(sam, label="SAM2", command=self.run_anylabeling)
+        menu.add_cascade(label="SAM", menu=sam)
 
         self.add_menu_item(contact, label="Github", command=lambda: open_new("https://github.com/Zoubir78/Crack-Base/tree/master"))
         contact.add_separator()
