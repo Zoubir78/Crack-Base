@@ -2211,19 +2211,13 @@ class Frames10(Frame):
         self.category = category
         self.canvas = Canvas(self, width=1050, height=800)
         self.canvas.pack(fill=BOTH, expand=True)
-        self.canvas_text1 = self.canvas.create_text(760, 70, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
+        self.canvas_text1 = self.canvas.create_text(720, 70, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
         self.canvas_text2 = self.canvas.create_text(760, 140, text=f"La première étape dans la détection des fissures consiste à lancer \nun entraînement de réseau profond afin d'obtenir un modèle pré-entraîné. \nCe modèle est ensuite utilisé pour détecter les fissures sur différentes \nimages de structures en béton des ouvrages d'art.", font=("times new roman", 13, "italic"), fill="white")
 
         self.load_images1()
         self.create_image_grid1()
 
         self.progress001 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
-        self.progress002 = Progressbar(self, orient=tk.HORIZONTAL, length=300, mode='determinate')
-
-        export_button00 = ttk.Button(self, text=f"Exporter", command=self.export_images_data00)
-        export_button11 = ttk.Button(self, text=f"Exporter", command=self.export_masques_data01)
-        export_button22 = ttk.Button(self, text=f"Exporter", command=self.export_images_data02)
-        export_button33 = ttk.Button(self, text=f"Exporter", command=self.export_masques_data03)
 
         button3 = ttk.Button(self, text=f"Ajouter des données Images à la base 'deepCrack'", width=45, command=lambda: upload_images_deep(self, category))
         button3.pack(pady=10)
@@ -2231,24 +2225,47 @@ class Frames10(Frame):
         button4 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=45, command=lambda: upload_masques_deep(self, category))
         button4.pack(pady=10)
 
-        button5 = ttk.Button(self, text=f"Ajouter des données Images à la base 'grandMare'", width=45, command=lambda: upload_images_grand(self, category))
-        button5.pack(pady=10)
-
-        button6 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=45, command=lambda: upload_masques_grand(self, category))
-        button6.pack(pady=10)
+        button5 = ttk.Button(self, text=f"Options Config", width=30, command=self.options_config)
+        button6 = ttk.Button(self, text=f"Voir les logs", width=30, command=self.open_log) 
+        button7 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.train)
+        button8 = ttk.Button(self, text=f"Evaluation du modèle", width=30, command=self.eval)
+        button9 = ttk.Button(self, text=f"Afficher le résultat", width=30, command=self.result)
 
         self.canvas_button = self.canvas.create_window(720, 260, window=button3)
-        self.canvas_export_button00 = self.canvas.create_window(940, 260, window=export_button00)
         self.canvas_button = self.canvas.create_window(720, 300, window=button4)
-        self.canvas_export_button11 = self.canvas.create_window(940, 300, window=export_button11)
         self.canvas_progress001 = self.canvas.create_window(720, 340, window=self.progress001)
-        self.canvas_button = self.canvas.create_window(720, 380, window=button5)
-        self.canvas_export_button22 = self.canvas.create_window(940, 380, window=export_button22)
+        self.canvas_button = self.canvas.create_window(720, 380, window=button5)     
         self.canvas_button = self.canvas.create_window(720, 420, window=button6)
-        self.canvas_export_button33 = self.canvas.create_window(940, 420, window=export_button33)
-        self.canvas_progress002 = self.canvas.create_window(720, 460, window=self.progress002)
+        self.canvas_button = self.canvas.create_window(720, 460, window=button7)
+        self.canvas_button = self.canvas.create_window(720, 500, window=button8)
+        self.canvas_button = self.canvas.create_window(720, 540, window=button9)
 
         self.entry_var = StringVar()
+
+    def options_config(self):
+        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
+        logging.info('Exécution du batch pour l\'entraînement: %s', chemin_batch)
+        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
+
+    def train(self):
+        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
+        logging.info('Exécution du batch pour l\'entraînement: %s', chemin_batch)
+        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
+
+    def result(self):
+        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_resultat.bat")
+        logging.info('Exécution du batch pour afficher le résultat: %s', chemin_batch)
+        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
+
+    def eval(self):
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deepcrack", "eval.py")
+        logging.info('Exécution du script eval.py: %s', chemin)
+        subprocess.run(["python", chemin])
+
+    def open_log(self):
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mmdetection", "open_log.py")
+        logging.info('Exécution du script open_log.py: %s', chemin)
+        subprocess.run(["python", chemin])
 
     def load_images1(self):
         for img_path, mask_path in zip(self.image_paths1, self.mask_paths1):
@@ -2307,76 +2324,16 @@ class Frames10(Frame):
         conn.close()
         messagebox.showinfo("Exportation réussie", f"Les données de la table '{table_name}' ont été exportées avec succès dans {file_path}.")
 
-    def export_data1(self, table_name, json_filename):
-        conn = sqlite3.connect('DB\\grandMare.db')
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT id, nom_image FROM {table_name}")
-        rows = cursor.fetchall()
-        
-        data = []
-        for row in rows:
-            data.append({
-                "id": row[0],
-                #"category": row[1],
-                #"site": row[2],
-                #"tube": row[3],
-                "nom_image": row[1]
-                #"image_json": row[5]
-            })
-        
-        os.makedirs('export', exist_ok=True)
-        file_path = os.path.join('export', json_filename)
-        with open(file_path, 'w') as json_file:
-            json.dump(data, json_file, indent=4)
-        
-        conn.close()
-        messagebox.showinfo("Exportation réussie", f"Les données de la table '{table_name}' ont été exportées avec succès dans {file_path}.")
-
     def export_images_data00(self):
         self.export_data0('images_deep', 'images_data_deep.json')
 
     def export_masques_data01(self):
         self.export_data0('masques_deep', 'masques_data_deep.json')
 
-    def export_images_data02(self):
-        self.export_data1('images_grand', 'images_data_grand.json')
-
-    def export_masques_data03(self):
-        self.export_data1('masques_grand', 'masques_data_grand.json')
-
 # Chemins des images et des masques
 image_paths1 = ["images/11129.jpg", "images/11142-1.jpg", "images/11142-2.jpg", "images/11169-1.jpg", "images/11169-2.jpg", "images/11215-1.jpg"]
 mask_paths1 = ["images/11129.png", "images/11142-1.png", "images/11142-2.png", "images/11169-1.png", "images/11169-2.png", "images/11215-1.png"]
 
-import subprocess  # Ajoutez ceci en haut de votre fichier
-
-#class OpenGLWidget(QGLWidget):
-#    def __init__(self, parent=None):
-#        super(OpenGLWidget, self).__init__(parent)
-#        self.width = self.size().width()
-#        self.height = self.size().height()
-#
-#    def initializeGL(self):
-#        glEnable(GL_DEPTH_TEST)
-#
-#    def resizeGL(self, width, height):
-#        self.width = width
-#        self.height = height
-#        glViewport(0, 0, self.width, self.height)
-#        glMatrixMode(GL_PROJECTION)
-#        glLoadIdentity()
-#        #gluOrtho2D(0, self.width, 0, self.height)
-#        glMatrixMode(GL_MODELVIEW)
-#        glLoadIdentity()
-#
-#    def paintGL(self):
-#        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-#        glBegin(GL_TRIANGLES)
-#        glVertex2f(0, 0)
-#        glVertex2f(self.width, 0)
-#        glVertex2f(self.width / 2, self.height)
-#        glEnd()
-#        self.swapBuffers()
 class TreeViewWindow(tk.Toplevel):
     def __init__(self, parent, db_directory):
         super().__init__(parent)
