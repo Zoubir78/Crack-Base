@@ -2211,10 +2211,9 @@ class Frames10(Frame):
         self.category = category
         self.canvas = Canvas(self, width=1050, height=800)
         self.canvas.pack(fill=BOTH, expand=True)
-        self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 30, "italic"), fill="white")
-        #self.canvas_text2 = self.canvas.create_text(800, 180,
-        #                                            text=f"Pour afficher vos données enregistrées '{category.lower()}',\ncliquez sur le menu View "
-        #                                                 f"de la barre de menu \net sélectionnez 'View {category}'.", font=("times new roman", 12, "normal"), fill="white")
+        self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(800, 180, text=f"Pour afficher vos données enregistrées,\ncliquez sur le menu View "
+                                                        f"de la barre de menu \net sélectionnez.", font=("times new roman", 12, "italic"), fill="white")
 
         self.load_images1()
         self.create_image_grid1()
