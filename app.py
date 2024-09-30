@@ -2211,9 +2211,8 @@ class Frames10(Frame):
         self.category = category
         self.canvas = Canvas(self, width=1050, height=800)
         self.canvas.pack(fill=BOTH, expand=True)
-        self.canvas_text1 = self.canvas.create_text(800, 80, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
-        self.canvas_text2 = self.canvas.create_text(800, 180, text=f"Pour afficher vos données enregistrées,\ncliquez sur le menu View "
-                                                        f"de la barre de menu \net sélectionnez.", font=("times new roman", 12, "italic"), fill="white")
+        self.canvas_text1 = self.canvas.create_text(760, 70, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(760, 140, text=f"La première étape dans la détection des fissures consiste à lancer \nun entraînement de réseau profond afin d'obtenir un modèle pré-entraîné. \nCe modèle est ensuite utilisé pour détecter les fissures sur différentes \nimages de structures en béton des ouvrages d'art.", font=("times new roman", 13, "italic"), fill="white")
 
         self.load_images1()
         self.create_image_grid1()
@@ -2238,16 +2237,16 @@ class Frames10(Frame):
         button6 = ttk.Button(self, text=f"Ajouter des données VT (format COCO)", width=45, command=lambda: upload_masques_grand(self, category))
         button6.pack(pady=10)
 
-        self.canvas_button = self.canvas.create_window(760, 160, window=button3)
-        self.canvas_export_button00 = self.canvas.create_window(980, 160, window=export_button00)
-        self.canvas_button = self.canvas.create_window(760, 200, window=button4)
-        self.canvas_export_button11 = self.canvas.create_window(980, 200, window=export_button11)
-        self.canvas_progress001 = self.canvas.create_window(760, 240, window=self.progress001)
-        self.canvas_button = self.canvas.create_window(760, 280, window=button5)
-        self.canvas_export_button22 = self.canvas.create_window(980, 280, window=export_button22)
-        self.canvas_button = self.canvas.create_window(760, 320, window=button6)
-        self.canvas_export_button33 = self.canvas.create_window(980, 320, window=export_button33)
-        self.canvas_progress002 = self.canvas.create_window(760, 360, window=self.progress002)
+        self.canvas_button = self.canvas.create_window(720, 260, window=button3)
+        self.canvas_export_button00 = self.canvas.create_window(940, 260, window=export_button00)
+        self.canvas_button = self.canvas.create_window(720, 300, window=button4)
+        self.canvas_export_button11 = self.canvas.create_window(940, 300, window=export_button11)
+        self.canvas_progress001 = self.canvas.create_window(720, 340, window=self.progress001)
+        self.canvas_button = self.canvas.create_window(720, 380, window=button5)
+        self.canvas_export_button22 = self.canvas.create_window(940, 380, window=export_button22)
+        self.canvas_button = self.canvas.create_window(720, 420, window=button6)
+        self.canvas_export_button33 = self.canvas.create_window(940, 420, window=export_button33)
+        self.canvas_progress002 = self.canvas.create_window(720, 460, window=self.progress002)
 
         self.entry_var = StringVar()
 
