@@ -1,6 +1,6 @@
 GPU_IDS=$1
 
-DATAROOT=./datasets/DeepCrack
+DATAROOT=./deepcrack/datasets/DeepCrack
 NAME=deepcrack
 MODEL=deepcrack
 DATASET_MODE=deepcrack

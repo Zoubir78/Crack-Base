@@ -2226,7 +2226,7 @@ class Frames10(Frame):
         button4.pack(pady=10)
 
         button5 = ttk.Button(self, text=f"Options Config", width=30, command=self.options_config)
-        button6 = ttk.Button(self, text=f"Voir les logs", width=30, command=self.open_log) 
+        button6 = ttk.Button(self, text=f"Voir les logs", width=30, command=self.open_logs) 
         button7 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.train)
         button8 = ttk.Button(self, text=f"Evaluation du modèle", width=30, command=self.eval)
         button9 = ttk.Button(self, text=f"Afficher le résultat", width=30, command=self.result)
@@ -2248,9 +2248,29 @@ class Frames10(Frame):
         subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
 
     def train(self):
-        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
-        logging.info('Exécution du batch pour l\'entraînement: %s', chemin_batch)
-        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
+        # Définir le chemin vers le répertoire "deepcrack"
+        deepcrack_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deepcrack")
+        
+        # Chemin vers le script d'entraînement
+        chemin_script = os.path.join(deepcrack_dir, "scripts", "train_deepcrack.sh")
+        
+        # Vérifier si le script existe
+        if not os.path.exists(chemin_script):
+            logging.error("Le fichier d'entraînement n'existe pas : %s", chemin_script)
+            return
+
+        logging.info('Exécution du script pour l\'entraînement: %s', chemin_script)
+
+        try:
+            # Chemin vers bash.exe
+            bash_path = "C:/Program Files/Git/git-bash.exe"
+            
+            # Exécuter le script avec bash en se plaçant dans le répertoire "deepcrack"
+            subprocess.run([bash_path, '-c', f'cd "{deepcrack_dir}" && sh ./scripts/train_deepcrack.sh'], check=True)
+        except subprocess.CalledProcessError as e:
+            logging.error("Erreur lors de l'exécution du script d'entraînement : %s", e)
+        except Exception as e:
+            logging.error("Erreur inattendue lors de l'exécution du script : %s", e)
 
     def result(self):
         chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_resultat.bat")
@@ -2258,14 +2278,66 @@ class Frames10(Frame):
         subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
 
     def eval(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deepcrack", "eval.py")
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deepcrack", "eval", "eval.py")
         logging.info('Exécution du script eval.py: %s', chemin)
         subprocess.run(["python", chemin])
 
-    def open_log(self):
-        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mmdetection", "open_log.py")
-        logging.info('Exécution du script open_log.py: %s', chemin)
-        subprocess.run(["python", chemin])
+    def open_logs(self):
+        logging.info('Ouverture des fichiers de logs')
+
+        # Créer une fenêtre principale avec le thème "breeze"
+        root = ThemedTk(theme="breeze")
+        root.title("Logs")
+        root.geometry("1000x800")
+
+        # Récupérer les répertoires des logs (corrigé pour utiliser les dossiers)
+        log_directory1 = r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\deepcrack\checkpoints\deepcrack"
+        log_directory2 = r"C:\Users\z.marouf-araibi\Desktop\Crack-Base\deepcrack\checkpoints\deepcrack"
+
+        # Lister les fichiers .txt dans le premier et deuxième répertoire
+        log_files1 = [f for f in os.listdir(log_directory1) if f == "loss_log.txt"]
+        log_files2 = [f for f in os.listdir(log_directory2) if f == "opt.txt"]
+
+        # Fonction pour afficher le contenu du fichier log sélectionné
+        def show_log(event, log_combobox):
+            selected_log = log_combobox.get()
+            log_directory_selected = log_directory1 if log_combobox == log_combobox1 else log_directory2
+            file_path = os.path.join(log_directory_selected, selected_log)
+            try:
+                with open(file_path, 'r') as f:
+                    log_content = f.read()
+                log_text.delete("1.0", tk.END)  # Effacer le texte précédent
+                log_text.insert(tk.END, log_content)
+            except Exception as e:
+                logging.error(f"Erreur lors de l'ouverture du fichier {file_path}: {e}")
+
+        # Créer une frame pour les listes déroulantes
+        combobox_frame = tk.Frame(root)
+        combobox_frame.pack(side="top", pady=10)
+
+        # Étiquette pour le premier répertoire (Loss logs)
+        label1 = tk.Label(combobox_frame, text="Loss logs")
+        label1.pack(side="left", padx=10)
+
+        # Liste déroulante pour le premier répertoire (Loss logs)
+        log_combobox1 = ttk.Combobox(combobox_frame, values=log_files1, width=30)
+        log_combobox1.pack(side="left", padx=10)
+        log_combobox1.bind("<<ComboboxSelected>>", lambda event: show_log(event, log_combobox1))
+
+        # Étiquette pour le deuxième répertoire (Option logs)
+        label2 = tk.Label(combobox_frame, text="Option logs")
+        label2.pack(side="left", padx=10)
+
+        # Liste déroulante pour le deuxième répertoire (Option logs)
+        log_combobox2 = ttk.Combobox(combobox_frame, values=log_files2, width=30)
+        log_combobox2.pack(side="left", padx=10)
+        log_combobox2.bind("<<ComboboxSelected>>", lambda event: show_log(event, log_combobox2))
+
+        # Zone de texte pour afficher le contenu des logs
+        log_text = tk.Text(root, wrap="word", bg="black", fg="white", font=("Arial", 10))
+        log_text.pack(expand=True, fill="both")
+
+        root.mainloop()
 
     def load_images1(self):
         for img_path, mask_path in zip(self.image_paths1, self.mask_paths1):
