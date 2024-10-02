@@ -2212,7 +2212,7 @@ class Frames10(Frame):
         self.canvas = Canvas(self, width=1050, height=800)
         self.canvas.pack(fill=BOTH, expand=True)
         self.canvas_text1 = self.canvas.create_text(720, 70, text=f"{category}", font=("Castellar", 20, "italic"), fill="white")
-        self.canvas_text2 = self.canvas.create_text(760, 140, text=f"La première étape dans la détection des fissures consiste à lancer \nun entraînement de réseau profond afin d'obtenir un modèle pré-entraîné. \nCe modèle est ensuite utilisé pour détecter les fissures sur différentes \nimages de structures en béton des ouvrages d'art.", font=("times new roman", 13, "italic"), fill="white")
+        self.canvas_text2 = self.canvas.create_text(760, 140, text=f"La première étape de la détection des fissures consiste à ajuster, si nécessaire, \nles paramètres dans le fichier de configuration avant de lancer l'entraînement \nd'un réseau de neurones profonds. Une fois le modèle pré-entraîné obtenu, \nil est utilisé pour identifier les fissures sur diverses images de structures \nen béton des ouvrages d'art.", font=("times new roman", 13, "italic"), fill="white")
 
         self.load_images1()
         self.create_image_grid1()

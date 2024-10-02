@@ -1,17 +1,17 @@
-GPU_IDS=$1
+#!/bin/bash
 
-DATAROOT=C:/Users/z.marouf-araibi/Desktop/Crack-Base/deepcrack/datasets/DeepCrack/   
-NAME="deepcrack"  
-MODEL="deepcrack"
-DATASET_MODE="deepcrack"
+DATAROOT=C:/Users/z.marouf-araibi/Desktop/Crack-Base/deepcrack/datasets/DeepCrack/
+NAME=deepcrack
+MODEL=deepcrack
+DATASET_MODE=deepcrack
 
-BATCH_SIZE=1
+BATCH_SIZE=2
 NUM_CLASSES=1
 LOAD_WIDTH=256
 LOAD_HEIGHT=256
-LOSS_MODE="focal"
+LOSS_MODE=focal
 
-NORM="batch"
+NORM=batch
 NITER=400
 NITER_DECAY=300
 
