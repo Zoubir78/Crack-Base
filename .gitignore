@@ -40,3 +40,8 @@ vit_b.pth
 checkpoints/
 resnet152-394f9c45.pth
 
+# Fichiers de deepcrack
+/deepcrack/
+50_net_G.pth
+pretrained_net_G.pth
+
