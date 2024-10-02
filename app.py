@@ -184,7 +184,7 @@ class CrackBase(Tk):
         menu.add_cascade(label="Label", menu=label)
 
         sam = Menu(menu, tearoff=0)
-        self.add_menu_item(sam, label="SAM", command=self.executer2)
+        self.add_menu_item(sam, label="SAM1", command=self.executer2)
         sam.add_separator()
         self.add_menu_item(sam, label="SAM2", command=self.run_anylabeling)
         menu.add_cascade(label="SAM", menu=sam)
