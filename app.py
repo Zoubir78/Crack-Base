@@ -1836,7 +1836,7 @@ class Frames8(Frame):
         button5 = ttk.Button(self, text=f"COCO Viewer", width=30, command=self.choose_cocoviewer)
         button6 = ttk.Button(self, text=f"Options Config", width=30, command=self.execute_program)
         button7 = ttk.Button(self, text=f"Voir les logs", width=30, command=self.open_log_files) 
-        button8 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.executer3)
+        button8 = ttk.Button(self, text=f"Lancer un entraînement", width=30, command=self.executer3)
         button9 = ttk.Button(self, text=f"Afficher le résultat", width=30, command=self.executer2)
         button10 = ttk.Button(self, text=f"Choix Epoch", width=30, command=self.executer1)
       
@@ -2227,9 +2227,9 @@ class Frames10(Frame):
 
         button5 = ttk.Button(self, text=f"Options Config", width=30, command=self.options_config)
         button6 = ttk.Button(self, text=f"Voir les logs", width=30, command=self.open_logs) 
-        button7 = ttk.Button(self, text=f"Lancer l'entraînement", width=30, command=self.train)
+        button7 = ttk.Button(self, text=f"Lancer un entraînement", width=30, command=self.train)
         button8 = ttk.Button(self, text=f"Evaluation du modèle", width=30, command=self.eval)
-        button9 = ttk.Button(self, text=f"Afficher le résultat", width=30, command=self.result)
+        button9 = ttk.Button(self, text=f"Tester des images", width=30, command=self.result)
 
         self.canvas_button = self.canvas.create_window(720, 260, window=button3)
         self.canvas_button = self.canvas.create_window(720, 300, window=button4)
@@ -2243,9 +2243,9 @@ class Frames10(Frame):
         self.entry_var = StringVar()
 
     def options_config(self):
-        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_train.bat")
-        logging.info('Exécution du batch pour l\'entraînement: %s', chemin_batch)
-        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deepcrack", "config.py")
+        logging.info('Exécution du script config.py: %s', chemin)
+        subprocess.run(["python", chemin])
 
     def train(self):
         # Définir le chemin vers le répertoire "deepcrack"
@@ -2273,9 +2273,9 @@ class Frames10(Frame):
             logging.error("Erreur inattendue lors de l'exécution du script : %s", e)
 
     def result(self):
-        chemin_batch = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_resultat.bat")
-        logging.info('Exécution du batch pour afficher le résultat: %s', chemin_batch)
-        subprocess.run(['start', 'cmd', '/k', chemin_batch], shell=True)
+        chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deepcrack", "result.py")
+        logging.info('Exécution du script result.py: %s', chemin)
+        subprocess.run(["python", chemin])
 
     def eval(self):
         chemin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deepcrack", "eval", "eval.py")
